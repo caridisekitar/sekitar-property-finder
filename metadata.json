@@ -1,0 +1,5 @@
+{
+  "name": "Sekitar - Property Finder",
+  "description": "A modern web application for finding and listing rental properties ('kost'), inspired by the Sekitar UI. It features property listings, search filters, and various informational sections, all wrapped in a responsive and aesthetically pleasing design.",
+  "requestFramePermissions": []
+}
