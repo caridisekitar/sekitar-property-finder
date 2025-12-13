@@ -9,15 +9,28 @@ const propertyTypes = ['Kost', 'Villa', 'Apartemen'];
 const rentalDurations = ['Harian', 'Bulanan', 'Tahunan'];
 const sortOptions = ['Harga Terendah', 'Harga Tertinggi'];
 
+const locations = ['Jakarta Selatan', 'Jakarta Pusat', 'Jakarta Timur', 'Jakarta Barat', 'Jakarta Utara'];
+const kostType = ['Kost Putri', 'Kost Putra', 'Kost Campur', 'Jendela luar', 'KM Dalam', 'Dekat transum'];
+const priceRange = ['1000000 - 2000000', '2000000 - 3000000', '3000000 - 5000000', 'Diatas 5jt (eksklusif)'];
+
 const FilterMenu: React.FC<FilterMenuProps> = ({ isOpen, setIsOpen }) => {
-  const [selectedType, setSelectedType] = useState('Kost');
-  const [selectedDuration, setSelectedDuration] = useState('Bulanan');
-  const [selectedSort, setSelectedSort] = useState('Harga Terendah');
+  // const [selectedLocation, setSelectedLocation] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState(false);
+  const [selectedPrice, setSelectedPrice] = useState(false);
+
+  const toggleLocation = (location: string) => {
+  setSelectedLocation(prev =>
+    prev.includes(location)
+      ? prev.filter(l => l !== location) // remove
+      : [...prev, location]              // add
+  );
+};
 
   const handleReset = () => {
-    setSelectedType('Kost');
-    setSelectedDuration('Bulanan');
-    setSelectedSort('Harga Terendah');
+    setSelectedLocation([]);
+    setSelectedType(false);
+    setSelectedPrice(false);
   };
 
   const handleApply = () => {
@@ -48,7 +61,7 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isOpen, setIsOpen }) => {
       >
         <div className="flex justify-between items-center mb-6">
             <h2 id="filter-menu-title" className="text-xl font-bold">Filter</h2>
-            <button onClick={() => setIsOpen(false)} className="text-gray-500 text-2xl" aria-label="Close filter menu">&times;</button>
+            <button onClick={() => setIsOpen(false)} className="text-gray-500 text-4xl" aria-label="Close filter menu">&times;</button>
         </div>
         
         <div className="space-y-6">
@@ -56,21 +69,29 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isOpen, setIsOpen }) => {
             <div>
                 <h3 className="font-semibold mb-3">Tipe properti</h3>
                 <div className="flex flex-wrap gap-2">
-                    {propertyTypes.map(type => (
-                        <button key={type} onClick={() => setSelectedType(type)} className={`px-4 py-2 text-sm rounded-lg border transition-colors ${selectedType === type ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
-                            {type}
-                        </button>
+                    {locations.map(location => (
+                        <button
+                            key={location}
+                            onClick={() => toggleLocation(location)}
+                            className={`px-4 py-2 text-xs rounded-lg border transition-colors ${
+                              selectedLocation.includes(location)
+                                ? 'bg-brand-dark text-white border-brand-dark'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {location}
+                          </button>
                     ))}
                 </div>
             </div>
 
             {/* Durasi Sewa */}
             <div>
-                <h3 className="font-semibold mb-3">Durasi Sewa</h3>
+                <h3 className="font-semibold mb-3">Tipe Kos</h3>
                 <div className="flex flex-wrap gap-2">
-                    {rentalDurations.map(duration => (
-                        <button key={duration} onClick={() => setSelectedDuration(duration)} className={`px-4 py-2 text-sm rounded-lg border transition-colors ${selectedDuration === duration ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
-                            {duration}
+                    {kostType.map(type => (
+                        <button key={type} onClick={() => setSelectedType(type)} className={`px-4 py-2 text-xs rounded-lg border transition-colors ${selectedType === type ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                            {type}
                         </button>
                     ))}
                 </div>
@@ -78,11 +99,11 @@ const FilterMenu: React.FC<FilterMenuProps> = ({ isOpen, setIsOpen }) => {
 
              {/* Urutkan */}
             <div>
-                <h3 className="font-semibold mb-3">Urutkan</h3>
+                <h3 className="font-semibold mb-3">Harga</h3>
                 <div className="flex flex-wrap gap-2">
-                    {sortOptions.map(option => (
-                        <button key={option} onClick={() => setSelectedSort(option)} className={`px-4 py-2 text-sm rounded-lg border transition-colors ${selectedSort === option ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
-                            {option}
+                    {priceRange.map(price => (
+                        <button key={price} onClick={() => setSelectedPrice(price)} className={`px-4 py-2 text-xs rounded-lg border transition-colors ${selectedPrice === price ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                            {price}
                         </button>
                     ))}
                 </div>

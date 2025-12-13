@@ -1,36 +1,56 @@
 import React from 'react';
 import type { Kost } from '../types';
-import HomeIcon from './icons/HomeIcon';
-import LocationIcon from './icons/LocationIcon';
-import SparklesIcon from './icons/SparklesIcon';
+import BedIcon from '@/components/icons/BedIcon';
+import { MapPin } from 'lucide-react';
 
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
-    <div className="bg-white rounded-xl shadow-md overflow-hidden transition-transform duration-200 hover:scale-105 h-full flex flex-col">
-        <div className="relative">
-            <img className="w-full h-48 object-cover" src={kost.imageUrl} alt={kost.name} />
-            <div className="absolute top-3 left-3 flex items-center space-x-2">
-                <span className="bg-white/90 backdrop-blur-sm text-xs font-semibold px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow">
-                    <HomeIcon className="w-3 h-3 text-gray-600"/> {kost.type}
-                </span>
-                {kost.isNew && (
-                    <div className="relative">
-                         <span className="bg-orange-500 text-white text-xs font-semibold px-2.5 py-1.5 rounded-full flex items-center gap-1 shadow">
-                            <SparklesIcon className="w-3 h-3"/> New
-                        </span>
-                        <div className="absolute left-1/2 -bottom-1 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-orange-500"></div>
-                    </div>
-                )}
-            </div>
+    <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
+        <a href={kost.link}>
+        {/* IMAGE */}
+      <div className="relative h-[360px] w-auto">
+        <img
+          src={kost.imageUrl || ''}
+          alt={kost.name}
+          className="h-full w-full object-cover"
+        />
+
+        {/* TYPE BADGE */}
+        <div className="absolute top-4 left-4 bg-white px-2 py-1 rounded-2xl flex items-center gap-2 shadow-sm">
+          {/* <img src="/images/bed.svg" alt="bed"  /> */}
+          <BedIcon className="w-3 h-3"/> 
+          <span className="font-medium text-gray-900 text-[10px]">
+            {kost.type}
+          </span>
         </div>
-        <div className="p-4 flex flex-col flex-grow">
-            <h3 className="text-md font-bold truncate">{kost.name}</h3>
-            <p className="text-sm text-gray-500 mt-1 flex items-center gap-1 truncate"><LocationIcon className="w-4 h-4 flex-shrink-0"/>{kost.location}</p>
-            <div className="mt-auto pt-4">
-                <div className="bg-brand-light-blue text-brand-dark text-center font-bold py-2 rounded-lg">
-                    Rp{kost.price.toLocaleString('id-ID')}
-                </div>
-            </div>
+
+        {/* NEW BADGE */}
+        {kost.isNew && (
+          <div className="absolute top-1 -right-2 text-white py-2 rounded-l-xl rounded-r-sm flex items-center gap-2 shadow-sm">
+            <img src="/images/new.svg" alt="new" />
+          </div>
+        )}
+
+        {/* FLOATING INFO CARD */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-[90%] bg-white rounded-xl shadow-lg p-3">
+        <h3 className="text-[14px] font-medium text-gray-900">
+          {kost.name || ''}
+        </h3>
+
+        {/* LOCATION */}
+        <div className="flex items-center text-gray-500 mt-1 mb-3 text-xs">
+          <MapPin size={16} className="mr-1" />
+          {kost.location}
         </div>
+
+        {/* PRICE */}
+        <div className="bg-[#EAF6FF] rounded-xl py-3 text-center">
+          <span className="text-[16px] font-bold text-gray-900">
+            {kost.price.toLocaleString('id-ID')}
+          </span>
+        </div>
+      </div>
+      </div>
+        </a>
     </div>
 );
 

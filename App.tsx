@@ -12,7 +12,14 @@ import CariKosPage from './pages/CariKosPage';
 import MapsPage from './pages/MapsPage';
 import WishlistPage from './pages/WishlistPage';
 import KalkulatorBudgetPage from './pages/KalkulatorBudgetPage';
+import KalkulatorBudgetResultPage from './pages/KalkulatorBudgetResultPage';
 import ProfilePage from './pages/ProfilePage';
+import FavoritesPage from './pages/profile/FavoritesPage';
+import SubscriptionsPage from './pages/profile/SubscriptionsPage';
+import ContributionsPage from './pages/profile/ContributionsPage';
+import LatestPage from './pages/profile/LatestPage';
+import DaftarkanBisnismu from "./pages/DaftarkanBisnismu";
+import KostDetailPage from './pages/kost/KostDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const AppContent: React.FC = () => {
@@ -34,7 +41,14 @@ const AppContent: React.FC = () => {
                     <Route path="/maps" element={<MapsPage />} />
                     <Route path="/wishlist" element={<WishlistPage />} />
                     <Route path="/kalkulator-budget" element={<KalkulatorBudgetPage />} />
+                    <Route path="/kalkulator-budget-result" element={<KalkulatorBudgetResultPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/profile/favorites" element={<FavoritesPage />} />
+                    <Route path="/profile/subscriptions" element={<SubscriptionsPage />} />
+                    <Route path="/profile/contributions" element={<ContributionsPage />} />
+                    <Route path="/profile/latest" element={<LatestPage />} />
+                    <Route path="/daftar-bisnis" element={<DaftarkanBisnismu />} />
+                    <Route path="/kost/:kostId/detail" element={<KostDetailPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>

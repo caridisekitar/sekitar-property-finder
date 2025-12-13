@@ -27,7 +27,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks }) 
       >
         <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold">Menu</h2>
-            <button onClick={() => setIsOpen(false)} className="text-gray-500 text-2xl">&times;</button>
+            <button onClick={() => setIsOpen(false)} className="text-gray-500 text-4xl">&times;</button>
         </div>
         <nav className="flex flex-col space-y-2">
           {navLinks.map((link) => (
@@ -41,7 +41,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks }) 
             </Link>
           ))}
         </nav>
-        <div className="mt-6 pt-3 border-t border-gray-200 flex flex-col space-y-3">
+        {/* <div className="mt-6 pt-3 border-t border-gray-200 flex flex-col space-y-3"> */}
+          <div className="mt-8 pt-6 border-t border-gray-200 grid grid-cols-2 gap-3">
              <Link
                 to="/login"
                 onClick={() => setIsOpen(false)}

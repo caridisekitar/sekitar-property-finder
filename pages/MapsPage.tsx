@@ -45,7 +45,8 @@ const MapsPage: React.FC = () => {
                 </li>
             </ol>
         </nav>
-      <h1 className="text-4xl font-bold text-brand-dark mb-6">Maps</h1>
+        <div className="w-full border-b border-gray-200 py-2"></div>
+      <h1 className="text-base md:text-3xl  lg:text-4xl font-bold text-brand-dark py-4">Maps</h1>
       
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Column: Search and Listings */}

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import type { Kost, Business, Testimonial } from '../types';
 import SearchIcon from '../components/icons/SearchIcon';
 import LocationIcon from '../components/icons/LocationIcon';
@@ -10,6 +11,7 @@ import SparklesIcon from '@/components/icons/SparklesIcon';
 import BedIcon from '@/components/icons/BedIcon';
 import { BUSINESSES } from '@/constants';
 import { ChevronRight, MapPin } from 'lucide-react';
+import SearchKost from '@/components/SearchKost';
 
 const mockKostData: Kost[] = Array.from({ length: 8 }, (_, i) => ({
     id: i + 1,
@@ -18,7 +20,7 @@ const mockKostData: Kost[] = Array.from({ length: 8 }, (_, i) => ({
     location: 'Mampang, Jakarta Selatan',
     price: 1500000,
     imageUrl: `https://picsum.photos/seed/${i+1}/400/300`,
-    link: `/kost/${i+1}`,
+    link: `/kost/${i+1}/detail`,
 }));
 
 const testimonials: Testimonial[] = [
@@ -170,7 +172,7 @@ const HomePage: React.FC = () => {
                     <div className="flex items-end justify-end mb-4">
                     <SparklesIcon className="h-8 w-8 lg:w-12 lg:h-12 items-end lg:hidden" />
                 </div>
-                    <p className="text-[#B3B3B3] text-md md:text-md lg:text-lg text-right">Dengan data yang akurat dan filter yang personal, <span className="text-[#96C8E2]">Sekitar</span> hadir untuk bantu kamu menemukan kost terbaik yang sesuai dengan kebutuhan mu, di mana pun kamu berada.</p>
+                <h4 className="text-[#B3B3B3] text-md md:text-md lg:text-xl text-right font-semibold">Dengan data yang akurat dan filter yang personal, <span className="text-[#96C8E2]">Sekitar</span> hadir untuk bantu kamu menemukan kost terbaik yang sesuai dengan kebutuhan mu, di mana pun kamu berada.</h4>
                 </div>
             </div>
         </div>
@@ -211,49 +213,8 @@ const HomePage: React.FC = () => {
                 <h2 className="text-3xl md:text-4xl font-bold">Mulai Cari Kos</h2>
                 <p className="text-gray-600 mt-2 text-md md:text-md lg:text-lg">Kalau biasanya kamu butuh 30 hari untuk cari kost yang sesuai, di Sekitar kamu hanya butuh 30 menit!</p>
             </div>
-            {/* Desktop Filter */}
-            <div className="hidden md:block bg-brand-light-blue p-6 rounded-2xl shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
-                    <div className="lg:col-span-2">
-                        <label className="font-semibold text-sm mb-2 block">Cari</label>
-                        <div className="relative">
-                            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"/>
-                            <input type="text" placeholder="Cari kos .." className="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs" />
-                        </div>
-                    </div>
-                     <div>
-                        <label className="font-semibold text-sm mb-2 block">Lokasi</label>
-                        <select className="w-full py-3 px-4 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs">
-                            <option>Pilih Lokasi</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="font-semibold text-sm mb-2 block">Tipe</label>
-                        <select className="w-full py-3 px-4 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs">
-                            <option>Pilih Tipe</option>
-                        </select>
-                    </div>
-                    <div className="">
-                        <label className="font-semibold text-sm mb-2 block">Harga</label>
-                        <select className="w-full py-3 px-4 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs">
-                            <option> &gt; Rp 1.000.000 - Rp 2.000.000</option>
-                        </select>
-                    </div>
-                    <button className="w-full bg-brand-dark text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition-colors text-xs">Cari</button>
-                </div>
-            </div>
-            {/* Mobile Filter */}
-            <div className="md:hidden bg-brand-light-blue p-4 rounded-2xl shadow-sm">
-                 <div className="relative flex items-center gap-3">
-                    <div className="relative flex-grow">
-                        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"/>
-                        <input type="text" placeholder="Cari kos .." className="w-full pl-12 pr-4 py-4 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 shadow-sm" />
-                    </div>
-                    <button onClick={() => setIsFilterMenuOpen(true)} aria-label="Open filters" className="flex-shrink-0 bg-brand-dark text-white rounded-full p-4 hover:bg-gray-800 transition-colors shadow-sm">
-                        <FilterIcon className="w-5 h-5" />
-                    </button>
-                </div>
-            </div>
+            <SearchKost setIsFilterMenuOpen={setIsFilterMenuOpen} />
+            
 
             <div className="mt-10">
                 <p className="text-gray-600 mb-6">Menampilkan {mockKostData.length} dari hasil pencarian</p>
@@ -292,7 +253,7 @@ const HomePage: React.FC = () => {
                <div className="inline-block bg-white px-3 py-1 rounded-xl text-xs font-bold mb-4">Gratis</div>
                <h3 className="text-md md:text-3xl font-bold text-white mb-4">Daftarkan Bisnismu</h3>
                <p className="text-white/90 text-xs lg:text-sm mb-6">Punya usaha lokal? Yuk, daftarkan bisnismu biar makin dikenal dan mudah ditemukan orang di sekitar kamu!</p>
-               <button className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-xs lg:text-sm font-medium hover:bg-gray-800">Daftar sekarang</button>
+               <Link to="/daftar-bisnis" className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-xs lg:text-sm font-medium hover:bg-gray-800">Daftar sekarang</Link>
              </div>
           </div>
         </div>

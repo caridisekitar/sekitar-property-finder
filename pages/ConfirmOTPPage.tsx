@@ -1,12 +1,58 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function ConfirmOTPPage() {
   const navigate = useNavigate();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputsRef = React.useRef<(HTMLInputElement | null)[]>([]);
+
+
+  const RESEND_SECONDS = 5 * 60; 
+
+  const [timeLeft, setTimeLeft] = useState(RESEND_SECONDS);
+  const [canResend, setCanResend] = useState(false);
+  const [resendCount, setResendCount] = useState(0);
+
+  const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+};
+
+  React.useEffect(() => {
+    if (timeLeft <= 0) {
+      setCanResend(true);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const handleResendOTP = () => {
+  if (!canResend) return; // 🔐 HARD BLOCK
+
+  if (resendCount >= 3) {
+    alert("Batas kirim ulang OTP tercapai");
+    return;
+  }
+
+  console.log("Resending OTP...");
+
+  // Reset timer
+  setResendCount(prev => prev + 1);
+  setCanResend(false);
+  setTimeLeft(RESEND_SECONDS);
+
+  // 🔥 Call resend OTP API here
+};
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
   const value = e.target.value.replace(/\D/g, ""); // Allow digits only
@@ -44,9 +90,15 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-50">
 
+    <div
+    className="md:hidden lg:hidden block bg-cover bg-center"
+    style={{
+      backgroundImage: "url('/images/bg-login.webp')"
+    }}
+  ></div>
   {/* LEFT: REGISTER FORM */}
   <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div className="max-w-lg w-full space-y-8 p-4 md:p-8 lg:p-8">
+    <div className="max-w-lg w-full space-y-8 p-6 md:p-8 lg:p-8">
 
       {/* Logo + Title */}
       <div className="">
@@ -104,14 +156,26 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
       <div className="">
         <p className="text-sm text-gray-600">
           Tidak menerima kode?{" "}
-          <Link
-            to="/login"
-            className="font-medium text-blue-600 hover:text-blue-500"
+          
+          <button
+            type="button"
+            onClick={handleResendOTP}
+            disabled={!canResend}
+            className={`font-medium ${
+              canResend
+                ? "text-blue-600 hover:text-blue-500"
+                : "text-gray-400 cursor-not-allowed"
+            }`}
           >
             Kirim Ulang Kode Disini
-          </Link>
+          </button>
         </p>
-        <p className="text-xs text-gray-600 mt-2">Kirim ulang dalam 00:59 (3/3)</p>
+        <p className="text-xs text-gray-600 mt-2">
+          {canResend
+            ? `Kamu bisa kirim ulang sekarang (${resendCount}/3)`
+            : `Kirim ulang dalam ${formatTime(timeLeft)} (${resendCount}/3)`
+          }
+        </p>
       </div>
     </div>
   </div>

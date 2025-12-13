@@ -23,9 +23,9 @@ const WishlistPage: React.FC = () => {
                 </li>
             </ol>
         </nav>
-      
+      <div className="w-full border-b border-gray-200 py-2"></div>
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold text-brand-dark mb-4">Wishlist</h1>
+        <h1 className="text-base md:text-3xl  lg:text-4xl font-bold text-brand-dark py-4">Wishlist</h1>
         <h2 className="text-2xl font-semibold text-brand-dark mb-3">
           <span className="text-brand-blue">#TemanSekitar</span> punya wishlist kos yang mau di survey?
         </h2>
@@ -50,7 +50,7 @@ const WishlistPage: React.FC = () => {
                 id="nama-kos"
                 name="nama-kos"
                 required
-                className="block w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-brand-blue focus:ring-brand-blue sm:text-sm py-3"
+                className="block w-full rounded-md border border-gray-300 pl-10 shadow-sm focus:border-brand-blue focus:ring-brand-blue sm:text-sm py-3"
                 placeholder="Tulis Nama Kos"
               />
             </div>
@@ -69,7 +69,7 @@ const WishlistPage: React.FC = () => {
                 id="google-maps-link"
                 name="google-maps-link"
                 required
-                className="block w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-brand-blue focus:ring-brand-blue sm:text-sm py-3"
+                className="block w-full rounded-md border border-gray-300 pl-10 shadow-sm focus:border-brand-blue focus:ring-brand-blue sm:text-sm py-3"
                 placeholder="Link"
               />
             </div>

@@ -9,7 +9,7 @@ import EllipsisIcon from '../components/icons/EllipsisIcon';
 
 const ProfilePage: React.FC = () => {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen mb-12 border-t border-gray-200">
       <SidebarMenu />
       <main className="flex-1 p-4 sm:p-6 lg:p-10">
         <div className="flex justify-between items-center mb-8">
@@ -22,7 +22,7 @@ const ProfilePage: React.FC = () => {
             </button>
         </div>
 
-        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm">
+        <div className="bg-white p-6 sm:p-8 rounded-2xl">
             {/* Profile Photo Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center pb-6 border-b border-gray-200">
                 <div className="w-full sm:w-1/3 mb-4 sm:mb-0">

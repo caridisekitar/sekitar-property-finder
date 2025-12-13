@@ -26,7 +26,7 @@ const SidebarMenu: React.FC = () => {
     };
 
     return (
-        <aside className="hidden lg:flex w-72 bg-white shadow-md flex-col justify-between">
+        <aside className="hidden lg:flex w-72 bg-white flex-col justify-between border-r">
             <div>
                 <div className="px-8 py-6">
                     <div className="p-4 border border-gray-200 rounded-2xl flex flex-col items-center text-center">
@@ -58,7 +58,7 @@ const SidebarMenu: React.FC = () => {
                     </ul>
                 </nav>
             </div>
-            <div className="px-6 py-6 border-t border-gray-200">
+            <div className="px-6 py-6">
                  <Link
                     to="/login"
                     className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors"
