@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone } from 'lucide-react';
