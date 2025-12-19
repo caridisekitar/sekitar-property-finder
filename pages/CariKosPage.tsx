@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Kost } from '../types';
 import SearchIcon from '../components/icons/SearchIcon';
@@ -6,6 +6,7 @@ import KostCard from '../components/KostCard';
 import Pagination from '../components/Pagination';
 import SearchKost from '@/components/SearchKost';
 import FilterMenu from '@/components/layout/FilterMenu';
+import { secureGet } from '@/lib/secureGet';
 
 const mockKostData: Kost[] = Array.from({ length: 100 }, (_, i) => ({
     id: i + 1,
@@ -19,13 +20,41 @@ const mockKostData: Kost[] = Array.from({ length: 100 }, (_, i) => ({
 }));
 
 const CariKosPage: React.FC = () => {
+    const [kosts, setKosts] = useState<Kost[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const ITEMS_PER_PAGE = 15;
     const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+
+    // 🔹 Fetch data from API
+    useEffect(() => {
+    const fetchKosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // 🔐 secured GET request
+        const data = await secureGet('/kosts', {
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+        });
+
+        setKosts(data);
+      } catch (err) {
+        setError((err as Error).message || 'Failed to fetch data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchKosts();
+  }, [currentPage]);
 
     const totalPages = Math.ceil(mockKostData.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const currentItems = mockKostData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const currentItems = kosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
     
     const handlePageChange = (page: number) => {
         if (page > 0 && page <= totalPages) {
@@ -54,15 +83,31 @@ const CariKosPage: React.FC = () => {
       <div className="my-8">
       </div>
 
-      <p className="text-gray-600 mb-6">Menampilkan {currentItems.length} dari {mockKostData.length} hasil pencarian</p>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
-          {currentItems.map(kost => (
-              <KostCard key={kost.id} kost={kost} />
-          ))}
-      </div>
+      {/* Loading / Error */}
+      {loading && <p className="text-gray-500 mt-6">Loading data...</p>}
+      {error && <p className="text-red-500 mt-6">{error}</p>}
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+      {!loading && !error && (
+        <>
+          <p className="text-gray-600 mb-6">
+            Menampilkan {currentItems.length} dari {kosts.length} hasil pencarian
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
+            {currentItems.map((kost) => (
+              <KostCard key={kost.id} kost={kost} />
+            ))}
+          </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </>
+      )}
+
+      
       <FilterMenu isOpen={isFilterMenuOpen} setIsOpen={setIsFilterMenuOpen} />
     </div>
   );

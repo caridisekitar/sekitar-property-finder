@@ -1,88 +1,145 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { securePost } from '@/lib/securePost';
 
+
+const OTP_LENGTH = 6;
+const RESEND_SECONDS = 5 * 60;
+const MAX_ATTEMPTS = 3;
 
 export default function ConfirmOTPPage() {
   const navigate = useNavigate();
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const inputsRef = React.useRef<(HTMLInputElement | null)[]>([]);
+  const location = useLocation();
+  const phone =
+    location.state?.phone ||
+    sessionStorage.getItem('otp_phone');
 
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(''));
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [attemptLeft, setAttemptLeft] = useState(MAX_ATTEMPTS);
 
-  const RESEND_SECONDS = 5 * 60; 
+  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const [timeLeft, setTimeLeft] = useState(RESEND_SECONDS);
   const [canResend, setCanResend] = useState(false);
   const [resendCount, setResendCount] = useState(0);
 
-  const formatTime = (seconds: number) => {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-};
+  
 
-  React.useEffect(() => {
+  // 🔐 Guard
+  useEffect(() => {
+    if (!phone) navigate('/login', { replace: true });
+  }, [phone, navigate]);
+
+  // ⏱ Resend timer
+  useEffect(() => {
     if (timeLeft <= 0) {
       setCanResend(true);
       return;
     }
-
-    const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
+    const t = setInterval(() => setTimeLeft(t => t - 1), 1000);
+    return () => clearInterval(t);
   }, [timeLeft]);
 
-  const handleResendOTP = () => {
-  if (!canResend) return; // 🔐 HARD BLOCK
+  const otpValue = otp.join('');
+  const isOtpComplete = otpValue.length === OTP_LENGTH;
 
-  if (resendCount >= 3) {
-    alert("Batas kirim ulang OTP tercapai");
-    return;
-  }
+  // ✏️ Input change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {
+    const v = e.target.value.replace(/\D/g, '');
+    if (!v) return;
 
-  console.log("Resending OTP...");
+    const next = [...otp];
+    next[idx] = v[0];
+    setOtp(next);
 
-  // Reset timer
-  setResendCount(prev => prev + 1);
-  setCanResend(false);
-  setTimeLeft(RESEND_SECONDS);
-
-  // 🔥 Call resend OTP API here
-};
-
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-  const value = e.target.value.replace(/\D/g, ""); // Allow digits only
-  if (!value) return;
-
-  const newOtp = [...otp];
-  newOtp[index] = value;
-  setOtp(newOtp);
-
-  // Move to next input
-  if (index < 5 && value) {
-    inputsRef.current[index + 1]?.focus();
-  }
-};
-
-const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-  if (e.key === "Backspace") {
-    const newOtp = [...otp];
-    newOtp[index] = "";
-    setOtp(newOtp);
-
-    if (index > 0 && !otp[index]) {
-      inputsRef.current[index - 1]?.focus();
+    if (idx < OTP_LENGTH - 1) {
+      inputsRef.current[idx + 1]?.focus();
     }
-  }
-};
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // ⌫ Backspace
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, idx: number) => {
+    if (e.key === 'Backspace') {
+      const next = [...otp];
+      next[idx] = '';
+      setOtp(next);
+
+      if (idx > 0) inputsRef.current[idx - 1]?.focus();
+    }
+  };
+
+  // 📋 Paste OTP
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '');
+    if (pasted.length !== OTP_LENGTH) return;
+
+    setOtp(pasted.split(''));
+    inputsRef.current[OTP_LENGTH - 1]?.focus();
+  };
+
+  // ✅ Verify OTP
+  const handleSubmit = async (e: React.FormEvent) => {
+    
     e.preventDefault();
-    // Mock register logic
-    console.log('Registering:', name);
-    navigate('/profile');
+    if (!isOtpComplete || loading) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+
+      const data = await securePost(
+                "/auth/verify-otp",
+                "POST",
+                {
+                  phone,
+                  otp: otpValue,
+                  device_id: localStorage.getItem('device_id')
+                }
+              );
+
+    // 🎉 SUCCESS
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    sessionStorage.removeItem("otp_phone");
+
+    navigate("/", { replace: true });
+
+    } catch (err: any) {
+      // Backend should return attempt_left on error
+      if (err.attempt_left !== undefined) {
+        setAttemptLeft(err.attempt_left);
+      } else {
+        setAttemptLeft(a => a - 1);
+      }
+
+      setOtp(Array(OTP_LENGTH).fill(""));
+      inputsRef.current[0]?.focus();
+
+      setError(err.message || "Gagal verifikasi OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🔁 Resend OTP
+  const handleResendOTP = async () => {
+    setError(null);
+    if (!canResend || resendCount >= 3) return;
+
+    const response = await securePost(
+          "/otp/generate",
+          "POST",
+          { phone: phone }
+        );
+
+    setResendCount(c => c + 1);
+    setTimeLeft(RESEND_SECONDS);
+    setCanResend(false);
+    setOtp(Array(OTP_LENGTH).fill(''));
   };
 
   return (
@@ -120,7 +177,7 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
         <div className="-space-y-px">
 
           {/* OTP INPUTS */}
-          <div className="flex justify-between gap-2">
+          <div className="flex justify-between gap-2" onPaste={handlePaste}>
             {otp.map((digit, idx) => (
               <input
                 key={idx}
@@ -143,19 +200,21 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
         <div>
           <button
             type="submit"
+            disabled={!isOtpComplete || loading}
             className="w-full flex justify-center py-3 px-4 rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
           >
-            Konfirmasi kode
+            {loading ? 'Memverifikasi...' : 'Konfirmasi kode'}
           </button>
         </div>
       </form>
+      { error && <div className="text-sm text-red-500">{error}</div> }
 
       {/* LOGIN LINK */}
       <div className="">
         <p className="text-sm text-gray-600">
           Tidak menerima kode?{" "}
           
-          <button
+          {/* <button
             type="button"
             onClick={handleResendOTP}
             disabled={!canResend}
@@ -166,14 +225,27 @@ const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) 
             }`}
           >
             Kirim Ulang Kode Disini
+          </button> */}
+          <button
+            type="button"
+            disabled={!canResend}
+            onClick={handleResendOTP}
+            className="font-medium text-sm text-blue-600 disabled:text-gray-400"
+          >
+            Kirim Ulang Kode Disini
           </button>
         </p>
-        <p className="text-xs text-gray-600 mt-2">
+        {!canResend && (
+          <p className="text-xs text-gray-500">
+            Kirim ulang dalam {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
+          </p>
+        )}
+        {/* <p className="text-xs text-gray-600 mt-2">
           {canResend
             ? `Kamu bisa kirim ulang sekarang (${resendCount}/3)`
             : `Kirim ulang dalam ${formatTime(timeLeft)} (${resendCount}/3)`
           }
-        </p>
+        </p> */}
       </div>
     </div>
   </div>

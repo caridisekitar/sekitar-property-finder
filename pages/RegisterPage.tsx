@@ -1,19 +1,80 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Phone } from 'lucide-react';
+import { secureGet } from '@/lib/secureGet';
+import { securePost } from '@/lib/securePost';
 
 export default function Register() {
   const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+
+  /* ===============================
+     CHECK EXISTING SESSION
+  =============================== */
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    (async () => {
+      try {
+        await secureGet('/auth/me');
+        navigate('/profile', { replace: true });
+      } catch {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    })();
+  }, [navigate]);
+
+  /* ===============================
+     SUBMIT REGISTER
+  =============================== */
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock register logic
-    console.log('Registering:', name, email, phone);
-    navigate('/confirm-otp');
+    setError('');
+
+    if (!name || !email || !phone) {
+      setError('Semua field wajib diisi');
+      return;
+    }
+
+    if (loading) return; // 🚫 prevent spam
+    setLoading(true);
+
+    try {
+      const res = await securePost('/auth/register', 
+      'POST', {
+        name,
+        email,
+        phone,
+      });
+
+      if (!res.success) {
+        setError(res.message || 'Gagal mengirim OTP');
+        return;
+      }
+
+      // ✅ store phone for OTP step
+      sessionStorage.setItem('otp_phone', res.data.phone);
+
+      navigate('/confirm-otp', {
+        state: { phone: res.data.phone },
+      });
+
+    } catch (err: any) {
+      setError(err.message || 'Terjadi kesalahan');
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-50">
@@ -60,17 +121,15 @@ export default function Register() {
             </label>
             <div className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm">
               <User size={20} className="w-6 h-6 text-gray-500"/>
-              
               <input 
-                id="name"
-                name="name"
-                type="text"
-                required
-                placeholder="Masukkan nama lengkap kamu"
-                className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              id="name"
+              name="name" 
+              type="text" 
+              required 
+              placeholder="Masukkan nama lengkap kamu" 
+              className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+              value={name} onChange={(e) => setName(e.target.value)} />
+
             </div>
           </div>
 
@@ -86,16 +145,14 @@ export default function Register() {
               <Mail size={20} className="w-6 h-6 text-gray-500"/>
               
               <input 
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                placeholder="Masukkan e-mail kamu"
-                className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              id="email-address" 
+              name="email" 
+              type="email" 
+              autoComplete="email" 
+              required 
+              placeholder="Masukkan e-mail kamu" 
+              className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+              value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
           </div>
 
@@ -109,17 +166,16 @@ export default function Register() {
             </label>
             <div className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm">
               <Phone size={20} className="w-6 h-6 text-gray-500"/>
-              
+
               <input 
-                id="phone-number"
-                name="phone"
-                type="phone"
-                required
-                placeholder="Masukkan no telepon kamu yang terhubung ke WhatsApp"
-                className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
+              id="phone-number" 
+              name="phone" 
+              type="phone" 
+              required 
+              placeholder="Masukkan no telepon kamu yang terhubung ke WhatsApp" 
+              className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+              value={phone} onChange={(e) => setPhone(e.target.value)} />
+              
             </div>
 
           </div>
@@ -128,11 +184,13 @@ export default function Register() {
         {/* SUBMIT BUTTON */}
         <div>
           <button
-            type="submit"
-            className="w-full flex justify-center py-3 px-4 rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
-          >
-            Selanjutnya
-          </button>
+              type="submit"
+              disabled={loading}
+              className={`w-full flex justify-center py-3 px-4 rounded-lg text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors
+                ${loading ? 'bg-gray-400' : 'bg-gray-900 hover:bg-gray-800'}`}
+            >
+              {loading ? 'Mengirim OTP...' : 'Selanjutnya'}
+            </button>
         </div>
       </form>
 
@@ -160,5 +218,33 @@ export default function Register() {
   ></div>
 </div>
 
+  );
+}
+
+function Input({
+  label,
+  icon,
+  value,
+  onChange,
+  placeholder,
+  type = 'text',
+}: any) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <div className="flex items-center gap-2 border rounded-md px-3 py-2 bg-white">
+        <span className="text-gray-400">{icon}</span>
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="w-full outline-none text-sm"
+          required
+        />
+      </div>
+    </div>
   );
 }

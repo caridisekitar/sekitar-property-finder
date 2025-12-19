@@ -12,8 +12,8 @@ const mockKostData: Kost[] = Array.from({ length: 68 }, (_, i) => ({
     name: 'Kost Dahlia Indah',
     type: 'Kost Putri',
     location: 'Mampang, Jakarta Selatan',
-    price: 1500000,
-    imageUrl: `https://picsum.photos/seed/${(i % 12) + 1}/400/300`,
+    price_monthly: 1500000,
+    img_cover: `https://picsum.photos/seed/${(i % 12) + 1}/400/300`,
     isNew: i % 6 === 0,
 }));
 

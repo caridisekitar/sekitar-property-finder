@@ -12,8 +12,11 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [tailwindcss()],
       define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.API_URL': JSON.stringify(env.API_URL),
+        'process.env.API_KEY': JSON.stringify(env.API_KEY),
+        'process.env.API_SECRET': JSON.stringify(env.API_SECRET),
+        'process.env.ORIGIN': JSON.stringify(env.ORIGIN)
       },
       resolve: {
         alias: {

@@ -1,36 +1,53 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import KostCard from "@/components/KostCard";
-import type { Kost } from '@/types';
-
-const mockKostData: Kost[] = Array.from({ length: 8 }, (_, i) => ({
-    id: i + 1,
-    name: 'Kost Dahlia Indah',
-    type: 'Kost Putri',
-    location: 'Mampang, Jakarta Selatan',
-    price: 1500000,
-    imageUrl: `https://picsum.photos/seed/${i+1}/400/300`,
-    link: `/kost/${i+1}/detail`,
-}));
-
-const items = [
-  { id: 1, name: "Kost Dahlia Indah", price: "Rp1.500.000" },
-  { id: 2, name: "Kost Dahlia Indah", price: "Rp1.500.000" },
-  { id: 3, name: "Kost Dahlia Indah", price: "Rp1.500.000" },
-];
+import type { Kost } from "@/types";
+import { secureGet } from '@/lib/secureGet';
 
 export default function RekomendasiKos() {
+  const [kosts, setKosts] = useState<Kost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        const data = await secureGet("/kosts/kost_recommendations");
+        setKosts(data);
+      
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendations();
+  }, []);
+
   return (
     <section className="mt-10">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-semibold text-lg">Rekomendasi lainnya</h2>
-        <Link to="/" className="text-sm text-sky-600">Lihat lainnya →</Link>
+        <Link to="/" className="text-sm text-sky-600">
+          Lihat lainnya →
+        </Link>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2">
-        {mockKostData.map(kost => (
-                <KostCard key={kost.id} kost={kost} />
-            ))}
-      </div>
+      {/* Loading */}
+      {loading && <p className="text-sm text-gray-500">Loading rekomendasi...</p>}
+
+      {/* Error */}
+      {error && <p className="text-sm text-red-500">{error}</p>}
+
+      {/* Cards */}
+      {!loading && !error && (
+        <div className="flex gap-4 overflow-x-auto pb-2">
+          {kosts.map((kost) => (
+            <KostCard key={kost.id} kost={kost} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -21,6 +21,7 @@ import LatestPage from './pages/profile/LatestPage';
 import DaftarkanBisnismu from "./pages/DaftarkanBisnismu";
 import KostDetailPage from './pages/kost/KostDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
+import ScrollToTop from "@/components/ScrollToTop";
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -31,7 +32,7 @@ const AppContent: React.FC = () => {
     return (
         <div className="bg-white text-brand-dark">
             {!hideHeaderFooter && <Header />}
-            <main className={hideHeaderFooter ? '' : 'min-h-screen'}>
+            <main className={hideHeaderFooter ? '' : 'md:min-h-[600px] lg:min-h-[600px]'}>
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/login" element={<LoginPage />} />
@@ -48,7 +49,7 @@ const AppContent: React.FC = () => {
                     <Route path="/profile/contributions" element={<ContributionsPage />} />
                     <Route path="/profile/latest" element={<LatestPage />} />
                     <Route path="/daftar-bisnis" element={<DaftarkanBisnismu />} />
-                    <Route path="/kost/:kostId/detail" element={<KostDetailPage />} />
+                    <Route path="/kost/:slug" element={<KostDetailPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>
@@ -60,6 +61,7 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   return (
     <BrowserRouter>
+        <ScrollToTop />
         <AppContent />
     </BrowserRouter>
   );

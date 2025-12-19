@@ -1,3 +1,12 @@
+export interface User {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  gender: string;
+  occupation: string;
+};
+
 export interface Kost {
   id: number;
   name: string;
@@ -22,4 +31,16 @@ export interface Testimonial {
   author: string;
   role: string;
   imageUrl: string;
+}
+
+export interface Facility {
+  id: number;
+  name: string;
+  icon: string;
+}
+
+export interface Kost {
+  id: number;
+  name: string;
+  facilities: Facility[];
 }

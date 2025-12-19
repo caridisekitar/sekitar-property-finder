@@ -1,12 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, cache } from 'react';
 import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
 import SekitarLogo from '../icons/SekitarLogo';
 import MenuIcon from '../icons/MenuIcon';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const token = localStorage.getItem('token');
+  const isAuthenticated = Boolean(token);
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -15,6 +18,8 @@ const Header: React.FC = () => {
     { name: 'Wishlist', path: '/wishlist' },
     { name: 'Kalkulator Budget', path: '/kalkulator-budget' },
   ];
+
+  const { subscription } = cache(useAuth());
 
   return (
     <>
@@ -38,18 +43,41 @@ const Header: React.FC = () => {
               ))}
             </nav>
             <div className="hidden md:flex items-center space-x-2">
-              <Link
-                to="/login"
-                className="px-4 py-2 text-brand-dark border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
-              >
-                Masuk
-              </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 text-white bg-brand-dark rounded-md hover:bg-gray-800 transition-colors"
-              >
-                Daftar
-              </Link>
+              {isAuthenticated ? (
+                <Link
+                  to="/profile"
+                  className="relative flex flex-col items-center px-4 py-2 transition-colors"
+                >
+                  <img
+                    src="/images/icons/user.png"
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full hover:bg-gray-100"
+                  />
+
+                  {subscription?.plan === "PREMIUM" && (
+                    <span className="-mt-2 text-xs font-bold text-[#F59E0B] border border-[#FDE68A] px-2 py-0.5 rounded-full bg-[#FFFBEB]">
+                      PREMIUM
+                    </span>
+                  )}
+                </Link>
+              ) : (
+                  <div>
+                    <Link
+                      to="/login"
+                      className="mx-4 px-4 py-2 text-brand-dark border border-gray-300 rounded-md hover:bg-gray-100 transition-colors"
+                    >
+                      Masuk
+                    </Link>
+                    <Link
+                    to="/register"
+                    className="px-4 py-2 text-white bg-brand-dark rounded-md hover:bg-gray-800 transition-colors"
+                  >
+                    Daftar
+                  </Link>
+                </div>
+              )}
+              
+              
             </div>
             <div className="md:hidden">
               <button
@@ -63,7 +91,7 @@ const Header: React.FC = () => {
           </div>
         </div>
       </header>
-      <MobileMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} navLinks={navLinks} />
+      <MobileMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} navLinks={navLinks} isAuthenticated={!!token}/>
     </>
   );
 };

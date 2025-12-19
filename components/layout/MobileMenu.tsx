@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -8,7 +8,33 @@ interface MobileMenuProps {
   navLinks: { name: string; path: string }[];
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks }) => {
+
+
+const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks, isAuthenticated }) => {
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+        try {
+            const token = localStorage.getItem('token');
+
+            await fetch(process.env.API_URL + '/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+        } catch (e) {
+            // ignore backend failure
+        } finally {
+            // always clear client
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            sessionStorage.clear();
+
+            navigate('/', { replace: true });
+        }
+    };
+
   return (
     <>
       {/* Overlay */}
@@ -43,13 +69,32 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks }) 
         </nav>
         {/* <div className="mt-6 pt-3 border-t border-gray-200 flex flex-col space-y-3"> */}
           <div className="mt-8 pt-6 border-t border-gray-200 grid grid-cols-2 gap-3">
-             <Link
+            {isAuthenticated ? (
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                className="w-full text-center px-4 py-3 text-brand-dark border border-gray-300 rounded-md hover:bg-gray-100 transition-colors text-sm"
+              >
+                Profil
+              </Link>
+            ) : (
+              <Link
                 to="/login"
                 onClick={() => setIsOpen(false)}
                 className="w-full text-center px-4 py-3 text-brand-dark border border-gray-300 rounded-md hover:bg-gray-100 transition-colors text-sm"
               >
                 Masuk
               </Link>
+            )}
+
+            {isAuthenticated ? (
+              <button
+                    onClick={handleLogout}
+                    className="w-full text-center px-4 py-3 text-white bg-brand-dark rounded-md hover:bg-gray-800 transition-colors text-sm"
+                >
+                    <span>Log out</span>
+                </button>
+            ) : (
               <Link
                 to="/register"
                 onClick={() => setIsOpen(false)}
@@ -57,6 +102,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks }) 
               >
                 Daftar
               </Link>
+            )}
+             
+              
         </div>
       </div>
     </>

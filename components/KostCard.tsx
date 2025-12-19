@@ -2,17 +2,18 @@ import React from 'react';
 import type { Kost } from '../types';
 import BedIcon from '@/components/icons/BedIcon';
 import { MapPin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
     <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
-        <a href={kost.link}>
+        <Link to={`/kost/${kost.slug}`}>
         {/* IMAGE */}
       <div className="relative h-[360px] w-auto">
         <img
-          src={kost.imageUrl || ''}
-          alt={kost.name}
-          className="h-full w-full object-cover"
-        />
+              src={kost.img_cover || ''}
+              alt={kost.name}
+              className="h-full w-full object-cover"
+            />
 
         {/* TYPE BADGE */}
         <div className="absolute top-4 left-4 bg-white px-2 py-1 rounded-2xl flex items-center gap-2 shadow-sm">
@@ -45,12 +46,12 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
         {/* PRICE */}
         <div className="bg-[#EAF6FF] rounded-xl py-3 text-center">
           <span className="text-[16px] font-bold text-gray-900">
-            {kost.price.toLocaleString('id-ID')}
+            {kost.price_monthly.toLocaleString('id-ID')}
           </span>
         </div>
       </div>
       </div>
-        </a>
+        </Link>
     </div>
 );
 

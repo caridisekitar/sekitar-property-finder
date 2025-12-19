@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import SearchIcon from "@/components/icons/SearchIcon"; 
 import FilterIcon from '@/components/icons/FilterIcon';
+import MultiSelectDropdown from "./MultiSelectDropdown";
 
 interface SearchKostProps {
   setIsFilterMenuOpen: (value: boolean) => void;
 }
 
 const SearchKost: React.FC<SearchKostProps> = ({ setIsFilterMenuOpen }) => {
+  const [lokasi, setLokasi] = useState<string[]>([]);
+  const [tipe, setTipe] = useState<string[]>([]);
   return (
     <>
       {/* Desktop Filter */}
@@ -20,39 +23,40 @@ const SearchKost: React.FC<SearchKostProps> = ({ setIsFilterMenuOpen }) => {
               <input
                 type="text"
                 placeholder="Cari kos .."
-                className="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs"
+                className="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-sm"
               />
             </div>
           </div>
 
           {/* Lokasi */}
-          <div>
-            <label className="font-semibold text-sm mb-2 block">Lokasi</label>
-            <select className="w-full py-3 px-4 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs">
-              <option>Pilih Lokasi</option>
-              <option>Jakarta Selatan</option>
-              <option>Jakarta Pusat</option>
-            </select>
-          </div>
+          <MultiSelectDropdown
+            label="Lokasi"
+            options={[
+              "Jakarta Selatan",
+              "Jakarta Pusat",
+              "Jakarta Barat",
+              "Jakarta Timur",
+            ]}
+            value={lokasi}
+            onChange={setLokasi}
+          />
 
           {/* Tipe */}
-          <div>
-            <label className="font-semibold text-sm mb-2 block">Tipe</label>
-            <select className="w-full py-3 px-4 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs">
-              <option>Pilih Tipe</option>
-              <option>Kost Putri</option>
-                <option>Kost Putra</option>
-                <option>Campur</option>
-            </select>
-          </div>
+          <MultiSelectDropdown
+            label="Tipe"
+            options={["Kos Putri", "Kos Putra", "Kos Campur", "Kost Pet Friendly", "Jendela Luar", "Kamar Mandi Dalam", "Dekat Transum"]}
+            value={tipe}
+            onChange={setTipe}
+          />
 
           {/* Harga */}
           <div>
             <label className="font-semibold text-sm mb-2 block">Harga</label>
             <select className="w-full py-3 px-4 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-xs">
-            <option>&gt; 1.000.000-2.000.000</option>
-            <option>&lt; 1.000.000</option>
-            <option>&gt; 2.000.000</option>
+            <option> 1.000.000-2.000.000</option>
+            <option> 2.000.000-3.000.000</option>
+            <option> 3.000.000-5.000.000</option>
+            <option>&gt; 5.000.000 (eksklusif)</option>
             </select>
           </div>
 

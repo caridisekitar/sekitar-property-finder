@@ -1,13 +1,48 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState, cache } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import HomeIcon from '../components/icons/HomeIcon';
 import LinkIcon from '../components/icons/LinkIcon';
+import { useAuth } from "../hooks/useAuth";
+import { securePost } from '@/lib/securePost';
 
 const WishlistPage: React.FC = () => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const [kosName, setKosName] = useState("");
+  const [mapsUrl, setMapsUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { isAuthenticated, token } = cache(useAuth());
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login?redirect=/wishlist" replace />;
+  }
+
+    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    
     // Handle form submission logic here
-    alert('Wishlist submitted!');
+      try {
+          const data = await securePost(
+          "/wishlist",
+          "POST",
+            {
+              kos_name: kosName,
+              google_maps_url: mapsUrl,
+              uid: user.id
+            }
+          );
+
+      } catch (err: any) {
+          console.log(err.message || "Submit wishlist failed");
+      }
+
+      alert("Wishlist berhasil dikirim 🎉");
+      setKosName("");
+      setMapsUrl("");
+      setLoading(false);
   };
 
   return (
@@ -46,13 +81,13 @@ const WishlistPage: React.FC = () => {
                 <HomeIcon className="h-5 w-5 text-gray-400" />
               </div>
               <input
-                type="text"
-                id="nama-kos"
-                name="nama-kos"
                 required
+                value={kosName}
+                onChange={(e) => setKosName(e.target.value)}
                 className="block w-full rounded-md border border-gray-300 pl-10 shadow-sm focus:border-brand-blue focus:ring-brand-blue sm:text-sm py-3"
                 placeholder="Tulis Nama Kos"
               />
+
             </div>
           </div>
 
@@ -65,23 +100,23 @@ const WishlistPage: React.FC = () => {
                 <LinkIcon className="h-5 w-5 text-gray-400" />
               </div>
               <input
-                type="url"
-                id="google-maps-link"
-                name="google-maps-link"
                 required
+                type="url"
+                value={mapsUrl}
+                onChange={(e) => setMapsUrl(e.target.value)}
+                placeholder="Link Google Maps"
+                pattern="https://(www\.)?(google\.com/maps|maps\.app\.goo\.gl)/.*"
                 className="block w-full rounded-md border border-gray-300 pl-10 shadow-sm focus:border-brand-blue focus:ring-brand-blue sm:text-sm py-3"
-                placeholder="Link"
               />
             </div>
           </div>
 
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
           <div>
-            <button
-              type="submit"
-              className="inline-flex justify-center rounded-md border border-transparent bg-brand-dark py-3 px-8 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2 transition-colors"
-            >
-              Kirim
-            </button>
+            <button disabled={loading} className="inline-flex justify-center rounded-md border border-transparent bg-brand-dark py-3 px-8 text-sm font-semibold text-white shadow-sm hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-brand-dark focus:ring-offset-2 transition-colors">
+            {loading ? "Mengirim..." : "Kirim"}
+          </button>
           </div>
         </form>
       </div>
