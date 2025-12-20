@@ -58,7 +58,7 @@ export default function SubscriptionsPage() {
             
         </div>
 
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+        <section className="w-full max-w-7xl mx-auto space-y-10">
 
   
           <div className={`rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4
@@ -75,7 +75,9 @@ export default function SubscriptionsPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-semibold text-gray-900">{subscription?.plan}</h3>
-                  <Link to="/profile/upgrade" className="text-sm font-semibold border bg-[#DCF4FF] px-3 py-1 rounded-full">Upgrade Plan</Link>
+                  {subscription?.plan === "FREE" && (
+                    <Link to="/profile/upgrade" className="text-sm font-semibold border bg-[#DCF4FF] px-3 py-1 rounded-full">Upgrade Plan</Link>
+                  )}
                 </div>
                 <p className="text-sm text-gray-600 py-1">
                   {subscription?.plan === "PREMIUM" ? "Unlimited Access" : "Limited Access"}
