@@ -108,19 +108,37 @@ export default function ConfirmOTPPage() {
 
     navigate("/", { replace: true });
 
-    } catch (err: any) {
-      // Backend should return attempt_left on error
+    } 
+    catch (err: any) {
+
+      if (err.status === 409) {
+        setError(err.message || "OTP sudah tidak valid");
+        return;
+      }
+
       if (err.attempt_left !== undefined) {
         setAttemptLeft(err.attempt_left);
-      } else {
-        setAttemptLeft(a => a - 1);
       }
 
       setOtp(Array(OTP_LENGTH).fill(""));
       inputsRef.current[0]?.focus();
 
       setError(err.message || "Gagal verifikasi OTP");
-    } finally {
+    }
+    // catch (err: any) {
+    //   // Backend should return attempt_left on error
+    //   if (err.attempt_left !== undefined) {
+    //     setAttemptLeft(err.attempt_left);
+    //   } else {
+    //     setAttemptLeft(a => a - 1);
+    //   }
+
+    //   setOtp(Array(OTP_LENGTH).fill(""));
+    //   inputsRef.current[0]?.focus();
+
+    //   setError(err.message || "Gagal verifikasi OTP");
+    // } 
+    finally {
       setLoading(false);
     }
   };
