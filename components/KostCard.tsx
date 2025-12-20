@@ -33,14 +33,14 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
 
         {/* FLOATING INFO CARD */}
       <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-[90%] bg-white rounded-xl shadow-lg p-3">
-        <h3 className="text-[14px] font-medium text-gray-900">
+        <h3 className="text-[14px] font-medium text-gray-900 truncate" alt={kost.name}>
           {kost.name || ''}
         </h3>
 
         {/* LOCATION */}
-        <div className="flex items-center text-gray-500 mt-1 mb-3 text-xs">
+        <div className="flex items-center text-gray-500 mt-1 mb-3 text-xs truncate">
           <MapPin size={16} className="mr-1" />
-          {kost.location}
+          {kost.city}
         </div>
 
         {/* PRICE */}

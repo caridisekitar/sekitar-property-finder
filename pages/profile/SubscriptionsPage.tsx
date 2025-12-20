@@ -1,5 +1,5 @@
 import React, { useEffect, useState, cache } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
 import { secureGet } from '@/lib/secureGet';
@@ -11,7 +11,7 @@ export default function SubscriptionsPage() {
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const [loading, setLoading] = useState(true);
-    const { subscription } = cache(useAuth());
+    const { subscription } = useAuth();
   
     useEffect(() => {
         if (!token) {
@@ -21,7 +21,7 @@ export default function SubscriptionsPage() {
   
         const fetchProfile = async () => {
                 try {
-                  const data = cache(useAuth());
+                  const data = await secureGet("/auth/me");
         
                     // Adjust based on your API response shape
                     setUser(data.user ?? data);
@@ -35,7 +35,7 @@ export default function SubscriptionsPage() {
                 } finally {
                     setLoading(false);
                 }
-                };
+            };
   
         fetchProfile();
       }, [token, navigate]);
@@ -73,8 +73,11 @@ export default function SubscriptionsPage() {
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{subscription?.plan}</h3>
-                <p className="text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-gray-900">{subscription?.plan}</h3>
+                  <Link to="/profile/upgrade" className="text-sm font-semibold border bg-[#DCF4FF] px-3 py-1 rounded-full">Upgrade Plan</Link>
+                </div>
+                <p className="text-sm text-gray-600 py-1">
                   {subscription?.plan === "PREMIUM" ? "Unlimited Access" : "Limited Access"}
                   </p>
               </div>

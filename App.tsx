@@ -22,6 +22,7 @@ import DaftarkanBisnismu from "./pages/DaftarkanBisnismu";
 import KostDetailPage from './pages/kost/KostDetailPage';
 import NotFoundPage from './pages/NotFoundPage';
 import ScrollToTop from "@/components/ScrollToTop";
+import UpgradePlanPage from './pages/profile/UpgradePlanPage';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -48,6 +49,7 @@ const AppContent: React.FC = () => {
                     <Route path="/profile/subscriptions" element={<SubscriptionsPage />} />
                     <Route path="/profile/contributions" element={<ContributionsPage />} />
                     <Route path="/profile/latest" element={<LatestPage />} />
+                    <Route path="/profile/upgrade" element={<UpgradePlanPage />} />
                     <Route path="/daftar-bisnis" element={<DaftarkanBisnismu />} />
                     <Route path="/kost/:slug" element={<KostDetailPage />} />
                     <Route path="*" element={<NotFoundPage />} />

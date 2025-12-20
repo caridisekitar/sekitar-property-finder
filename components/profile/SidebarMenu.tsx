@@ -70,7 +70,7 @@ const SidebarMenu: React.FC = ({ user }) => {
                                     to={item.path}
                                     className={`flex items-center gap-3 px-4 py-3 my-1 rounded-lg text-sm font-semibold transition-colors ${
                                         isActive(item.path)
-                                        ? 'bg-brand-light-blue text-brand-blue'
+                                        ? 'bg-[#DCF4FF]'
                                         : 'text-gray-600 hover:bg-gray-100'
                                     }`}
                                 >

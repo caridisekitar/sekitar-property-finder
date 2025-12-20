@@ -2,7 +2,7 @@ import React, { useEffect, useState, cache } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
+import { secureGet } from '@/lib/secureGet';
 
 export default function SubscriptionsPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -17,31 +17,21 @@ export default function SubscriptionsPage() {
         }
   
         const fetchProfile = async () => {
-          try {
-            // const res = cache(useAuth());
-            const res = await fetch(
-              process.env.API_URL + '/auth/me',
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            console.log("Me on Latest");
-  
-            if (res.status === 401) {
-              localStorage.removeItem('access_token');
-              navigate('/login', { replace: true });
-              return;
+            try {
+              const data = await secureGet("/auth/me");
+    
+                // Adjust based on your API response shape
+                setUser(data.user ?? data);
+    
+            } catch (err) {
+                // Token invalid / expired / unauthorized
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+    
+                navigate("/login", { replace: true });
+            } finally {
+                setLoading(false);
             }
-  
-            const data = await res.json();
-            setUser(data.user);
-          } catch {
-            navigate('/login', { replace: true });
-          } finally {
-            setLoading(false);
-          }
         };
   
         fetchProfile();
