@@ -7,6 +7,7 @@ import RekomendasiKos from "@/components/kost/RekomendasiKos";
 import type { Kost } from "@/types";
 import NotFoundKost from "@/components/NotFoundKost";
 import { secureGet } from '@/lib/secureGet';
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const KosDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -36,9 +37,7 @@ const KosDetailPage: React.FC = () => {
     fetchKostDetail();
   }, [slug]);
 
-  if (loading) {
-    return <p className="text-center py-10">Loading detail kos...</p>;
-  }
+  if (loading) return <LoadingOverlay message="Memuat detail kos ..." />;
 
   if (error || !kost) {
     return (

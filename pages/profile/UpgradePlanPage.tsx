@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
 import { secureGet } from '@/lib/secureGet';
+import { securePost } from '@/lib/securePost';
 import { useAuth } from '@/hooks/useAuth';
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 export default function UpgradePlanPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -39,9 +41,51 @@ export default function UpgradePlanPage() {
         fetchProfile();
       }, [token, navigate]);
   
-      if (loading) return <div>Loading profile...</div>;
+      if (loading) return <LoadingOverlay message="Memuat ..." />;
   
       if (!user) return null;
+
+    const handleUpgrade = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        const res = await securePost(
+                "/invoices/create-invoice",
+                "POST",
+                {
+                  user_id: user.id,
+                  customer_name: user.name,
+                  customer_email: user.email,
+                  items: [
+                    {
+                      name: "Premium Subscription (1 Year)",
+                      qty: 1,
+                      price: 99000,
+                    },
+                  ],
+                  due_date: new Date(
+                    Date.now() + 7 * 24 * 60 * 60 * 1000
+                  ).toISOString().slice(0, 10),
+                }
+              );
+
+
+        // const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(res.message || "Gagal membuat invoice");
+        }
+
+        // Redirect to invoice detail / payment page
+        // navigate(`/invoices/${data.invoice_id}`);
+      } catch (err) {
+        console.error(err);
+        alert("Gagal membuat invoice. Silakan coba lagi.");
+      } finally {
+        setLoading(false);
+      }
+    };
       
   return (
     <div className="flex min-h-screen mb-12 border-t border-gray-200 container mx-auto">
@@ -128,9 +172,17 @@ export default function UpgradePlanPage() {
 
                     <div className="mt-auto pt-8">
                         {subscription?.plan === 'FREE' ? (
-                        <button className="w-full bg-[#96C8E2] text-white py-3 rounded-lg font-medium hover:bg-blue-200 transition">
-                            Upgrade langganan
-                        </button>
+                          <button
+                              onClick={handleUpgrade}
+                              disabled={loading}
+                              className={`w-full py-3 rounded-lg font-medium transition ${
+                                loading
+                                  ? "bg-gray-400 cursor-not-allowed"
+                                  : "bg-[#96C8E2] text-white hover:bg-blue-200"
+                              }`}
+                            >
+                              {loading ? "Membuat invoice..." : "Upgrade langganan"}
+                            </button>
                         ) : (
                         <div className="w-full bg-gray-500 text-white py-3 rounded-lg font-medium text-center opacity-50 cursor-not-allowed">
                             Plan sekarang

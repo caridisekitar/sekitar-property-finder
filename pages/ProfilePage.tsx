@@ -10,6 +10,7 @@ import EllipsisIcon from '../components/icons/EllipsisIcon';
 import { User } from '../types';
 import { securePost } from '@/lib/securePost';
 import { secureGet } from '@/lib/secureGet';
+import LoadingOverlay from '@/components/LoadingOverlay';
 
 
 const ProfilePage: React.FC = () => {
@@ -64,7 +65,7 @@ const ProfilePage: React.FC = () => {
     fetchProfile();
   }, [token, navigate]);
 
-  if (loading) return <div>Loading profile...</div>;
+  if (loading) return <LoadingOverlay message="Memuat data Profile ..." />;
 
   if (!user) return null;
 
@@ -110,14 +111,14 @@ const ProfilePage: React.FC = () => {
                 </div>
                 <div className="w-full sm:w-2/3 flex items-center justify-start gap-6">
                     <img 
-                        src="https://picsum.photos/seed/t1/200/200" 
+                        src="/images/icons/user.png" 
                         alt={user.name}
                         className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover"
                     />
-                    <div className="flex gap-4">
+                    {/* <div className="flex gap-4">
                         <button className="text-sm font-semibold text-red-500 hover:text-red-700">Hapus</button>
                         <button className="text-sm font-semibold text-brand-blue hover:text-blue-700">Update</button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 

@@ -14,14 +14,28 @@ type User = {
 };
 
 export const useAuth = () => {
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState<string | null>(
+    () => localStorage.getItem("token")
+  );
 
   const [user, setUser] = useState<User | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔁 Sync token changes
+  useEffect(() => {
+    const onStorage = () => {
+      setToken(localStorage.getItem("token"));
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   useEffect(() => {
     if (!token) {
+      setUser(null);
+      setSubscription(null);
       setLoading(false);
       return;
     }

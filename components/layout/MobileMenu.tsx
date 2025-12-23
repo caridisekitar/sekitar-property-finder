@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { securePost } from '@/lib/securePost';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -16,17 +17,25 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks, is
         try {
             const token = localStorage.getItem('token');
 
-            await fetch(process.env.API_URL + '/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
+            const data = await securePost(
+                            "/auth/logout",
+                            "POST",
+                            {}
+                          );
+
+            // await fetch(process.env.API_URL + '/auth/logout', {
+            //     method: 'POST',
+            //     headers: {
+            //         'Authorization': `Bearer ${token}`,
+            //         'Content-Type': 'application/json',
+            //     },
+            // });
         } catch (e) {
             // ignore backend failure
         } finally {
             // always clear client
+            localStorage.removeItem('device_id');
+            localStorage.removeItem('post_login_redirect');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             sessionStorage.clear();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, cache } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import HomeIcon from '../components/icons/HomeIcon';
 import LinkIcon from '../components/icons/LinkIcon';
@@ -10,11 +10,14 @@ const WishlistPage: React.FC = () => {
   const [mapsUrl, setMapsUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { isAuthenticated, token } = cache(useAuth());
+  const { isAuthenticated, token } = useAuth();
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
   if (!isAuthenticated) {
-    return <Navigate to="/login?redirect=/wishlist" replace />;
+    localStorage.setItem("post_login_redirect", '/wishlist');
+    
+    return <Navigate to="/login" replace />;
+    // return <Navigate to="/login?redirect=/wishlist" replace />;
   }
 
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {

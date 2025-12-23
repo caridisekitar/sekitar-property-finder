@@ -105,8 +105,17 @@ export default function ConfirmOTPPage() {
     localStorage.setItem("user", JSON.stringify(data.user));
 
     sessionStorage.removeItem("otp_phone");
+    // 🔁 restore redirect
+    const redirectTo = localStorage.getItem("post_login_redirect");
 
-    navigate("/", { replace: true });
+    const safeRedirect =
+      redirectTo && redirectTo.startsWith("/")
+        ? redirectTo
+        : "/";
+
+    navigate(safeRedirect, { replace: true });
+
+    // navigate("/", { replace: true });
 
     } 
     catch (err: any) {

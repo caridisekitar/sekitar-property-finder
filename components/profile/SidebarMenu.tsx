@@ -6,6 +6,7 @@ import DiamondIcon from '../icons/DiamondIcon';
 import HandshakeIcon from '../icons/HandshakeIcon';
 import SparklesIcon from '../icons/SparklesIcon';
 import LogoutIcon from '../icons/LogoutIcon';
+import { securePost } from '@/lib/securePost';
 
 const SidebarMenu: React.FC = ({ user }) => {
     const location = useLocation();
@@ -15,17 +16,19 @@ const SidebarMenu: React.FC = ({ user }) => {
         try {
             const token = localStorage.getItem('token');
 
-            await fetch(process.env.API_URL + '/auth/logout', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
+            const data = await securePost(
+                            "/auth/logout",
+                            "POST",
+                            {}
+                          );
+
+            
         } catch (e) {
             // ignore backend failure
         } finally {
             // always clear client
+            localStorage.removeItem('device_id');
+            localStorage.removeItem('post_login_redirect');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             sessionStorage.clear();
@@ -55,7 +58,7 @@ const SidebarMenu: React.FC = ({ user }) => {
                 <div className="px-8 py-6">
                     <div className="p-4 border border-gray-200 rounded-2xl flex flex-col items-center text-center">
                         <img 
-                            src="https://picsum.photos/seed/t1/200/200" 
+                            src="/images/icons/user.png" 
                             alt={user.name}
                             className="w-20 h-20 rounded-full object-cover mb-4"
                         />

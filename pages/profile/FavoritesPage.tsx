@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
 import { secureGet } from '@/lib/secureGet';
+import LoadingOverlay from '@/components/LoadingOverlay';
   
 export default function Favorites() {
   const [user, setUser] = useState<User | null>(null);
@@ -37,7 +38,7 @@ export default function Favorites() {
       fetchProfile();
     }, [token, navigate]);
 
-    if (loading) return <div>Loading profile...</div>;
+    if (loading) return <LoadingOverlay message="Memuat data Favoritmu..." />;
 
     if (!user) return null;
 

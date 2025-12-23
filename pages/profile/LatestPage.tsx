@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
 import { secureGet } from '@/lib/secureGet';
+import LoadingOverlay from '@/components/LoadingOverlay';
 
-export default function SubscriptionsPage() {
+export default function LatestPage() {
   const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
@@ -37,7 +38,7 @@ export default function SubscriptionsPage() {
         fetchProfile();
       }, [token, navigate]);
   
-      if (loading) return <div>Loading profile...</div>;
+      if (loading) return <LoadingOverlay message="Memuat ..." />;
   
       if (!user) return null;
       

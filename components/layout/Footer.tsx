@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import HouseLogo from '../icons/HouseLogo';
 import TikTokIcon from '../icons/TikTokIcon';
 import InstagramIcon from '../icons/InstagramIcon';
 
