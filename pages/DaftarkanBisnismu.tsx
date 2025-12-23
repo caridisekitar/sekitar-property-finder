@@ -152,7 +152,7 @@ export default function DaftarkanBisnismu() {
           setShowSuccess(true);
           
         } catch (err: any) {
-          console.log(err);
+          
           if (err?.status === 422 ) {
             setErrors(err);
           } else {

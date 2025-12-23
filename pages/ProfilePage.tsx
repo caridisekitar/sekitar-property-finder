@@ -45,7 +45,6 @@ const ProfilePage: React.FC = () => {
         try {
             
             const data = await secureGet("/auth/me");
-            console.log("Me on Profile");
 
             // Adjust based on your API response shape
             setUser(data.user ?? data);

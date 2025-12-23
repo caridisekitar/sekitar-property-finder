@@ -88,8 +88,8 @@ export default function Login() {
         );
 
 
-      console.log("OTP sent:", response);
-      console.log(response.status);
+      // console.log("OTP sent:", response);
+      // console.log(response.status);
 
       // 🔴 Rate limit detected
       if (response.status === 429 || response.status != 200) {
