@@ -12,8 +12,9 @@ import BedIcon from '@/components/icons/BedIcon';
 import { BUSINESSES } from '@/constants';
 import { ChevronRight, MapPin } from 'lucide-react';
 import SearchKost from '@/components/SearchKost';
+import SubscriptionModal from '@/components/SubscriptionModal';
 
-const mockKostData: Kost[] = Array.from({ length: 8 }, (_, i) => ({
+const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
     name: 'Kost Dahlia Indah',
     type: 'Kost Putri',
@@ -46,6 +47,13 @@ const testimonials: Testimonial[] = [
         imageUrl: "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
 ];
+
+const VISIBLE_COUNT = 5;
+
+const isSubscribed = false; // 🔐 change to true after payment/login
+
+const visibleData = mockKostData.slice(0, VISIBLE_COUNT);
+const lockedData = mockKostData.slice(VISIBLE_COUNT, VISIBLE_COUNT * 2);
 
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
     <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
@@ -102,6 +110,7 @@ const HomePage: React.FC = () => {
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
     const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
     const kostCarouselRef = useRef<HTMLDivElement>(null);
+    const [open, setOpen] = useState(false);
 
     const nextTestimonial = () => {
         setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
@@ -218,14 +227,53 @@ const HomePage: React.FC = () => {
 
             <div className="mt-10">
                 <p className="text-gray-600 mb-6">Menampilkan {mockKostData.length} dari hasil pencarian</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    {mockKostData.map(kost => (
-                        <KostCard key={kost.id} kost={kost} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 py-6">
+                  {visibleData.map((kost) => (
+                      <KostCard key={kost.id} kost={kost} />
                     ))}
                 </div>
+                <div className="relative">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 
+                  blur-lg pointer-events-none select-none">
+                  {lockedData.map((kost) => (
+                    <KostCard key={kost.id} kost={kost} />
+                  ))}
+                </div>
+                {!isSubscribed && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full mx-4">
+                      
+                      <div className="flex justify-center mb-4">
+                        <div className="flex items-center justify-center">
+                          <img src="/images/icons/icon-locked.png" alt="Lock Icon" className="w-16 h-16" />
+                        </div>
+                      </div>
+
+                      <h3 className="text-xl font-bold mb-2">
+                        Yah terkunci nih!
+                      </h3>
+
+                      <p className="text-gray-600 mb-6">
+                        Jangan khawatir, kamu bisa akses ratusan informasi kost dengan harga bersahabat.
+                      </p>
+
+                      <button
+                        onClick={() => setOpen(true)}
+                        className="px-6 py-3 rounded-xl bg-[#96C8E2] text-white font-semibold hover:bg-blue-600 transition"
+                      >
+                        Mulai langganan
+                      </button>
+
+                    </div>
+                  </div>
+                )}
+                </div>
+                
+
             </div>
         </div>
     </section>
+    <SubscriptionModal open={open} onClose={() => setOpen(false)} />
 
 
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">

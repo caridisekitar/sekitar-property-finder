@@ -11,6 +11,7 @@ import { User } from '../types';
 import { securePost } from '@/lib/securePost';
 import { secureGet } from '@/lib/secureGet';
 import LoadingOverlay from '@/components/LoadingOverlay';
+import DropdownMobileMenu from '../components/profile/DropdownMobileMenu';
 
 
 const ProfilePage: React.FC = () => {
@@ -91,17 +92,18 @@ const ProfilePage: React.FC = () => {
     <div className="flex min-h-screen mb-12 border-t border-gray-200 container mx-auto">
       <SidebarMenu user={user} />
       <main className="flex-1 p-4 sm:p-6 lg:p-10">
+        <DropdownMobileMenu user={user}/>
         <div className="flex justify-between items-center mb-8">
             <div>
-                <h1 className="text-3xl font-bold text-brand-dark">Profileku</h1>
-                <p className="text-gray-500 mt-1">Update foto profile dan detail tentang kamu di sini</p>
+                <h1 className="text-xl md:text-3xl lg:text-3xl font-bold text-brand-dark">Profileku</h1>
+                <p className="text-gray-500 mt-1 text-sm md:text-md lg:text-md">Update foto profile dan detail tentang kamu di sini</p>
             </div>
             {/* <button className="text-gray-500 hover:text-brand-dark">
                 <EllipsisIcon className="w-6 h-6" />
             </button> */}
         </div>
 
-        <div className="bg-white p-6 sm:p-8 rounded-2xl">
+        <div className="bg-white md:p-6 lg:p-6 sm:p-8 rounded-2xl">
             {/* Profile Photo Section */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center pb-6 border-b border-gray-200">
                 <div className="w-full sm:w-1/3 mb-4 sm:mb-0">

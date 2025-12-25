@@ -4,6 +4,7 @@ import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
 import { secureGet } from '@/lib/secureGet';
 import LoadingOverlay from '@/components/LoadingOverlay';
+import DropdownMobileMenu from '@/components/profile/DropdownMobileMenu';
 
 export default function LatestPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -45,8 +46,14 @@ export default function LatestPage() {
   return (
     <div className="flex min-h-screen mb-12 border-t border-gray-200 container mx-auto">
       <SidebarMenu user={user}/>
-      <h1>Your Latest Items</h1>
-      <p>List of favorites will go here.</p>
+      <main className="flex-1 p-4 sm:p-6 lg:p-10">
+        <DropdownMobileMenu user={user}/>
+        <div className="flex justify-between items-center mb-8">
+            <h1>Your Latest Items</h1>
+            <p>List of favorites will go here.</p>
+        </div>
+        
+      </main>
     </div>
   );
 }

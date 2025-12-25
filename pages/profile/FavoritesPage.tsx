@@ -4,6 +4,7 @@ import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
 import { secureGet } from '@/lib/secureGet';
 import LoadingOverlay from '@/components/LoadingOverlay';
+import DropdownMobileMenu from '@/components/profile/DropdownMobileMenu';
   
 export default function Favorites() {
   const [user, setUser] = useState<User | null>(null);
@@ -46,6 +47,7 @@ export default function Favorites() {
     <div className="flex min-h-screen mb-12 border-t border-gray-200 container mx-auto">
       <SidebarMenu user={user} />
       <main className="flex-1 p-4 sm:p-6 lg:p-10">
+        <DropdownMobileMenu user={user}/>
         <div className="flex justify-between items-center mb-8">
             <div className="w-full border-b border-gray-200 py-2">
                 <h1 className="text-3xl font-bold text-brand-dark">Favoritku</h1>

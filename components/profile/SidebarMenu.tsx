@@ -53,6 +53,7 @@ const SidebarMenu: React.FC = ({ user }) => {
     };
 
     return (
+        <>
         <aside className="hidden lg:flex w-72 bg-white flex-col justify-between border-r">
             <div>
                 <div className="px-8 py-6">
@@ -95,6 +96,8 @@ const SidebarMenu: React.FC = ({ user }) => {
                 </button>
             </div>
         </aside>
+
+        </>
     );
 };
 
