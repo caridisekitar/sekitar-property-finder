@@ -119,7 +119,7 @@ export default function SubscriptionModal({
             </div>
 
             <button
-              onClick={() => alert("Proceed to payment")}
+              onClick={() => alert("Proceed to payment Duitku POP")}
               className="mt-8 w-full py-3 rounded-xl bg-blue-400 text-white font-semibold hover:bg-blue-500 transition"
             >
               Mulai langganan
