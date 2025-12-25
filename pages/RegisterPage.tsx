@@ -1,17 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { User, Mail, Phone } from 'lucide-react';
 import { secureGet } from '@/lib/secureGet';
 import { securePost } from '@/lib/securePost';
 
+type Plan = "basic" | "premium";
+const ALLOWED_PLANS: Plan[] = ["basic", "premium"];
+
 export default function Register() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const paramPlan = params.get("new");
+
+  const selectedPlan: Plan =
+    ALLOWED_PLANS.includes(paramPlan as Plan)
+      ? (paramPlan as Plan)
+      : "basic";
+
+  const [plan, setPlan] = useState<Plan>(selectedPlan);
 
 
 
@@ -54,12 +66,14 @@ export default function Register() {
         name,
         email,
         phone,
+        plan,
       });
 
       if (!res.success) {
         setError(res.message || 'Gagal mengirim OTP');
         return;
       }
+      localStorage.setItem("plan", plan);
 
       // ✅ store phone for OTP step
       sessionStorage.setItem('otp_phone', res.data.phone);
@@ -172,14 +186,22 @@ export default function Register() {
               name="phone" 
               type="phone" 
               required 
-              placeholder="Masukkan no telepon kamu yang terhubung ke WhatsApp" 
+              placeholder="Masukkan no telepon kamu yang terhubung ke WhatsApp, contoh: 08xxxxxxxxx" 
               className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
               value={phone} onChange={(e) => setPhone(e.target.value)} />
               
             </div>
 
           </div>
+
+          
         </div>
+        {/* ERROR MESSAGE */}
+        {error && (
+          <div className="text-sm text-red-500 mb-2">
+            {error}
+          </div>
+        )}
 
         {/* SUBMIT BUTTON */}
         <div>

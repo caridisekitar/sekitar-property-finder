@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 type SubscriptionModalProps = {
   open: boolean;
@@ -9,6 +11,7 @@ export default function SubscriptionModal({
   open,
   onClose,
 }: SubscriptionModalProps) {
+  const navigate = useNavigate();
   // Disable background scroll
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
@@ -16,6 +19,10 @@ export default function SubscriptionModal({
       document.body.style.overflow = "auto";
     };
   }, [open]);
+
+    const handleSubscribe = (plan: 'basic' | 'premium') => {
+        navigate(`/register?new=${plan}`);
+    }
 
   if (!open) return null;
 
@@ -30,9 +37,9 @@ export default function SubscriptionModal({
         ✕
       </button>
 
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
         {/* Logo */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-2">
           {/* <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-500">
             
           </div> */}
@@ -40,7 +47,7 @@ export default function SubscriptionModal({
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl md:text-3xl font-bold text-center">
+        <h1 className="text-xl md:text-2xl font-bold text-center">
           Pilih tipe akun kamu
         </h1>
         <p className="text-gray-500 text-center mt-2 text-sm">
@@ -49,7 +56,7 @@ export default function SubscriptionModal({
         </p>
 
         {/* Pricing Cards */}
-        <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-5xl">
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-5xl">
           {/* BASIC */}
           <div className="border rounded-2xl p-8 shadow-sm flex flex-col justify-between">
             <div>
@@ -71,7 +78,9 @@ export default function SubscriptionModal({
               <FeatureList basic />
             </div>
 
-            <button className="mt-8 w-full py-3 rounded-xl bg-black text-white font-semibold">
+            <button 
+            onClick={() => handleSubscribe('basic')}
+            className="mt-8 w-full py-3 rounded-xl bg-black text-white font-semibold">
               Gratis
             </button>
           </div>
@@ -119,7 +128,7 @@ export default function SubscriptionModal({
             </div>
 
             <button
-              onClick={() => alert("Proceed to payment Duitku POP")}
+              onClick={() => handleSubscribe('premium')}
               className="mt-8 w-full py-3 rounded-xl bg-blue-400 text-white font-semibold hover:bg-blue-500 transition"
             >
               Mulai langganan
@@ -139,12 +148,12 @@ function FeatureList({ basic = false }: { basic?: boolean }) {
     { text: "Akses ratusan informasi kost", ok: true, limited: basic },
     { text: "Akses fitur Kalkulator", ok: true, limited: basic },
     { text: "Akses fitur Maps", ok: true, limited: basic },
-    { text: "Bebas request kost via Wishlist", ok: true },
-    { text: "Newsletter mingguan", ok: true },
+    { text: "Bebas request kost via fitur Wishlist", ok: true },
+    { text: "Newsletter yang dikirim personal ke email kamu setiap minggu", ok: true },
     { text: "Akses fitur Daftarkan Kost Mu", ok: !basic },
     { text: "Akses fitur Daftarkan Bisnis Mu", ok: !basic },
     {
-      text: "Jumlah list kost akan terus bertambah setiap bulan",
+      text: "Jumlah list kost akan terus bertambah ratusan setiap bulan nya",
       ok: !basic,
     },
   ];

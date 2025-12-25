@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { securePost } from '@/lib/securePost';
+import { generateUUID } from '@/lib/uuid';
 
 
 const OTP_LENGTH = 6;
@@ -44,6 +45,9 @@ export default function ConfirmOTPPage() {
 
   const otpValue = otp.join('');
   const isOtpComplete = otpValue.length === OTP_LENGTH;
+  if (!localStorage.getItem('device_id')) {
+    localStorage.setItem('device_id', generateUUID());
+  }
 
   // ✏️ Input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, idx: number) => {

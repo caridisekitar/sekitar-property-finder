@@ -111,6 +111,7 @@ const HomePage: React.FC = () => {
     const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
     const kostCarouselRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
+    const plan = localStorage.getItem('plan');
 
     const nextTestimonial = () => {
         setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
@@ -129,6 +130,11 @@ const HomePage: React.FC = () => {
             });
         }
     };
+
+    if(plan == 'premium'){
+        alert(`Kamu telah memilih paket ${plan.toUpperCase()}. Selanjutnya kamu akan diarahkan ke halaman pembayaran.`);
+        localStorage.removeItem("plan");
+    }
 
 
   return (
@@ -227,13 +233,27 @@ const HomePage: React.FC = () => {
 
             <div className="mt-10">
                 <p className="text-gray-600 mb-6">Menampilkan {mockKostData.length} dari hasil pencarian</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 py-6">
+                <div
+                    className="
+                      flex gap-4 overflow-x-auto snap-x snap-mandatory
+                      px-4 -mx-4
+                      sm:grid sm:grid-cols-2
+                      md:grid-cols-3
+                      lg:grid-cols-5
+                      sm:overflow-visible sm:px-0 sm:mx-0
+                    "
+                    style={{ scrollbarWidth: 'none' }}
+                  >
                   {visibleData.map((kost) => (
                       <KostCard key={kost.id} kost={kost} />
                     ))}
                 </div>
                 <div className="relative">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 
+                <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory
+                      sm:grid sm:grid-cols-2
+                      md:grid-cols-3
+                      lg:grid-cols-5
+                      sm:overflow-visible
                   blur-lg pointer-events-none select-none">
                   {lockedData.map((kost) => (
                     <KostCard key={kost.id} kost={kost} />

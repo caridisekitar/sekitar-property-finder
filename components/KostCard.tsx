@@ -5,7 +5,11 @@ import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
-    <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
+    // <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
+    <div className="flex-shrink-0
+    w-[280px] sm:w-full
+    bg-white rounded-xl shadow-md
+    overflow-hidden snap-start">
         <Link to={`/kost/${kost.slug}`}>
         {/* IMAGE */}
       <div className="relative h-[360px] w-auto">
