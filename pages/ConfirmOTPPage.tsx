@@ -118,6 +118,7 @@ export default function ConfirmOTPPage() {
         : "/";
 
     navigate(safeRedirect, { replace: true });
+    localStorage.removeItem("post_login_redirect");
 
     // navigate("/", { replace: true });
 

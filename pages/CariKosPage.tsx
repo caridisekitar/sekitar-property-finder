@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Kost } from '../types';
-import SearchIcon from '../components/icons/SearchIcon';
+import { useAuth } from '@/hooks/useAuth';
 import KostCard from '../components/KostCard';
 import Pagination from '../components/Pagination';
 import SearchKost from '@/components/SearchKost';
@@ -22,7 +22,7 @@ const mockKostData: Kost[] = Array.from({ length: 100 }, (_, i) => ({
 
 const VISIBLE_COUNT = 5;
 
-const isSubscribed = false; // 🔐 change to true after payment/login
+// const isSubscribed = false; // 🔐 change to true after payment/login
 
 const CariKosPage: React.FC = () => {
     const [kosts, setKosts] = useState<Kost[]>([]);
@@ -31,6 +31,8 @@ const CariKosPage: React.FC = () => {
     const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const { subscription } = useAuth();
+    const [isSubscribed, setIsSubscribed] = useState(false);
 
 
     // 🔹 Fetch data from API
@@ -63,7 +65,19 @@ const CariKosPage: React.FC = () => {
     const visibleData = kosts.slice(0, VISIBLE_COUNT);
     const lockedData = mockKostData.slice(VISIBLE_COUNT, VISIBLE_COUNT * 2);
     const [open, setOpen] = useState(false);
-    const plan = localStorage.getItem('plan');
+
+    useEffect(() => {
+  if (
+    subscription?.plan === 'PREMIUM' &&
+    subscription?.is_active === true
+    ) {
+      setIsSubscribed(true);
+    } else {
+      setIsSubscribed(false);
+    }
+  }, [subscription]);
+    
+    // subscription?.plan == 'PREMIUM' ? setIsSubscribed(true) : setIsSubscribed(false);
 
     
     const handlePageChange = (page: number) => {

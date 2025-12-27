@@ -185,6 +185,8 @@ const Footer: React.FC = () => {
               <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-end lg:items-end">
                 <button className="bg-black text-white px-6 py-2 rounded-lg text-sm mb-4 w-full md:w-auto lg:w-auto">Contact Us</button>
                 <a href="mailto:caridisekitar@gmail.com" className="text-sm text-gray-500">caridisekitar@gmail.com</a>
+                <span className="text-sm text-gray-500">+62811-8801-2581</span>
+                <span className="text-sm text-gray-500">Green village, Tangerang</span>
               </div>
             </div>
         
