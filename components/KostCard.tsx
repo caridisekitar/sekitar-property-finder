@@ -7,12 +7,12 @@ import { Link } from 'react-router-dom';
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
     // <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
     <div className="flex-shrink-0
-    w-[280px] sm:w-full
+    lg:w-[220px] sm:w-full
     bg-white rounded-xl shadow-md
     overflow-hidden snap-start">
         <Link to={`/kost/${kost.slug}`}>
         {/* IMAGE */}
-      <div className="relative h-[360px] w-auto">
+      <div className="relative lg:h-[360px] w-auto">
         <img
               src={kost.img_cover || ''}
               alt={kost.name}
@@ -50,7 +50,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
         {/* PRICE */}
         <div className="bg-[#EAF6FF] rounded-xl py-3 text-center">
           <span className="text-[16px] font-bold text-gray-900">
-            {kost.price_monthly.toLocaleString('id-ID')}
+            IDR {kost.price_monthly.toLocaleString('id-ID')}
           </span>
         </div>
       </div>

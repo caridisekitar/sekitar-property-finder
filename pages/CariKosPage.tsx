@@ -7,17 +7,22 @@ import Pagination from '../components/Pagination';
 import SearchKost from '@/components/SearchKost';
 import FilterMenu from '@/components/layout/FilterMenu';
 import { secureGet } from '@/lib/secureGet';
+import SubscriptionModal from '@/components/SubscriptionModal';
 
 const mockKostData: Kost[] = Array.from({ length: 100 }, (_, i) => ({
     id: i + 1,
     name: 'Kost Dahlia Indah',
     type: 'Kost Putri',
-    location: 'Mampang, Jakarta Selatan',
-    price: 1500000,
-    imageUrl: `https://picsum.photos/seed/${(i % 20) + 1}/400/300`, // Use a smaller set of repeating images
-    isNew: i % 5 === 0, // Make every 5th item "New",
+    city: 'Mampang, Jakarta Selatan',
+    price_monthly: 1500000,
+    img_cover: `https://picsum.photos/seed/${(i % 20) + 1}/400/300`, // Use a smaller set of repeating images
+    isNew: 0,
     link: `/kost/${i+1}`,
 }));
+
+const VISIBLE_COUNT = 5;
+
+const isSubscribed = false; // 🔐 change to true after payment/login
 
 const CariKosPage: React.FC = () => {
     const [kosts, setKosts] = useState<Kost[]>([]);
@@ -52,9 +57,14 @@ const CariKosPage: React.FC = () => {
     fetchKosts();
   }, [currentPage]);
 
-    const totalPages = Math.ceil(mockKostData.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(kosts.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const currentItems = kosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const visibleData = kosts.slice(0, VISIBLE_COUNT);
+    const lockedData = mockKostData.slice(VISIBLE_COUNT, VISIBLE_COUNT * 2);
+    const [open, setOpen] = useState(false);
+    const plan = localStorage.getItem('plan');
+
     
     const handlePageChange = (page: number) => {
         if (page > 0 && page <= totalPages) {
@@ -94,9 +104,51 @@ const CariKosPage: React.FC = () => {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
-            {currentItems.map((kost) => (
+            {visibleData.map((kost) => (
               <KostCard key={kost.id} kost={kost} />
             ))}
+          </div>
+
+
+          <div className="relative">
+            <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory
+                        sm:grid sm:grid-cols-2
+                        md:grid-cols-3
+                        lg:grid-cols-5
+                        sm:overflow-visible
+                    blur-lg pointer-events-none select-none">
+              {lockedData.map((kost) => (
+                <KostCard key={kost.id} kost={kost} />
+              ))}
+            </div>
+            {!isSubscribed && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full mx-4">
+                        
+                        <div className="flex justify-center mb-4">
+                          <div className="flex items-center justify-center">
+                            <img src="/images/icons/icon-locked.png" alt="Lock Icon" className="w-16 h-16" />
+                          </div>
+                        </div>
+
+                        <h3 className="text-xl font-bold mb-2">
+                          Yah terkunci nih!
+                        </h3>
+
+                        <p className="text-gray-600 mb-6">
+                          Jangan khawatir, kamu bisa akses ratusan informasi kost dengan harga bersahabat.
+                        </p>
+
+                        <button
+                          onClick={() => setOpen(true)}
+                          className="px-6 py-3 rounded-xl bg-[#96C8E2] text-white font-semibold hover:bg-blue-600 transition"
+                        >
+                          Mulai langganan
+                        </button>
+
+                      </div>
+                    </div>
+                  )}
           </div>
 
           <Pagination
@@ -107,7 +159,7 @@ const CariKosPage: React.FC = () => {
         </>
       )}
 
-      
+      <SubscriptionModal open={open} onClose={() => setOpen(false)} />
       <FilterMenu isOpen={isFilterMenuOpen} setIsOpen={setIsFilterMenuOpen} />
     </div>
   );

@@ -51,7 +51,7 @@ const MapsPage: React.FC = () => {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Column: Search and Listings */}
         <div className="lg:w-1/2 xl:w-2/5">
-            <div className="p-4 bg-brand-light-blue rounded-2xl">
+            <div className="p-4 bg-brand-light-blue rounded-2xl hidden lg:block">
                 <div className="relative flex gap-2">
                     <div className="relative flex-grow">
                         <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"/>
@@ -61,7 +61,7 @@ const MapsPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 text-brand-blue font-semibold my-6">
+            <div className="flex items-center gap-2 text-brand-blue font-semibold my-6 hidden lg:block">
                 <CrosshairIcon className="w-5 h-5"/>
                 <span>Lokasi di sekitarmu</span>
             </div>
@@ -79,7 +79,23 @@ const MapsPage: React.FC = () => {
         </div>
 
         {/* Right Column: Map */}
-        <div className="lg:w-1/2 xl:w-3/5 lg:h-[calc(100vh-150px)] lg:sticky lg:top-24">
+        <div className="lg:w-1/2 xl:w-3/5 lg:h-[calc(100vh-150px)] lg:sticky lg:top-24 order-first lg:order-last">
+
+            <div className="p-4 bg-brand-light-blue rounded-2xl lg:hidden mb-6">
+                <div className="relative flex gap-2">
+                    <div className="relative flex-grow">
+                        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"/>
+                        <input type="text" placeholder="Cari kos .." className="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 shadow-sm" />
+                    </div>
+                    <button className="bg-brand-dark text-white font-bold py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors shadow-sm">Cari</button>
+                </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-brand-blue font-semibold my-6 lg:hidden">
+                <CrosshairIcon className="w-5 h-5"/>
+                <span>Lokasi di sekitarmu</span>
+            </div>
+
              <div className="w-full h-96 lg:h-full bg-gray-200 rounded-2xl shadow-lg overflow-hidden">
                 <img 
                     src="https://www.google.com/maps/d/u/0/thumbnail?mid=1_2S-5722A1251817479708_9652562&hl=en" 
