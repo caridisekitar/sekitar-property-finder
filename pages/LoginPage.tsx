@@ -84,7 +84,9 @@ export default function Login() {
       const response = await securePost(
           "/otp/generate",
           "POST",
-          { phone: normalizedPhone }
+          { phone: normalizedPhone,
+            device_id: localStorage.getItem('device_id')
+           }
         );
 
 

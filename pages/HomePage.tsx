@@ -1,19 +1,19 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { Kost, Business, Testimonial } from '../types';
+import { useAuth } from '@/hooks/useAuth';
 import SearchIcon from '../components/icons/SearchIcon';
-import LocationIcon from '../components/icons/LocationIcon';
-import FilterIcon from '../components/icons/FilterIcon';
 import FilterMenu from '../components/layout/FilterMenu';
 import HouseLogo from '@/components/icons/HouseLogo';
 import StarIcon from '@/components/icons/StarIcon';
 import SparklesIcon from '@/components/icons/SparklesIcon';
-import BedIcon from '@/components/icons/BedIcon';
 import { BUSINESSES } from '@/constants';
 import { ChevronRight, MapPin } from 'lucide-react';
 import SearchKost from '@/components/SearchKost';
 import SubscriptionModal from '@/components/SubscriptionModal';
 import KostCard from '../components/KostCard';
+import { secureGet } from '@/lib/secureGet';
+
 
 const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
@@ -52,68 +52,62 @@ const testimonials: Testimonial[] = [
 
 const VISIBLE_COUNT = 5;
 
-const isSubscribed = false; // 🔐 change to true after payment/login
+// const isSubscribed = false; // 🔐 change to true after payment/login
 
-const visibleData = mockKostData.slice(0, VISIBLE_COUNT);
-const lockedData = mockKostData.slice(VISIBLE_COUNT, VISIBLE_COUNT * 2);
-
-// const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
-//     <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
-//         <a href={kost.link}>
-//         {/* IMAGE */}
-//       <div className="relative h-[360px] w-auto">
-//         <img
-//           src={kost.imageUrl || ''}
-//           alt={kost.name}
-//           className="h-full w-full object-cover"
-//         />
-
-//         {/* TYPE BADGE */}
-//         <div className="absolute top-4 left-4 bg-white px-2 py-1 rounded-2xl flex items-center gap-2 shadow-sm">
-//           {/* <img src="/images/bed.svg" alt="bed"  /> */}
-//           <BedIcon className="w-3 h-3"/> 
-//           <span className="font-medium text-gray-900 text-[10px]">
-//             {kost.type}
-//           </span>
-//         </div>
-
-//         {/* NEW BADGE */}
-//         {kost.isNew && (
-//           <div className="absolute top-1 -right-2 text-white py-2 rounded-l-xl rounded-r-sm flex items-center gap-2 shadow-sm">
-//             <img src="/images/new.svg" alt="new" />
-//           </div>
-//         )}
-
-//         {/* FLOATING INFO CARD */}
-//       <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-[90%] bg-white rounded-xl shadow-lg p-3">
-//         <h3 className="text-[14px] font-medium text-gray-900">
-//           {kost.name || ''}
-//         </h3>
-
-//         {/* LOCATION */}
-//         <div className="flex items-center text-gray-500 mt-1 mb-3 text-xs">
-//           <MapPin size={16} className="mr-1" />
-//           {kost.location}
-//         </div>
-
-//         {/* PRICE */}
-//         <div className="bg-[#EAF6FF] rounded-xl py-3 text-center">
-//           <span className="text-[16px] font-bold text-gray-900">
-//             {kost.price.toLocaleString('id-ID')}
-//           </span>
-//         </div>
-//       </div>
-//       </div>
-//         </a>
-//     </div>
-// );
 
 const HomePage: React.FC = () => {
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
     const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
     const kostCarouselRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 15;
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [kosts, setKosts] = useState<Kost[]>([]);
     const plan = localStorage.getItem('plan');
+    const { subscription } = useAuth();
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT);
+
+    // 🔹 Fetch data from API
+      useEffect(() => {
+      const fetchKosts = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+  
+          // 🔐 secured GET request
+          const data = await secureGet('/kosts', {
+            page: currentPage,
+            limit: ITEMS_PER_PAGE,
+          });
+  
+          setKosts(data);
+        } catch (err) {
+          setError((err as Error).message || 'Failed to fetch data');
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchKosts();
+    }, [currentPage]);
+
+    useEffect(() => {
+        if (
+          subscription?.plan === 'PREMIUM'
+          ) {
+            setIsSubscribed(true);
+            setVisibleCount(100); // Show all items for subscribed users
+          } else {
+            setIsSubscribed(false);
+          }
+        }, [subscription]);
+    
+    
+    const visibleData = kosts.slice(0, visibleCount);
+    const lockedData = mockKostData.slice(visibleCount, visibleCount * 2);
 
     const nextTestimonial = () => {
         setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
@@ -223,78 +217,107 @@ const HomePage: React.FC = () => {
     </section>
 
     {/* Search Form Section */}
-    <section className="py-12 lg:py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
-                <p className="text-sm font-bold tracking-widest mb-2">✦ CARI KOS</p>
-                <h2 className="text-3xl md:text-4xl font-bold">Mulai Cari Kos</h2>
-                <p className="text-gray-600 mt-2 text-md md:text-md lg:text-lg">Kalau biasanya kamu butuh 30 hari untuk cari kost yang sesuai, di Sekitar kamu hanya butuh 30 menit!</p>
+<section className="py-12 lg:py-16">
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-10">
+      <p className="text-sm font-bold tracking-widest mb-2">✦ CARI KOS</p>
+      <h2 className="text-3xl md:text-4xl font-bold">Mulai Cari Kos</h2>
+      <p className="text-gray-600 mt-2 text-md md:text-md lg:text-lg">
+        Kalau biasanya kamu butuh 30 hari untuk cari kost yang sesuai,
+        di Sekitar kamu hanya butuh 30 menit!
+      </p>
+    </div>
+
+    {/* Search Component */}
+    <SearchKost
+      setIsFilterMenuOpen={setIsFilterMenuOpen}
+      onResult={(results) => {
+        setKosts(results);
+        setVisibleCount(isSubscribed ? results.length : VISIBLE_COUNT);
+      }}
+    />
+
+    {/* RESULT */}
+    <div className="mt-10">
+      {/* COUNT */}
+      <p className="text-gray-600 mb-6">
+        Menampilkan {Math.min(visibleCount, kosts.length)} dari {kosts.length} hasil pencarian
+      </p>
+
+      {/* VISIBLE DATA */}
+      <div
+        className="
+          flex gap-4 overflow-x-auto snap-x snap-mandatory
+          px-4 -mx-4
+          sm:grid sm:grid-cols-2
+          md:grid-cols-3
+          lg:grid-cols-5
+          sm:overflow-visible sm:px-0 sm:mx-0
+        "
+        style={{ scrollbarWidth: 'none' }}
+      >
+        {kosts.slice(0, visibleCount).map((kost) => (
+          <KostCard key={kost.id} kost={kost} />
+        ))}
+      </div>
+
+      {/* LOCKED DATA */}
+      {!isSubscribed && kosts.length > visibleCount && (
+        <div className="relative mt-6">
+          <div
+            className="
+              flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory
+              sm:grid sm:grid-cols-2
+              md:grid-cols-3
+              lg:grid-cols-5
+              sm:overflow-visible
+              blur-lg pointer-events-none select-none
+            "
+          >
+            {kosts.slice(visibleCount, visibleCount + VISIBLE_COUNT).map((kost) => (
+              <KostCard key={kost.id} kost={kost} />
+            ))}
+          </div>
+
+          {/* LOCK OVERLAY */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full mx-4">
+              <div className="flex justify-center mb-4">
+                <img
+                  src="/images/icons/icon-locked.png"
+                  alt="Lock Icon"
+                  className="w-16 h-16"
+                />
+              </div>
+
+              <h3 className="text-xl font-bold mb-2">Yah terkunci nih!</h3>
+
+              <p className="text-gray-600 mb-6">
+                Jangan khawatir, kamu bisa akses ratusan informasi kost
+                dengan harga bersahabat.
+              </p>
+
+              <button
+                onClick={() => setOpen(true)}
+                className="px-6 py-3 rounded-xl bg-[#96C8E2] text-white font-semibold hover:bg-blue-600 transition"
+              >
+                Mulai langganan
+              </button>
             </div>
-            <SearchKost setIsFilterMenuOpen={setIsFilterMenuOpen} />
-            
-
-            <div className="mt-10">
-                <p className="text-gray-600 mb-6">Menampilkan {mockKostData.length} dari hasil pencarian</p>
-                <div
-                    className="
-                      flex gap-4 overflow-x-auto snap-x snap-mandatory
-                      px-4 -mx-4
-                      sm:grid sm:grid-cols-2
-                      md:grid-cols-3
-                      lg:grid-cols-5
-                      sm:overflow-visible sm:px-0 sm:mx-0
-                    "
-                    style={{ scrollbarWidth: 'none' }}
-                  >
-                  {visibleData.map((kost) => (
-                      <KostCard key={kost.id} kost={kost} />
-                    ))}
-                </div>
-                <div className="relative">
-                <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory
-                      sm:grid sm:grid-cols-2
-                      md:grid-cols-3
-                      lg:grid-cols-5
-                      sm:overflow-visible
-                  blur-lg pointer-events-none select-none">
-                  {lockedData.map((kost) => (
-                    <KostCard key={kost.id} kost={kost} />
-                  ))}
-                </div>
-                {!isSubscribed && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full mx-4">
-                      
-                      <div className="flex justify-center mb-4">
-                        <div className="flex items-center justify-center">
-                          <img src="/images/icons/icon-locked.png" alt="Lock Icon" className="w-16 h-16" />
-                        </div>
-                      </div>
-
-                      <h3 className="text-xl font-bold mb-2">
-                        Yah terkunci nih!
-                      </h3>
-
-                      <p className="text-gray-600 mb-6">
-                        Jangan khawatir, kamu bisa akses ratusan informasi kost dengan harga bersahabat.
-                      </p>
-
-                      <button
-                        onClick={() => setOpen(true)}
-                        className="px-6 py-3 rounded-xl bg-[#96C8E2] text-white font-semibold hover:bg-blue-600 transition"
-                      >
-                        Mulai langganan
-                      </button>
-
-                    </div>
-                  </div>
-                )}
-                </div>
-                
-
-            </div>
+          </div>
         </div>
-    </section>
+      )}
+
+      {/* EMPTY STATE */}
+      {kosts.length === 0 && !loading && (
+        <div className="text-center py-16 text-gray-500">
+          Belum ada hasil pencarian. Yuk mulai cari kost 👀
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
     <SubscriptionModal open={open} onClose={() => setOpen(false)} />
 
 

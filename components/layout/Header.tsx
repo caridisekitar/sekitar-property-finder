@@ -19,7 +19,7 @@ const Header: React.FC = () => {
     { name: 'Kalkulator Budget', path: '/kalkulator-budget' },
   ];
 
-  const { subscription } = cache(useAuth());
+  const { subscription } = useAuth();
 
   return (
     <>
