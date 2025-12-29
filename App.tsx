@@ -24,6 +24,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import ScrollToTop from "@/components/ScrollToTop";
 import UpgradePlanPage from './pages/profile/UpgradePlanPage';
 import CallbackPage from '@/pages/CallbackPage';
+import FAQPage from '@/pages/FAQPage';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -54,6 +55,7 @@ const AppContent: React.FC = () => {
                     <Route path="/daftar-bisnis" element={<DaftarkanBisnismu />} />
                     <Route path="/kost/:slug" element={<KostDetailPage />} />
                     <Route path="/callback" element={<CallbackPage />} />
+                    <Route path="/faq" element={<FAQPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>

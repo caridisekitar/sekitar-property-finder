@@ -5,11 +5,12 @@ import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
-    // <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center">
+  <div>
+    {/* <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center"> */}
     <div className="flex-shrink-0
     lg:w-[220px] sm:w-full
     bg-white rounded-xl shadow-md
-    overflow-hidden snap-start">
+    overflow-hidden snap-start hidden lg:block">
         <Link to={`/kost/${kost.slug}`}>
         {/* IMAGE */}
       <div className="relative lg:h-[360px] w-auto">
@@ -57,6 +58,63 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
       </div>
         </Link>
     </div>
+    {/* Mobile View */}
+    <Link to={`/kost/${kost.slug}`}>
+    <div className="relative w-full max-w-5xl overflow-hidden rounded-xl bg-gray-200 lg:hidden">
+      {/* Background Image */}
+      <img
+        src="https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1600&auto=format&fit=crop"
+        alt="Kost Room"
+        className="h-[160px] w-full object-cover sm:h-[320px]"
+      />
+
+      {/* Overlay Card */}
+      <div className="absolute right-4 top-1/2 w-[170px] -translate-y-1/2 rounded-xl bg-white p-3 shadow-xl sm:right-8 sm:w-[320px]">
+        {/* Type */}
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-medium">
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7" />
+            <path d="M3 7l9-4 9 4" />
+          </svg>
+          {kost.type}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-sm font-bold text-gray-900">
+          {kost.name || ''}
+        </h3>
+
+        {/* Location */}
+        <p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
+          <svg
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 21s-6-5.686-6-10a6 6 0 1112 0c0 4.314-6 10-6 10z" />
+            <circle cx="12" cy="11" r="2" />
+          </svg>
+          {kost.city}
+        </p>
+
+        {/* Price */}
+        <div className="mt-1 rounded-lg bg-[#F0F9FF] py-2 text-center text-sm font-bold text-gray-900">
+          IDR {kost.price_monthly.toLocaleString('id-ID')}
+        </div>
+      </div>
+    </div>
+    </Link>
+
+    
+  </div>
 );
 
 export default KostCard;

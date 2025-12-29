@@ -87,7 +87,7 @@ const Footer: React.FC = () => {
                     </li>
                     <li>
                     <Link
-                        to="/cari-kost"
+                        to="/faq"
                         className="text-gray-900 text-sm lg:text-sm"
                     >
                         Faq
