@@ -10,6 +10,17 @@ const FAQ_DATA = {
     { q: "Apakah akun Sekitar bisa dipindah tangankan ke orang lain?", a: "Tidak bisa. \nSatu akun Sekitar hanya boleh digunakan oleh satu pengguna. \nJika sistem kami mendeteksi aktivitas pemindahan akun atau penggunaan tidak wajar, akun akan disuspend secara permanen tanpa pengembalian dana (no refund)." },
     { q: "Apakah jumlah kost/hunian di Sekitar akan bertambah?", a: "Iya, tentu 😊 \n Jumlah kost dan hunian di Sekitar akan terus bertambah setiap bulan, karena tim kami rutin melakukan survei langsung ke lapangan. Jadi kamu nggak perlu khawatir kehabisan pilihan." },
     { q: "Bisa request kost atau hunian tertentu nggak?", a: "Bisa, dan GRATIS 🙌 \n Kamu cukup masuk ke laman Wishlist, lalu klik fitur request. \nTim Sekitar akan mencoba membantu mencarikan dan mensurvei kost yang kamu butuhkan." },
+    { q: "Apakah Sekitar bisa diakses di semua device?", a: "Ya, Sekitar bisa diakses di <b>semua device</b> (laptop, tablet, dan smartphone).\nNamun, untuk pengalaman terbaik—terutama saat melihat detail foto, video, dan insight hunian—<b>kami merekomendasikan akses melalui laptop atau desktop.</b>" },
+    { q: "Apakah Sekitar adalah agen atau perantara kost?", a: "Bukan. \nSekitar bukan agen dan tidak mengambil komisi apapun dari pemilik kost.\nKami adalah platform kurasi dan informasi hunian, sehingga keputusan dan komunikasi tetap langsung antara kamu dan pemilik kost." },
+    { q: "Apakah harga dan informasi kost di Sekitar selalu akurat?", a: "Kami berusaha semaksimal mungkin menjaga akurasi data.\nSeluruh hunian di Sekitar disurvei langsung oleh tim kami, namun harga dan ketersediaan kamar dapat berubah sewaktu-waktu sesuai kebijakan pemilik kost.\nKami menyarankan untuk tetap melakukan konfirmasi langsung sebelum memutuskan." },
+    { q: "Apakah Sekitar menjamin ketersediaan kamar?", a: "Tidak.\n Sekitar menyediakan informasi dan insight hunian, bukan sistem booking.\n Ketersediaan kamar sepenuhnya tergantung pada pemilik atau pengelola kost masing-masing." },
+    { q: "Apakah data pribadi saya aman di Sekitar?", a: "Ya.\nKami menjaga keamanan data pengguna dan tidak membagikan informasi pribadi ke pihak ketiga tanpa izin.\nData kamu hanya digunakan untuk keperluan layanan di dalam platform Sekitar." },
+    { q: "Apakah subscription bisa dibatalkan atau direfund?", a: "Saat ini, subscription yang sudah aktif tidak dapat dibatalkan maupun direfund.\nKami menyarankan untuk memanfaatkan fitur preview dan informasi gratis sebelum melakukan pembelian." },
+    { q: "Apa bedanya Sekitar dengan platform kost lainnya?", a: "Sekitar fokus pada kurasi, insight lokal, dan pengalaman tinggal, bukan sekadar daftar kost.\nKami membantu kamu memahami vibe lingkungan, keseharian, dan kecocokan gaya hidup, supaya kamu bisa memilih hunian dengan lebih yakin." },
+    { q: "Apakah Sekitar hanya tersedia untuk wilayah Jakarta?", a: "Untuk saat ini, Sekitar berfokus di wilayah Jakarta dan sekitarnya.\n Namun, kami berencana untuk memperluas jangkauan ke kota lain secara bertahap." },
+    { q: "Bagaimana jika saya mengalami kendala saat menggunakan website?", a: "Kamu bisa menghubungi tim Sekitar melalui email atau kanal bantuan yang tersedia di website.\nKami akan berusaha membantu secepat mungkin." },
+
+    
   ],
   payments: [
     { q: "What do these roles – Admin, Editor, Author, and Translator – mean?", a: "Each role has different access levels and responsibilities." },
@@ -108,8 +119,10 @@ export default function FaqPage() {
                 </button>
 
                 {isOpen && (
-                  <div className="px-5 pb-5 text-gray-600 text-sm leading-relaxed whitespace-pre-line">
-                    {item.a}
+                  <div className="px-5 pb-5 text-gray-600 text-sm leading-relaxed whitespace-pre-line"
+                  dangerouslySetInnerHTML={{
+                    __html: item.a.replace(/\n/g, "<br />"),
+                  }}>
                   </div>
                 )}
               </div>
