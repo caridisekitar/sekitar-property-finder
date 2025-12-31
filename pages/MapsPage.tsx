@@ -5,6 +5,7 @@ import SearchIcon from '../components/icons/SearchIcon';
 import CrosshairIcon from '../components/icons/CrosshairIcon';
 import KostCard from '../components/KostCard';
 import Pagination from '../components/Pagination';
+import MapboxMap from '@/components/MapboxMap';
 
 // Mock data for demonstration
 const mockKostData: Kost[] = Array.from({ length: 68 }, (_, i) => ({
@@ -97,11 +98,12 @@ const MapsPage: React.FC = () => {
             </div>
 
              <div className="w-full h-96 lg:h-full bg-gray-200 rounded-2xl shadow-lg overflow-hidden">
-                <img 
+                <MapboxMap />
+                {/* <img 
                     src="https://www.google.com/maps/d/u/0/thumbnail?mid=1_2S-5722A1251817479708_9652562&hl=en" 
                     alt="Map of Jakarta with property locations" 
                     className="w-full h-full object-cover"
-                />
+                /> */}
             </div>
         </div>
 

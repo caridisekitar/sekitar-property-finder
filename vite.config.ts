@@ -18,7 +18,8 @@ export default defineConfig(({ mode }) => {
         'process.env.API_SECRET': JSON.stringify(env.API_SECRET),
         'process.env.ORIGIN': JSON.stringify(env.ORIGIN),
         'process.env.PUBLIC_POSTHOG_KEY': JSON.stringify(env.PUBLIC_POSTHOG_KEY),
-        'process.env.PUBLIC_POSTHOG_HOST': JSON.stringify(env.PUBLIC_POSTHOG_HOST)
+        'process.env.PUBLIC_POSTHOG_HOST': JSON.stringify(env.PUBLIC_POSTHOG_HOST),
+        'process.env.MAPBOX_TOKEN': JSON.stringify(env.MAPBOX_TOKEN)
       },
       resolve: {
         alias: {
