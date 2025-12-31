@@ -11,6 +11,7 @@ type Property = {
   lng: number;
   lat: number;
   image: string;
+  type: string;
 };
 
 const MapPage: React.FC = () => {
@@ -41,6 +42,7 @@ const MapPage: React.FC = () => {
         lng: 106.816666,
         lat: -6.200000,
         image: 'https://picsum.photos/seed/apt1/400/300',
+        type: 'kost apartment',
     },
     {
         id: '2',
@@ -49,6 +51,7 @@ const MapPage: React.FC = () => {
         lng: 106.8105,
         lat: -6.2615,
         image: 'https://picsum.photos/seed/house2/400/300',
+        type: 'kost campuran',
     },
     {
         id: '3',
@@ -57,6 +60,7 @@ const MapPage: React.FC = () => {
         lng: 106.8230,
         lat: -6.2146,
         image: 'https://picsum.photos/seed/studio3/400/300',
+        type: 'kost putri',
     },
     {
         id: '4',
@@ -65,6 +69,7 @@ const MapPage: React.FC = () => {
         lng: 106.8069,
         lat: -6.2275,
         image: 'https://picsum.photos/seed/lux4/400/300',
+        type: 'kost putra',
     },
     {
         id: '5',
@@ -73,6 +78,7 @@ const MapPage: React.FC = () => {
         lng: 106.8566,
         lat: -6.2262,
         image: 'https://picsum.photos/seed/family5/400/300',
+        type: 'kost campuran',
     },
     {
         id: '6',
@@ -81,29 +87,64 @@ const MapPage: React.FC = () => {
         lng: 106.8413,
         lat: -6.1921,
         image: 'https://picsum.photos/seed/kost6/400/300',
+        type: 'kost putri',
     },
     ];
 
+    function formatPriceJt(price: number): string {
+    if (price >= 1_000_000) {
+        const jt = price / 1_000_000;
+
+        // Remove trailing .0, keep 1 decimal if needed
+        const formatted = jt % 1 === 0
+        ? jt.toString()
+        : jt.toFixed(1).replace('.', ',');
+
+        return `${formatted}jt`;
+    }
+
+    return price.toLocaleString('id-ID');
+    }
+
+
 
     properties.forEach((property) => {
-      const el = document.createElement('div');
-      el.className =
-        'bg-white px-3 py-1 rounded-full shadow-md text-sm font-semibold cursor-pointer border border-gray-200';
-      el.innerText = `Rp ${property.price.toLocaleString('id-ID')}`;
+        // 1. Root marker element
+        const el = document.createElement('div');
+        el.className =
+            'flex items-center gap-1 bg-[#18181B] px-3 py-1 rounded-full shadow-md text-sm font-semibold cursor-pointer border border-gray-200 text-white';
 
-      el.onclick = () => {
-        setSelectedProperty(property);
+        // 2. SVG icon (inline)
+        const icon = document.createElement('img');
+        icon.src = '/images/icons/icon-map.svg'; // <-- your SVG path
+        icon.alt = 'Property';
+        icon.className = 'w-6 h-6';
 
-        map.flyTo({
-          center: [property.lng, property.lat],
-          zoom: 15,
+        // 3. Price text
+        const price = document.createElement('span');
+        price.innerText = `Rp ${formatPriceJt(property.price)} `;
+
+        // 4. Append icon + price
+        el.appendChild(icon);
+        el.appendChild(price);
+
+        // 5. Click handler
+        el.onclick = () => {
+            setSelectedProperty(property);
+
+            map.flyTo({
+            center: [property.lng, property.lat],
+            zoom: 15,
+            offset: [0, 10], // space for card + arrow
+            });
+        };
+
+        // 6. Add marker to map
+        new mapboxgl.Marker(el)
+            .setLngLat([property.lng, property.lat])
+            .addTo(map);
         });
-      };
 
-      new mapboxgl.Marker(el)
-        .setLngLat([property.lng, property.lat])
-        .addTo(map);
-    });
 
     return () => {
       map.remove();

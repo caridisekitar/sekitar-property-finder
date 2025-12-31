@@ -66,7 +66,7 @@ const Footer: React.FC = () => {
                     </li>
                     <li>
                     <Link
-                        to="/cari-kost"
+                        to="/kalkulator-budget"
                         className="text-gray-900 text-sm lg:text-sm"
                     >
                         Kalkulator Budget
@@ -79,10 +79,10 @@ const Footer: React.FC = () => {
                 <ul className="space-y-3">
                     <li>
                     <Link
-                        to="/cari-kost"
+                        to="/privacy-policy"
                         className="text-gray-900 text-sm lg:text-sm"
                     >
-                        Privacy
+                        Privasi
                     </Link>
                     </li>
                     <li>
@@ -142,7 +142,7 @@ const Footer: React.FC = () => {
                     </li>
                     <li>
                     <Link
-                        to="/cari-kost"
+                        to="/kalkulator-budget"
                         className="text-gray-900 text-sm lg:text-sm"
                     >
                         Kalkulator Budget
@@ -155,15 +155,15 @@ const Footer: React.FC = () => {
                 <ul className="space-y-1">
                     <li>
                     <Link
-                        to="/cari-kost"
+                        to="/privacy-policy"
                         className="text-gray-900 text-sm lg:text-sm"
                     >
-                        Privacy
+                        Privasi
                     </Link>
                     </li>
                     <li>
                     <Link
-                        to="/cari-kost"
+                        to="/faq"
                         className="text-gray-900 text-sm lg:text-sm"
                     >
                         Faq

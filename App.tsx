@@ -25,6 +25,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import UpgradePlanPage from './pages/profile/UpgradePlanPage';
 import CallbackPage from '@/pages/CallbackPage';
 import FAQPage from '@/pages/FAQPage';
+import PrivacyPolicyPage from '@/pages/PrivacyPolicy';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -56,6 +57,7 @@ const AppContent: React.FC = () => {
                     <Route path="/kost/:slug" element={<KostDetailPage />} />
                     <Route path="/callback" element={<CallbackPage />} />
                     <Route path="/faq" element={<FAQPage />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>
