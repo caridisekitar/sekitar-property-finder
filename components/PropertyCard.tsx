@@ -5,7 +5,17 @@ type Props = {
 
 const PropertyCard: React.FC<Props> = ({ property, onClose }) => {
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-white rounded-xl shadow-xl overflow-hidden">
+    <div className="absolute
+  top-4
+  lg:top-4
+  left-1/2
+  -translate-x-1/2
+  w-[90%]
+  max-w-md
+  bg-white
+  rounded-xl
+  shadow-xl
+  overflow-hidden">
       <img
         src={property.image}
         alt={property.title}
