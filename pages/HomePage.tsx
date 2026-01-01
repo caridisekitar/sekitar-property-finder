@@ -7,12 +7,11 @@ import FilterMenu from '../components/layout/FilterMenu';
 import HouseLogo from '@/components/icons/HouseLogo';
 import StarIcon from '@/components/icons/StarIcon';
 import SparklesIcon from '@/components/icons/SparklesIcon';
-import { BUSINESSES } from '@/constants';
-import { ChevronRight, MapPin } from 'lucide-react';
 import SearchKost from '@/components/SearchKost';
 import SubscriptionModal from '@/components/SubscriptionModal';
 import KostCard from '../components/KostCard';
 import { secureGet } from '@/lib/secureGet';
+import BusinessSection from '@/components/BusinessSection';
 
 
 const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
@@ -363,43 +362,12 @@ const HomePage: React.FC = () => {
           <p className="text-gray-500 max-w-2xl mx-auto text-md md:text-md lg:text-lg">Kami percaya setiap usaha layak untuk tumbuh. Karena itu, kami bantu #TemanSekitar mempromosikan bisnis kecil/UMKM secara gratis di website ini. 🩵</p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {BUSINESSES.map((biz) => (
-            <div key={biz.id} className="relative rounded-xl overflow-hidden bg-white shadow-md">
-                <a href={`/business/`+ biz.id}>
-        
-                <div className="relative h-[360px] w-full">
-                  <img
-                    src={biz.image}
-                    alt={biz.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-4 w-[90%] bg-white/20 backdrop-blur-sm rounded-xl shadow-lg p-2">
-                  <h3 className="text-[16px] lg:text-[16px] md:text-[16px] text-white">
-                    {biz.name}
-                  </h3>
-                  
-                  <div className="text-center flex justify-between items-end">
-                    <span className="text-[16px] lg:text-[16px] md:text-[16px] font-bold text-white">
-                      {biz.priceRange}
-                    </span>
-                    <div className="w-8 h-8 bg-white rounded-full p-2 hover:bg-gray-200 transition-colors">
-                      <ChevronRight size={16} className="text-gray-900" />
-                    </div>
-                  </div>
-                </div>
-                </a>
-              </div>
-
-          ))}
-        </div>
+        <BusinessSection />
 
         
-         <div className="flex justify-center mt-10">
+         {/* <div className="flex justify-center mt-10">
            <button className="px-8 py-3 border border-[#18181B] rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Lihat semua</button>
-         </div>
+         </div> */}
       </section>
 
       
@@ -413,12 +381,12 @@ const HomePage: React.FC = () => {
 
           <div className="relative max-w-6xl mx-auto">
             <div className="bg-[#F5F5F5] rounded-2xl flex flex-col md:flex-row items-center gap-8">
-              <img src={testimonials[currentTestimonial].imageUrl} alt={testimonials[currentTestimonial].author} className="w-full h-auto md:w-auto md:h-[300px] object-cover flex-shrink-0 rounded-l-xl" />
+              {/* <img src={testimonials[currentTestimonial].imageUrl} alt={testimonials[currentTestimonial].author} className="w-full h-auto md:w-auto md:h-[300px] object-cover flex-shrink-0 rounded-l-xl" /> */}
               <div className="text-left md:text-left p-4 lg:p-8">
                 <span className="text-5xl font-serif">“</span>
-                <p className="text-md md:text-3xl lg:text-3xl text-gray-700 -mt-4">{testimonials[currentTestimonial].quote}</p>
-                <p className="font-bold mt-6">&mdash; {testimonials[currentTestimonial].author}</p>
-                <p className="text-xs text-gray-500">{testimonials[currentTestimonial].role}</p>
+                <p className="text-md md:text-3xl lg:text-3xl text-gray-700 -mt-4 ms-4">{testimonials[currentTestimonial].quote}</p>
+                <p className="font-bold mt-6 ms-4">&mdash; {testimonials[currentTestimonial].author}</p>
+                <p className="text-xs text-gray-500 ms-4">{testimonials[currentTestimonial].role}</p>
               </div>
             </div>
             <button onClick={prevTestimonial} aria-label="Previous testimonial" className="w-10 h-10 absolute top-1/2 -translate-y-1/2 -left-4 md:-left-12 bg-white rounded-full p-2 border border-[#757575] text-[#757575] hover:bg-gray-100 transition-colors">&larr;</button>

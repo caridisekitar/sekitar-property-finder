@@ -67,7 +67,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
       {/* CTA BUTTON */}
       <div className="px-4 pb-4">
         <button
-        onClick={() => navigate(`/property/${property.id}`)}
+        onClick={() => navigate(`/kost/${property.id}`)}
         className="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-medium"
         >
         Lihat detail

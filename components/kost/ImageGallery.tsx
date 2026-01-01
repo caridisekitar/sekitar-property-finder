@@ -84,7 +84,7 @@ export default function ImageGallery() {
       {/* VIDEO MODAL */}
       {showVideo && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="relative bg-black rounded-xl w-full max-w-3xl aspect-video">
+          <div className="relative bg-black rounded-xl w-full max-w-sm aspect-[9/16]">
             <button
               className="absolute -top-10 right-0 text-white"
               onClick={() => setShowVideo(false)}
@@ -92,9 +92,17 @@ export default function ImageGallery() {
               <X className="w-6 h-6" />
             </button>
 
+            {/* <div class="w-full max-w-md mx-auto">
+              <video
+                class="w-full h-auto"
+                controls
+                src="https://customer-u8becv1dx82s1frs.cloudflarestream.com/4e3231c03fe40637c713ba840367b72b/watch"
+              ></video>
+            </div> */}
+
             <iframe
               className="w-full h-full rounded-xl"
-              src="https://www.youtube.com/embed/6yhkkaGdkpg?autoplay=1"
+              src="https://customer-u8becv1dx82s1frs.cloudflarestream.com/4e3231c03fe40637c713ba840367b72b/watch?autoplay=1"
               title="Kos Video"
               frameBorder="0"
               allow="autoplay; encrypted-media"
