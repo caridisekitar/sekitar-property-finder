@@ -12,6 +12,7 @@ import SubscriptionModal from '@/components/SubscriptionModal';
 import KostCard from '../components/KostCard';
 import { secureGet } from '@/lib/secureGet';
 import BusinessSection from '@/components/BusinessSection';
+import HeroSearch from '@/components/HeroSearch';
 
 
 const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
@@ -147,7 +148,7 @@ const HomePage: React.FC = () => {
           </h1>
           <div className="mt-4 md:mt-8 lg:mt-8 w-full max-w-lg">
             <div className="relative">
-              <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              {/* <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
                 placeholder="Tulis nama kost disini..."
@@ -155,7 +156,8 @@ const HomePage: React.FC = () => {
               />
               <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-brand-dark text-white px-6 py-2.5 rounded-full font-semibold hover:bg-gray-800 transition-colors text-xs lg:text-base">
                 Cari
-              </button>
+              </button> */}
+              <HeroSearch />
             </div>
           </div>
         </div>
