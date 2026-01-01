@@ -86,7 +86,7 @@ export default function ImageGallery() {
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="relative bg-black rounded-xl w-full max-w-sm aspect-[9/16]">
             <button
-              className="absolute -top-10 right-0 text-white"
+              className="absolute top-2 right-2 text-white bg-black/50 hover:bg-black/60 p-2 rounded-full"
               onClick={() => setShowVideo(false)}
             >
               <X className="w-6 h-6" />
