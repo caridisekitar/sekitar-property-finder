@@ -190,7 +190,7 @@ const HomePage: React.FC = () => {
                 <div className="flex flex-col justify-between h-full">
                     <div className="mb-6 md:mb-0">
                         <h2 className="text-2xl md:text-4xl font-bold">5 Kost Pilihan Kami</h2>
-                        <p className="text-gray-600 py-4 max-w-md text-md md:text-md lg:text-lg">Pusing ya pilih kos yang nyaman, aman, dan strategis? <br /> Tenang, ini dia 5 kost pilihan kami ✍️</p>
+                        <p className="text-[#757575] py-4 max-w-md text-md md:text-md lg:text-lg">Pusing ya pilih kos yang nyaman, aman, dan strategis? <br /> Tenang, ini dia 5 kost pilihan kami ✍️</p>
                     </div>
                     <div className="flex space-x-2 mb-8">
                         <button onClick={() => scrollKostCarousel('left')} aria-label="Previous Kost" className="w-12 h-12 bg-white border border-gray-300 rounded-full p-3 hover:bg-gray-100 transition-colors">&larr;</button>
@@ -223,7 +223,7 @@ const HomePage: React.FC = () => {
     <div className="text-center mb-10">
       <p className="text-sm font-bold tracking-widest mb-2">✦ CARI KOS</p>
       <h2 className="text-3xl md:text-4xl font-bold">Mulai Cari Kos</h2>
-      <p className="text-gray-600 mt-2 text-md md:text-md lg:text-lg">
+      <p className="text-[#1E1E1E] mt-2 text-md md:text-md lg:text-lg text-opacity-50">
         Kalau biasanya kamu butuh 30 hari untuk cari kost yang sesuai,
         di Sekitar kamu hanya butuh 1 menit!
       </p>
@@ -361,7 +361,7 @@ const HomePage: React.FC = () => {
              <span className="text-xl">✦</span> BISNIS
           </div>
           <h2 className="text-2xl md:text-[48px] lg:text-[48px] font-bold text-gray-900 mb-4">Bisnis Teman Sekitar</h2>
-          <p className="text-gray-500 max-w-2xl mx-auto text-md md:text-md lg:text-lg">Kami percaya setiap usaha layak untuk tumbuh. Karena itu, kami bantu #TemanSekitar mempromosikan bisnis kecil/UMKM secara gratis di website ini. 🩵</p>
+          <p className="text-[#1E1E1E] max-w-4xl mx-auto text-md md:text-md lg:text-md text-opacity-50">Kami percaya setiap usaha layak untuk tumbuh. Karena itu, kami bantu #TemanSekitar mempromosikan bisnis kecil/UMKM secara gratis di website ini. 🩵</p>
         </div>
         
         <BusinessSection />
@@ -377,8 +377,8 @@ const HomePage: React.FC = () => {
       <section className="py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold">Apa Kata <span className="text-brand-blue">#TemanSekitar</span></h2>
-            <p className="text-gray-600 mt-2 text-md md:text-md lg:text-lg">Setiap pengguna punya cerita. Inilah pengalaman mereka menemukan kost yang tepat bersama Sekitar.🤍</p>
+            <h2 className="text-3xl md:text-4xl font-bold">Apa Kata <span className="text-[#96C8E2]">#TemanSekitar</span></h2>
+            <p className="text-[#1E1E1E] mt-2 text-md md:text-md lg:text-md text-opacity-50">Setiap pengguna punya cerita. Inilah pengalaman mereka menemukan kost yang tepat bersama Sekitar.🤍</p>
           </div>
 
           <div className="relative max-w-6xl mx-auto">

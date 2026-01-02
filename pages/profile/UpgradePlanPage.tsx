@@ -54,7 +54,7 @@ export default function UpgradePlanPage() {
                 "/duitku/create",
                 "POST",
                 {
-                  amount: 99000,
+                  amount: 12000,
                   product_name: "Subscription Premium",
                   email: user.email,
                   phone: user.phone,
