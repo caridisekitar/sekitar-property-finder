@@ -5,25 +5,7 @@ import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatHargaRange } from '@/lib/helper';
 
-// function formatHargaRange(range: string): string {
-//   if (!range) return ""
 
-//   const format = (value: number) => {
-//     const jt = value / 1_000_000
-//     return Number.isInteger(jt)
-//       ? `${jt}jt`
-//       : `${jt.toFixed(1).replace(".", ",")}jt`
-//   }
-
-//   // RANGE VALUE
-//   if (range.includes("-")) {
-//     const [min, max] = range.split("-").map(Number)
-//     return `${format(min)} - ${format(max)}`
-//   }
-
-//   // SINGLE VALUE
-//   return format(Number(range))
-// }
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
   <div>
     {/* <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center"> */}
