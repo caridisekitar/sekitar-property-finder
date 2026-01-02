@@ -9,10 +9,15 @@ import { formatHargaRange } from '@/lib/helper';
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
   <div>
     {/* <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center"> */}
-    <div className="flex-shrink-0
-    lg:w-[220px] sm:w-full
+    <div
+  className="
+    hidden lg:block
+    flex-shrink-0
+    w-[220px]
     bg-white rounded-xl shadow-md
-    overflow-hidden snap-start hidden lg:block">
+    overflow-hidden snap-start
+  "
+>
         <Link to={`/kost/${kost.slug}`}>
         {/* IMAGE */}
       <div className="relative lg:h-[360px] w-auto">
@@ -63,7 +68,11 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
     </div>
     {/* Mobile View */}
     <Link to={`/kost/${kost.slug}`}>
-    <div className="relative w-full max-w-5xl overflow-hidden rounded-xl bg-gray-200 lg:hidden">
+    <div className="relative lg:hidden
+    flex-shrink-0
+    w-[280px] sm:w-[320px]
+    overflow-hidden rounded-xl
+    bg-gray-200 snap-start">
       {/* Background Image */}
       <img
         src="https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1600&auto=format&fit=crop"

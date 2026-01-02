@@ -198,7 +198,15 @@ const HomePage: React.FC = () => {
                     </div>
                 </div>
                 <div className="">
-                    <div ref={kostCarouselRef} className="flex overflow-x-auto space-x-6 pb-4 snap-x snap-mandatory" style={{ scrollbarWidth: 'none' }}>
+                    <div
+                        ref={kostCarouselRef}
+                        className="
+                          flex gap-4 overflow-x-auto pb-4
+                          snap-x snap-mandatory
+                          lg:gap-6
+                        "
+                        style={{ scrollbarWidth: "none" }}
+                      >
                         {mockKostData.slice(0,5).map(kost => <KostCard key={kost.id} kost={kost} />)}
                     </div>
                 </div>
