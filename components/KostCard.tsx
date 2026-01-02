@@ -3,7 +3,27 @@ import type { Kost } from '../types';
 import BedIcon from '@/components/icons/BedIcon';
 import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { formatHargaRange } from '@/lib/helper';
 
+// function formatHargaRange(range: string): string {
+//   if (!range) return ""
+
+//   const format = (value: number) => {
+//     const jt = value / 1_000_000
+//     return Number.isInteger(jt)
+//       ? `${jt}jt`
+//       : `${jt.toFixed(1).replace(".", ",")}jt`
+//   }
+
+//   // RANGE VALUE
+//   if (range.includes("-")) {
+//     const [min, max] = range.split("-").map(Number)
+//     return `${format(min)} - ${format(max)}`
+//   }
+
+//   // SINGLE VALUE
+//   return format(Number(range))
+// }
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
   <div>
     {/* <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center"> */}
@@ -51,7 +71,8 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
         {/* PRICE */}
         <div className="bg-[#EAF6FF] rounded-xl py-3 text-center">
           <span className="text-[16px] font-bold text-gray-900">
-            IDR {kost.price_monthly.toLocaleString('id-ID')}
+            IDR {formatHargaRange(kost.price_monthly)}
+
           </span>
         </div>
       </div>

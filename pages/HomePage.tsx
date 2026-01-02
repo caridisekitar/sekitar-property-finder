@@ -20,7 +20,7 @@ const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
     name: 'Kost Dahlia Indah',
     type: 'Kost Putri',
     city: 'Mampang, Jakarta Selatan',
-    price_monthly: 1500000,
+    price_monthly: "1500000",
     img_cover: `https://picsum.photos/seed/${i+1}/400/300`,
     isNew: 0,
     link: `/kost/${i+1}/detail`,
@@ -148,15 +148,6 @@ const HomePage: React.FC = () => {
           </h1>
           <div className="mt-4 md:mt-8 lg:mt-8 w-full max-w-lg">
             <div className="relative">
-              {/* <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Tulis nama kost disini..."
-                className="w-full pl-12 pr-28 py-4 text-gray-800 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-brand-blue text-xs lg:text-base"
-              />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-brand-dark text-white px-6 py-2.5 rounded-full font-semibold hover:bg-gray-800 transition-colors text-xs lg:text-base">
-                Cari
-              </button> */}
               <HeroSearch />
             </div>
           </div>

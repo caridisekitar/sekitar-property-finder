@@ -8,6 +8,9 @@ import type { Kost } from "@/types";
 import NotFoundKost from "@/components/NotFoundKost";
 import { secureGet } from '@/lib/secureGet';
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { formatHargaRange, formatDeposit } from "@/lib/helper";
+import { useAuth } from "@/hooks/useAuth";
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 const KosDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -15,7 +18,9 @@ const KosDetailPage: React.FC = () => {
   const [kost, setKost] = useState<Kost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [open, setOpen] = useState(false);
+  const { subscription } = useAuth();
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
    useEffect(() => {
     if (!slug) return;
@@ -37,15 +42,21 @@ const KosDetailPage: React.FC = () => {
     fetchKostDetail();
   }, [slug]);
 
-  if (loading) return <LoadingOverlay message="Memuat detail kos ..." />;
+  // ✅ EFFECT 2 — subscription status
+  useEffect(() => {
+    setIsSubscribed(subscription?.plan === "PREMIUM");
+    }, [subscription]);
 
-  if (error || !kost) {
-    return (
-      error ?? <NotFoundKost />
-    );
-  }
+    // ⛔ returns AFTER hooks
+    if (loading) {
+      return <LoadingOverlay message="Memuat detail kos ..." />;
+    }
 
-  const handleContactOwner = () => {
+    if (error || !kost) {
+      return error ? <p>{error}</p> : <NotFoundKost />;
+    }
+
+    const handleContactOwner = () => {
     if (!kost?.whatsapp_number) return;
 
     // normalize phone number (remove leading 0, spaces, +)
@@ -61,12 +72,24 @@ const KosDetailPage: React.FC = () => {
     const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
 
     window.open(whatsappUrl, "_blank");
-    };
+    
+  };
+
+  
+
 
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
+      {!isSubscribed && (
+        <div className="relative mt-6">
+          <div
+            className="
+              blur-lg pointer-events-none select-none
+            "
+          >
 
+            
       {/* Breadcrumb */}
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/" className="hover:text-gray-800">Home</Link> /
@@ -94,7 +117,7 @@ const KosDetailPage: React.FC = () => {
         {/* RIGHT CARD */}
         <div className="bg-white border rounded-xl p-5 h-fit">
           <div className="text-2xl font-bold text-gray-900">
-            Rp{Number(kost.price_monthly).toLocaleString("id-ID")}
+            Rp{formatHargaRange(kost.price_monthly)}
             <span className="text-sm font-medium text-gray-500"> /bulan</span>
           </div>
 
@@ -105,7 +128,7 @@ const KosDetailPage: React.FC = () => {
                 </div>
                 <div>
                     <p className="text-sm text-gray-600 mt-2">
-                    Deposit: Rp{Number(kost.deposit).toLocaleString("id-ID")}
+                    Deposit: Rp{formatDeposit(kost.deposit)}
                     </p>
                 </div>
               </div>
@@ -196,8 +219,8 @@ const KosDetailPage: React.FC = () => {
                 width="100%"
                 height="250"
                 loading="lazy"
-                allowfullscreen
-                referrerpolicy="no-referrer-when-downgrade"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
                 src={`https://www.google.com/maps?q=${kost.latitude},${kost.longitude}&z=15&output=embed`}>
                 </iframe>
           </div>
@@ -243,6 +266,37 @@ const KosDetailPage: React.FC = () => {
 
       {/* REKOMENDASI */}
       <RekomendasiKos />
+            </div>
+
+            {/* LOCK OVERLAY */}
+                <div className="absolute inset-0 flex items-start justify-center mt-[100px] md:mt-[200px] lg:mt-[200px]">
+                  <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full mx-4">
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src="/images/icons/icon-locked.png"
+                        alt="Lock Icon"
+                        className="w-16 h-16"
+                      />
+                    </div>
+
+                    <h3 className="text-xl font-bold mb-2">Yah terkunci nih!</h3>
+
+                    <p className="text-gray-600 mb-6">
+                      Jangan khawatir, kamu bisa akses ratusan informasi kost
+                      dengan harga bersahabat.
+                    </p>
+
+                    <button
+                      onClick={() => setOpen(true)}
+                      className="px-6 py-3 rounded-xl bg-[#96C8E2] text-white font-semibold hover:bg-blue-600 transition"
+                    >
+                      Mulai langganan
+                    </button>
+                  </div>
+                </div>
+          </div>
+      )}
+      <SubscriptionModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };
