@@ -51,37 +51,25 @@ export default function UpgradePlanPage() {
       try {
         setLoading(true);
         const res = await securePost(
-                "/invoices/create-invoice",
+                "/duitku/create",
                 "POST",
                 {
-                  user_id: user.id,
-                  customer_name: user.name,
-                  customer_email: user.email,
-                  items: [
-                    {
-                      name: "Premium Subscription (1 Year)",
-                      qty: 1,
-                      price: 99000,
-                    },
-                  ],
-                  due_date: new Date(
-                    Date.now() + 7 * 24 * 60 * 60 * 1000
-                  ).toISOString().slice(0, 10),
-                }
+                  amount: 99000,
+                  product_name: "Subscription Premium",
+                  email: user.email,
+                  phone: user.phone,
+                  name: user.name,
+                } 
               );
-
-
-        // const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(res.message || "Gagal membuat invoice");
+        // Redirect ke halaman pembayaran Duitku
+        if (res.paymentUrl) {
+          window.location.href = res.paymentUrl;
         }
 
         // Redirect to invoice detail / payment page
         // navigate(`/invoices/${data.invoice_id}`);
       } catch (err) {
-        console.error(err);
-        alert("Gagal membuat invoice. Silakan coba lagi.");
+      alert(err.message || "Gagal memproses pembayaran");
       } finally {
         setLoading(false);
       }
@@ -122,7 +110,7 @@ export default function UpgradePlanPage() {
                     <Feature text="Akses fitur Daftarkan Kost Mu" disabled />
                     <Feature text="Akses fitur Daftarkan Kost Bisnis Mu" disabled />
                     <Feature text="Jumlah list kost akan terus bertambah setiap bulan" disabled />
-                    { subscription?.plan === 'FREE' && (
+                    { subscription?.plan === 'BASIC' && (
                         
                         <div className="mt-auto pt-8">
                             <div className="w-full bg-gray-500 text-white py-3 rounded-lg font-medium text-center opacity-50 cursor-not-allowed">
@@ -171,7 +159,7 @@ export default function UpgradePlanPage() {
                     <Feature text="Jumlah list kost terus bertambah setiap bulan" />
 
                     <div className="mt-auto pt-8">
-                        {subscription?.plan === 'FREE' ? (
+                        {subscription?.plan === 'BASIC' ? (
                           <button
                               onClick={handleUpgrade}
                               disabled={loading}

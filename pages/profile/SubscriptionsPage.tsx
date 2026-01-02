@@ -122,7 +122,7 @@ export default function SubscriptionsPage() {
                 Masa berlaku sampai: <span className="font-medium">{formatDateID(subscription?.ends_at)}</span>
             </p>
             ) : (
-              "Free"
+              "Basic"
             )}
           </div>
 
@@ -133,7 +133,7 @@ export default function SubscriptionsPage() {
             </h2>
           </div>
 
-          {subscription?.plan === "FREE" && invoices?.length === 0 && (
+          {subscription?.plan === "BASIC" && invoices?.length === 0 && (
             <div>
               <div className="flex justify-center mb-6">
                 <img

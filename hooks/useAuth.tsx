@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { secureGet } from "@/lib/secureGet";
 
 type Subscription = {
-  plan: "FREE" | "PREMIUM";
+  plan: "BASIC" | "PREMIUM";
   ends_at: string;
   is_active: number;
 };

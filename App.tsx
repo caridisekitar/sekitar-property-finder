@@ -26,6 +26,7 @@ import UpgradePlanPage from './pages/profile/UpgradePlanPage';
 import CallbackPage from '@/pages/CallbackPage';
 import FAQPage from '@/pages/FAQPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicy';
+import PaymentSuccess from "@/pages/PaymentSuccess";
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -56,6 +57,7 @@ const AppContent: React.FC = () => {
                     <Route path="/daftar-bisnis" element={<DaftarkanBisnismu />} />
                     <Route path="/kost/:slug" element={<KostDetailPage />} />
                     <Route path="/callback" element={<CallbackPage />} />
+                    <Route path="/payment/success" element={<PaymentSuccess />} />
                     <Route path="/faq" element={<FAQPage />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                     <Route path="*" element={<NotFoundPage />} />

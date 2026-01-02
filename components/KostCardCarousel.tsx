@@ -6,18 +6,17 @@ import { Link } from 'react-router-dom';
 import { formatHargaRange } from '@/lib/helper';
 
 
-const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
+const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
   <div>
-    {/* <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center"> */}
     <div
-  className="
-    hidden lg:block
-    flex-shrink-0
-    w-[220px]
-    bg-white rounded-xl shadow-md
-    overflow-hidden snap-start
-  "
->
+        className="
+          hidden lg:block
+          flex-shrink-0
+          w-[220px]
+          bg-white rounded-xl shadow-md
+          overflow-hidden snap-start
+        "
+      >
         <Link to={`/kost/${kost.slug}`}>
         {/* IMAGE */}
       <div className="relative lg:h-[360px] w-auto">
@@ -129,4 +128,4 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
   </div>
 );
 
-export default KostCard;
+export default KostCardCarousel;

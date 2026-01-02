@@ -202,8 +202,9 @@ const HomePage: React.FC = () => {
                         ref={kostCarouselRef}
                         className="
                           flex gap-4 overflow-x-auto pb-4
-                          snap-x snap-mandatory
-                          lg:gap-6
+    snap-x snap-mandatory
+    touch-pan-x
+    overscroll-x-contain
                         "
                         style={{ scrollbarWidth: "none" }}
                       >
