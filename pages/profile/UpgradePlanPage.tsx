@@ -56,6 +56,7 @@ export default function UpgradePlanPage() {
                 {
                   amount: 12000,
                   product_name: "Subscription Premium",
+                  user_id: user.id,
                   email: user.email,
                   phone: user.phone,
                   name: user.name,
