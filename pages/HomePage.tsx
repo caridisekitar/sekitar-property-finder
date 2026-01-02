@@ -225,7 +225,7 @@ const HomePage: React.FC = () => {
       <h2 className="text-3xl md:text-4xl font-bold">Mulai Cari Kos</h2>
       <p className="text-gray-600 mt-2 text-md md:text-md lg:text-lg">
         Kalau biasanya kamu butuh 30 hari untuk cari kost yang sesuai,
-        di Sekitar kamu hanya butuh 30 menit!
+        di Sekitar kamu hanya butuh 1 menit!
       </p>
     </div>
 
