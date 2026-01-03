@@ -173,35 +173,58 @@ export default function SubscriptionsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {invoices.map((invoice, index) => (
-                  <tr className="border-t">
-                    <td className="px-6 py-4">{index + 1}</td>
-                    <td className="px-6 py-4">{invoice?.orders.product_name}</td>
-                    <td className="px-6 py-4">{formatDateID(invoice?.orders.created_at)}</td>
-                    <td className="px-6 py-4">{formatDateID(invoice?.subscription.ends_at)}</td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium border-yellow-800 bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-500">{invoice?.status}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      {invoice?.orders.status === "PENDING" ? (
-                        <a href="#" className="text-blue-600 hover:underline">
-                          Bayar
-                        </a>
-                      ) : (
-                        invoice?.orders.status
-                      )}
-                      </td>
-                    <td className="px-6 py-4 text-right">
-                      <button
-                          onClick={() => downloadInvoice(invoice?.orders.id)}
-                          className="text-blue-600 hover:underline"
-                        >
-                          Download invoice
-                        </button>
-                    </td>
-                  </tr>
-                    ) )}
+                  {invoices.map((invoice, invoiceIndex) =>
+                    invoice.orders.map((order, orderIndex) => (
+                      <tr key={`${invoice.id}-${order.id}`} className="border-t">
+                        <td className="px-6 py-4">
+                          {invoiceIndex + 1}.{orderIndex + 1}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {order.product_name ?? "-"}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {formatDateID(order.created_at)}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {formatDateID(invoice.subscription?.ends_at)}
+                        </td>
+
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium
+                            border-yellow-800 bg-yellow-100 text-yellow-800">
+                            {order.status}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {order.status === "PENDING" ? (
+                            <a
+                              href="#"
+                              className="text-blue-600 hover:underline"
+                            >
+                              Bayar
+                            </a>
+                          ) : (
+                            order.status
+                          )}
+                        </td>
+
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => downloadInvoice(order.id)}
+                            className="text-blue-600 hover:underline"
+                          >
+                            Download invoice
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
+
               </table>
             </div>
 
