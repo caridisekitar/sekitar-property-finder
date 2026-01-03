@@ -8,6 +8,41 @@ import { formatDateID } from "@/lib/date";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import DropdownMobileMenu from '@/components/profile/DropdownMobileMenu';
 
+
+export const PAYMENT_METHODS = [
+  { code: "VC", label: "Visa / Master Card / JCB" },
+  { code: "BC", label: "BCA Virtual Account" },
+  { code: "M2", label: "Mandiri Virtual Account" },
+  { code: "VA", label: "Maybank Virtual Account" },
+  { code: "I1", label: "BNI Virtual Account" },
+  { code: "B1", label: "CIMB Niaga Virtual Account" },
+  { code: "BT", label: "Permata Bank Virtual Account" },
+  { code: "A1", label: "ATM Bersama" },
+  { code: "AG", label: "Bank Artha Graha" },
+  { code: "NC", label: "Bank Neo Commerce / BNC" },
+  { code: "BR", label: "BRIVA" },
+  { code: "SI", label: "Bank Sahabat Sampoerna" },
+  { code: "DM", label: "Danamon Virtual Account" },
+  { code: "BV", label: "BSI Virtual Account" },
+  { code: "FT", label: "Pegadaian / ALFA / Pos" },
+  { code: "IR", label: "Indomaret" },
+  { code: "OV", label: "OVO (Support Void)" },
+  { code: "SA", label: "ShopeePay Apps (Support Void)" },
+  { code: "LF", label: "LinkAja Apps (Fixed Fee)" },
+  { code: "LA", label: "LinkAja Apps (Percentage Fee)" },
+  { code: "DA", label: "DANA" },
+  { code: "SL", label: "ShopeePay Account Link" },
+  { code: "OL", label: "OVO Account Link" },
+  { code: "SP", label: "ShopeePay" },
+  { code: "NQ", label: "Nobu" },
+  { code: "GQ", label: "Gudang Voucher" },
+  { code: "SQ", label: "Nusapay" },
+  { code: "DN", label: "Indodana Paylater" },
+  { code: "AT", label: "ATOME" },
+  { code: "JP", label: "Jenius Pay" },
+];
+
+
 export default function SubscriptionsPage() {
   const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
@@ -20,6 +55,10 @@ export default function SubscriptionsPage() {
       const res = await secureGet(`/invoices/${invoiceId}/${user.id}/signed-url`);
       window.open(res.url, "_blank");
     };
+
+    const getPaymentLabel = (code) =>
+        PAYMENT_METHODS.find(m => m.code === code)?.label ?? code;
+
   
     useEffect(() => {
         if (!token) {
@@ -197,7 +236,16 @@ export default function SubscriptionsPage() {
                           </td>
 
                           <td className="px-6 py-4">
-                            {order.payment_method ?? "-"}
+                            { order.payment_code && (
+                              <span className="inline-flex px-3 py-1 text-xs text-green-800">
+                                 {getPaymentLabel(order.payment_code)}
+                              </span>
+                            )}
+                            {!order.payment_code && (
+                              <span className="inline-flex px-3 py-1 text-xs text-red-800">
+                                 -
+                              </span>
+                            )}
                           </td>
 
                           <td className="px-6 py-4 text-right">
