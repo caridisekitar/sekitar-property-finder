@@ -91,7 +91,7 @@ export default function SubscriptionsPage() {
 
   
           <div className={`rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4
-            ${subscription.plan === "PREMIUM" ? "bg-[#FEF3C7]" : "bg-[#DCF4FF]"}
+            ${subscription?.plan === "PREMIUM" ? "bg-[#FEF3C7]" : "bg-[#DCF4FF]"}
             `}>
             
             <div className="flex items-center gap-4">
