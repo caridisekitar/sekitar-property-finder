@@ -176,24 +176,24 @@ export default function SubscriptionsPage() {
                   {invoices.map((invoice, index) => (
                   <tr className="border-t">
                     <td className="px-6 py-4">{index + 1}</td>
-                    <td className="px-6 py-4">Premium</td>
-                    <td className="px-6 py-4">{formatDateID(invoice?.created_at)}</td>
-                    <td className="px-6 py-4">{formatDateID(invoice?.due_date)}</td>
+                    <td className="px-6 py-4">{invoice?.orders.product_name}</td>
+                    <td className="px-6 py-4">{formatDateID(invoice?.orders.created_at)}</td>
+                    <td className="px-6 py-4">{formatDateID(invoice?.subscription.ends_at)}</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium border-yellow-800 bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-500">{invoice?.status}</span>
                     </td>
                     <td className="px-6 py-4">
-                      {invoice?.status === "unpaid" ? (
+                      {invoice?.orders.status === "PENDING" ? (
                         <a href="#" className="text-blue-600 hover:underline">
                           Bayar
                         </a>
                       ) : (
-                        invoice?.payment_method
+                        invoice?.orders.status
                       )}
                       </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                          onClick={() => downloadInvoice(invoice.id)}
+                          onClick={() => downloadInvoice(invoice?.orders.id)}
                           className="text-blue-600 hover:underline"
                         >
                           Download invoice
