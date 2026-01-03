@@ -113,7 +113,7 @@ const ProfilePage: React.FC = () => {
                 <div className="w-full sm:w-2/3 flex items-center justify-start gap-6">
                     <img 
                         src="/images/icons/user.png" 
-                        alt={user.name}
+                        alt='user'
                         className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover"
                     />
                     {/* <div className="flex gap-4">

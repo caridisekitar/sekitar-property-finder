@@ -60,7 +60,7 @@ const SidebarMenu: React.FC = ({ user }) => {
                     <div className="p-4 border border-gray-200 rounded-2xl flex flex-col items-center text-center">
                         <img 
                             src="/images/icons/user.png" 
-                            alt={user.name}
+                            alt='user'
                             className="w-20 h-20 rounded-full object-cover mb-4"
                         />
                         <h3 className="font-bold text-lg text-brand-dark capitalize">{user.name}</h3>
