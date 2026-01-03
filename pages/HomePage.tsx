@@ -65,7 +65,6 @@ const HomePage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [kosts, setKosts] = useState<Kost[]>([]);
-    const plan = localStorage.getItem('plan');
     const { subscription } = useAuth();
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT);
@@ -126,11 +125,6 @@ const HomePage: React.FC = () => {
             });
         }
     };
-
-    if(plan == 'premium'){
-        alert(`Kamu telah memilih paket ${plan.toUpperCase()}. Selanjutnya kamu akan diarahkan ke halaman pembayaran.`);
-        localStorage.removeItem("plan");
-    }
 
 
   return (
