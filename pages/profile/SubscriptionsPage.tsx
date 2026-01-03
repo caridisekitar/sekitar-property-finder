@@ -157,106 +157,65 @@ export default function SubscriptionsPage() {
           )}
 
 
-          {invoices?.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-gray-50 text-gray-600 font-medium">
-                  <tr>
-                    <th className="px-6 py-4">No</th>
-                    <th className="px-6 py-4">Tipe</th>
-                    <th className="px-6 py-4">Tanggal</th>
-                    <th className="px-6 py-4">Masa berlaku sampai</th>
-                    <th className="px-6 py-4">Status Pembayaran</th>
-                    <th className="px-6 py-4">Metode Pembayaran</th>
-                    <th className="px-6 py-4 text-right">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invoices.map((invoice, invoiceIndex) =>
-                    invoice.orders.map((order, orderIndex) => (
-                      <tr key={`${invoice.id}-${order.id}`} className="border-t">
-                        <td className="px-6 py-4">
-                          {invoiceIndex + 1}.{orderIndex + 1}
-                        </td>
+          {Array.isArray(invoices?.orders) && invoices.orders.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-gray-50 text-gray-600 font-medium">
+                      <tr>
+                        <th className="px-6 py-4">No</th>
+                        <th className="px-6 py-4">Tipe</th>
+                        <th className="px-6 py-4">Tanggal</th>
+                        <th className="px-6 py-4">Masa berlaku sampai</th>
+                        <th className="px-6 py-4">Status Pembayaran</th>
+                        <th className="px-6 py-4">Metode Pembayaran</th>
+                        <th className="px-6 py-4 text-right">Aksi</th>
+                      </tr>
+                    </thead>
 
-                        <td className="px-6 py-4">
-                          {order.product_name ?? "-"}
-                        </td>
+                    <tbody>
+                      {invoices.orders.map((order, index) => (
+                        <tr key={order.id} className="border-t">
+                          <td className="px-6 py-4">{index + 1}</td>
 
-                        <td className="px-6 py-4">
-                          {formatDateID(order.created_at)}
-                        </td>
+                          <td className="px-6 py-4">
+                            {order.product_name ?? "-"}
+                          </td>
 
-                        <td className="px-6 py-4">
-                          {formatDateID(invoice.subscription?.ends_at)}
-                        </td>
+                          <td className="px-6 py-4">
+                            {formatDateID(order.created_at)}
+                          </td>
 
-                        <td className="px-6 py-4">
-                          <span className="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium
-                            border-yellow-800 bg-yellow-100 text-yellow-800">
-                            {order.status}
-                          </span>
-                        </td>
+                          <td className="px-6 py-4">
+                            {formatDateID(invoices.subscription?.ends_at)}
+                          </td>
 
-                        <td className="px-6 py-4">
-                          {order.status === "PENDING" ? (
-                            <a
-                              href="#"
+                          <td className="px-6 py-4">
+                            <span className="inline-flex px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                              {order.status}
+                            </span>
+                          </td>
+
+                          <td className="px-6 py-4">
+                            {order.payment_method ?? "-"}
+                          </td>
+
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => downloadInvoice(order.id)}
                               className="text-blue-600 hover:underline"
                             >
-                              Bayar
-                            </a>
-                          ) : (
-                            order.status
-                          )}
-                        </td>
-
-                        <td className="px-6 py-4 text-right">
-                          <button
-                            onClick={() => downloadInvoice(order.id)}
-                            className="text-blue-600 hover:underline"
-                          >
-                            Download invoice
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-
-              </table>
-            </div>
-
-            
-            <div className="md:hidden divide-y">
-              <div className="p-4 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Tipe</span>
-                  <span className="font-medium">Premium</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Tanggal</span>
-                  <span>31 Oktober 2025</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Berlaku sampai</span>
-                  <span>31 Oktober 2026</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Pembayaran</span>
-                  <span>Virtual Account</span>
-                </div>
-                <div className="pt-2">
-                  <a href="#" className="text-blue-600 font-medium">
-                    Download invoice
-                  </a>
+                              Download invoice
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            </div>
+            )}
 
-          </div>
-          )}
 
 
 

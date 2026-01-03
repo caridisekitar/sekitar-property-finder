@@ -77,7 +77,7 @@ export default function PaymentSuccess() {
   if (status === "success") {
     return (
         <div className="flex min-h-screen mb-12 border-t border-gray-200 container mx-auto">
-            <SidebarMenu user={user}/>
+            {user && <SidebarMenu user={user} />}
                 <div className="px-5 h-screen flex flex-col items-center justify-center mx-auto">
                 <img src="/images/payment-success.png" alt="Payment Success" className="w-[300px] h-[300px]" />
                 <h5 className="mt-3 font-bold text-[24px]">Selamat! Akun Premium-mu aktif</h5>
