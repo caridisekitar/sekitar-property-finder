@@ -25,6 +25,32 @@ export function formatHargaRange(range: unknown): string {
   return isNaN(num) ? str : format(num);
 }
 
+export function formatHargaRangeID(range: unknown): string {
+  if (range === null || range === undefined) return "";
+
+  const str = String(range).trim();
+  if (!str) return "";
+
+  const format = (value: number) =>
+    value.toLocaleString("id-ID");
+
+  // Range value (e.g. 2000000-3000000)
+  if (str.includes("-")) {
+    const [min, max] = str.split("-").map(v =>
+      Number(v.replace(/[^\d]/g, ""))
+    );
+
+    if (!isNaN(min) && !isNaN(max)) {
+      return `${format(min)}-${format(max)}`;
+    }
+  }
+
+  // Single value
+  const num = Number(str.replace(/[^\d]/g, ""));
+  return isNaN(num) ? str : format(num);
+}
+
+
 
 
 export function formatDeposit(deposit: unknown): string {
@@ -57,7 +83,7 @@ export function formatDeposit(deposit: unknown): string {
     );
 
     if (!isNaN(min) && !isNaN(max)) {
-      return `${formatJt(min)} - ${formatJt(max)}`;
+      return `Rp${formatJt(min)} - ${formatJt(max)}`;
     }
   }
 
@@ -69,6 +95,6 @@ export function formatDeposit(deposit: unknown): string {
 function formatJt(value: number) {
   const jt = value / 1_000_000;
   return Number.isInteger(jt)
-    ? `${jt}jt`
-    : `${jt.toFixed(1).replace(".", ",")}jt`;
+    ? `Rp${jt}jt`
+    : `Rp${jt.toFixed(1).replace(".", ",")}jt`;
 }

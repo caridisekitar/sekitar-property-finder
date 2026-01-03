@@ -133,7 +133,7 @@ export default function SubscriptionsPage() {
             </h2>
           </div>
 
-          {subscription?.plan === "BASIC" && invoices?.length === 0 && (
+          {subscription?.plan === "BASIC" && (
             <div>
               <div className="flex justify-center mb-6">
                 <img
