@@ -107,8 +107,38 @@ export default function ConfirmOTPPage() {
     // 🎉 SUCCESS
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
-
     sessionStorage.removeItem("otp_phone");
+    
+    const pendingPlan = sessionStorage.getItem("pending_plan");
+
+    // ===============================
+    // 🔥 PREMIUM FLOW
+    // ===============================
+    if (pendingPlan === "premium") {
+      sessionStorage.removeItem("pending_plan");
+
+      const payment = await securePost(
+        "/duitku/create",
+        "POST",
+        {
+          amount: 99000,
+          product_name: "Subscription Premium",
+          user_id: data.user.id,
+          email: data.user.email,
+          phone: data.user.phone,
+          name: data.user.name,
+        }
+      );
+
+      if (payment?.paymentUrl) {
+        window.location.href = payment.paymentUrl;
+        return; // ⛔ stop navigation
+      }
+    }
+
+    // ===============================
+    // ✅ BASIC / FALLBACK FLOW
+    // ===============================
     // 🔁 restore redirect
     const redirectTo = localStorage.getItem("post_login_redirect");
 
@@ -117,10 +147,8 @@ export default function ConfirmOTPPage() {
         ? redirectTo
         : "/";
 
-    navigate(safeRedirect, { replace: true });
     localStorage.removeItem("post_login_redirect");
-
-    // navigate("/", { replace: true });
+    navigate(safeRedirect, { replace: true });
 
     } 
     catch (err: any) {
@@ -139,19 +167,6 @@ export default function ConfirmOTPPage() {
 
       setError(err.message || "Gagal verifikasi OTP");
     }
-    // catch (err: any) {
-    //   // Backend should return attempt_left on error
-    //   if (err.attempt_left !== undefined) {
-    //     setAttemptLeft(err.attempt_left);
-    //   } else {
-    //     setAttemptLeft(a => a - 1);
-    //   }
-
-    //   setOtp(Array(OTP_LENGTH).fill(""));
-    //   inputsRef.current[0]?.focus();
-
-    //   setError(err.message || "Gagal verifikasi OTP");
-    // } 
     finally {
       setLoading(false);
     }

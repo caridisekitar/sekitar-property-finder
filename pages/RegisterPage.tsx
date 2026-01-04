@@ -73,10 +73,33 @@ export default function Register() {
         setError(res.message || 'Gagal mengirim OTP');
         return;
       }
-      localStorage.setItem("plan", plan);
+      
+      // check if new user with new params and plan is PREMIUM, then redirect to upgrade page
+      /* Do this function
+      const res = await securePost(
+                      "/duitku/create",
+                      "POST",
+                      {
+                        amount: 99000,
+                        product_name: "Subscription Premium",
+                        user_id: user.id,
+                        email: user.email,
+                        phone: user.phone,
+                        name: user.name,
+                      } 
+                    );
+              // Redirect ke halaman pembayaran Duitku
+              if (res.paymentUrl) {
+                window.location.href = res.paymentUrl;
+              }
+      */
 
       // ✅ store phone for OTP step
       sessionStorage.setItem('otp_phone', res.data.phone);
+
+      // ✅ store intended plan (important)
+      sessionStorage.setItem('pending_plan', plan);
+
 
       navigate('/confirm-otp', {
         state: { phone: res.data.phone },
