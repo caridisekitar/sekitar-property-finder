@@ -83,13 +83,13 @@ export function formatDeposit(deposit: unknown): string {
     );
 
     if (!isNaN(min) && !isNaN(max)) {
-      return `Rp${formatJt(min)} - ${formatJt(max)}`;
+      return `Rp${min} - ${max}`;
     }
   }
 
   // SINGLE NUMBER
   const num = Number(str.replace(/[^\d]/g, ""));
-  return isNaN(num) ? str : formatJt(num);
+  return str; //isNaN(num) ? str : formatJt(num);
 }
 
 function formatJt(value: number) {

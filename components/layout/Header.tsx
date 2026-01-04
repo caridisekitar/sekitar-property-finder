@@ -28,7 +28,7 @@ const Header: React.FC = () => {
           <div className="flex items-center justify-between h-20">
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center space-x-2">
-                <SekitarLogo className="h-12 w-auto text-brand-dark"/>
+                <SekitarLogo className="h-12 w-auto"/>
               </Link>
             </div>
             <nav className="hidden md:flex md:items-center md:space-x-8">

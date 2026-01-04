@@ -94,7 +94,7 @@ const KosDetailPage: React.FC = () => {
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/" className="hover:text-gray-800">Home</Link> /
         <Link to="/cari-kost" className="mx-1 hover:text-gray-800">Kost</Link> /
-        <span className="mx-1 text-gray-800 font-medium">{kost.city}</span>
+        <span className="mx-1 text-gray-800 font-medium">Lorem Ipsum</span>
       </nav>
 
       {/* Header */}
@@ -105,19 +105,19 @@ const KosDetailPage: React.FC = () => {
           <ImageGallery images={kost.images ?? [kost.img_cover]} />
 
           <h1 className="mt-4 text-xl font-semibold text-gray-900">
-            {kost.name}
+            Lorem Ipsum
           </h1>
 
           <div className="flex items-center text-sm text-gray-500 mt-1">
             <MapPin className="w-4 h-4 mr-1" />
-            {kost.city}
+            Lorem Ipsum
           </div>
         </div>
 
         {/* RIGHT CARD */}
         <div className="bg-white border rounded-xl p-5 h-fit">
           <div className="text-2xl font-bold text-gray-900">
-            Rp{formatHargaRange(kost.price_monthly)}
+            Rp
             <span className="text-sm font-medium text-gray-500"> /bulan</span>
           </div>
 
@@ -128,7 +128,7 @@ const KosDetailPage: React.FC = () => {
                 </div>
                 <div>
                     <p className="text-sm text-gray-600 mt-2">
-                    Deposit: {formatDeposit(kost.deposit)}
+                    Deposit: -
                     </p>
                 </div>
               </div>
@@ -153,15 +153,8 @@ const KosDetailPage: React.FC = () => {
 
 
         <>
-            {!kost.whatsapp_number && (
-                <p className="text-xs text-red-500 mt-2">
-                Nomor WhatsApp pemilik belum tersedia
-                </p>
-            )}
 
             <button
-                onClick={handleContactOwner}
-                disabled={!kost.whatsapp_number}
                 className="mt-4 w-full bg-gray-900 text-white py-3 rounded-lg
                         hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -197,10 +190,10 @@ const KosDetailPage: React.FC = () => {
                     >
                     <img
                         src={`/images/icons/${facility.icon}`}
-                        alt={facility.name}
+                        alt="Lorem Ipsum"
                         className="w-4 h-4 object-contain"
                     />
-                    <span>{facility.name}</span>
+                    <span>Lorem Ipsum</span>
                     </div>
                 ))
                 ) : (
@@ -221,39 +214,16 @@ const KosDetailPage: React.FC = () => {
                 loading="lazy"
                 allowFullScreen
                 referrerPolicy="no-referrer-when-downgrade"
-                src={`https://www.google.com/maps?q=${kost.latitude},${kost.longitude}&z=15&output=embed`}>
+                src={`https://www.google.com/maps?q=-6.1786755,106.8271231&z=15&output=embed`}>
                 </iframe>
           </div>
         )}
 
         {activeTab === "insight" && (
             <div className="space-y-4">
-                {kost.insights && kost.insights.length > 0 ? (
-                kost.insights.map((insight) => (
-                    <div
-                    key={insight.id}
-                    className="border rounded-xl p-4 text-sm text-gray-700"
-                    >
-                    <strong>{insight.author ?? "Admin"}</strong>
-
-                    <p className="mt-2">
-                        {insight.content}
-                    </p>
-
-                    <span className="block mt-2 text-xs text-gray-400">
-                        {new Date(insight.created_at).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                        })}
-                    </span>
-                    </div>
-                ))
-                ) : (
                 <div className="border rounded-xl p-4 text-sm text-gray-500">
                     Belum ada insight untuk kos ini.
                 </div>
-                )}
             </div>
             )}
 
@@ -447,19 +417,18 @@ const KosDetailPage: React.FC = () => {
                     key={insight.id}
                     className="border rounded-xl p-4 text-sm text-gray-700"
                     >
-                    <strong>{insight.author ?? "Admin"}</strong>
 
                     <p className="mt-2">
                         {insight.content}
                     </p>
 
-                    <span className="block mt-2 text-xs text-gray-400">
+                    {/* <span className="block mt-2 text-xs text-gray-400">
                         {new Date(insight.created_at).toLocaleDateString("id-ID", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",
                         })}
-                    </span>
+                    </span> */}
                     </div>
                 ))
                 ) : (
