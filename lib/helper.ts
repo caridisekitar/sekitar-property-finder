@@ -98,3 +98,11 @@ function formatJt(value: number) {
     ? `Rp${jt}jt`
     : `Rp${jt.toFixed(1).replace(".", ",")}jt`;
 }
+
+export function formatIDRNumber(value: string | number): string {
+  const stringValue = String(value);
+  const numeric = stringValue.replace(/\D/g, '');
+  if (!numeric) return '';
+  return new Intl.NumberFormat('id-ID').format(Number(numeric));
+}
+

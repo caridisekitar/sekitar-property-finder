@@ -41,7 +41,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ user }) => {
     { name: 'Favorit', path: '/profile/favorites', icon: <HeartIcon className="w-5 h-5" /> },
     { name: 'Langgananku', path: '/profile/subscriptions', icon: <DiamondIcon className="w-5 h-5" /> },
     { name: 'Kontribusiku', path: '/profile/contributions', icon: <HandshakeIcon className="w-5 h-5" /> },
-    { name: 'Yang terbaru', path: '/profile/latest', icon: <SparklesIcon className="w-5 h-5" /> },
+    // { name: 'Yang terbaru', path: '/profile/latest', icon: <SparklesIcon className="w-5 h-5" /> },
   ];
 
   const isActive = (path: string) => {

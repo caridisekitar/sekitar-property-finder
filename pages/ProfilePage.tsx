@@ -96,7 +96,7 @@ const ProfilePage: React.FC = () => {
         <div className="flex justify-between items-center mb-8">
             <div>
                 <h1 className="text-xl md:text-3xl lg:text-3xl font-bold text-brand-dark">Profileku</h1>
-                <p className="text-gray-500 mt-1 text-sm md:text-md lg:text-md">Update foto profile dan detail tentang kamu di sini</p>
+                <p className="text-gray-500 mt-1 text-sm md:text-md lg:text-md">Update foto profil dan detail tentang kamu di sini</p>
             </div>
             {/* <button className="text-gray-500 hover:text-brand-dark">
                 <EllipsisIcon className="w-6 h-6" />
@@ -108,7 +108,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center pb-6 border-b border-gray-200">
                 <div className="w-full sm:w-1/3 mb-4 sm:mb-0">
                     <h2 className="text-md font-semibold text-gray-700">Foto kamu</h2>
-                    <p className="text-sm text-gray-500">Foto ini akan didisplay sebagai profile kamu</p>
+                    <p className="text-sm text-gray-500">Foto ini akan ditampilkan sebagai profil kamu</p>
                 </div>
                 <div className="w-full sm:w-2/3 flex items-center justify-start gap-6">
                     <img 

@@ -1,14 +1,78 @@
 
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import WalletIcon from '../components/icons/WalletIcon';
+import { useAuth } from '@/hooks/useAuth';
+import { securePost } from "@/lib/securePost";
+import KostCard from "@/components/KostCard";
+import { formatIDRNumber } from '@/lib/helper';
+import SubscriptionModal from '@/components/SubscriptionModal';
 
 const KalkulatorBudgetPage: React.FC = () => {
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const { subscription } = useAuth();
+    const isPremiumUser = subscription?.plan === 'PREMIUM';
+    const [error, setError] = useState<React.ReactNode | null>(null);
+    const [gaji, setGaji] = useState<string>('');
+    const [results, setResults] = useState<number[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+    const premiumError = (
+        <>
+            Fitur ini hanya tersedia untuk pengguna Premium.{" "}
+            <button
+            onClick={() => setOpen(true)}
+            className="text-blue-600 font-semibold transition"
+            >
+                Upgrade Sekarang
+            </button>
+        </>
+        );
+
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Handle calculation logic here
-        alert('Budget calculation feature coming soon!');
+        setError('');
+
+        // 1️⃣ Check subscription
+            if (!isPremiumUser) {
+                setError(premiumError);
+                return;
+            }
+        
+        // 2️⃣ Sanitize input (numbers only)
+            const sanitized = gaji.replace(/\D/g, '');
+            const salary = Number(sanitized);
+
+            if (!salary || salary <= 0) {
+                setError('Masukkan nominal gaji yang valid.');
+                return;
+            }
+
+        // 3️⃣ Budget logic (example: max 30% of salary)
+        const maxBudget = Math.floor(salary * 0.3);
+
+        try {
+            const res = await securePost(
+            '/kost/search_by_salary',
+            'POST',
+            {
+                max_budget: maxBudget,
+            }
+            );
+
+            console.log(res.data)
+            // 4️⃣ Limit to max 5 cards (backend already limits, but safe on frontend)
+            setResults((res.data || []).slice(0, 5));
+        } catch (err: any) {
+            setError(
+            err?.message ||
+            'Terjadi kesalahan saat mencari kost. Silakan coba lagi.'
+            );
+        }
+
     };
+
+
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
@@ -49,9 +113,12 @@ const KalkulatorBudgetPage: React.FC = () => {
                                 <WalletIcon className="h-5 w-5 text-gray-400" />
                             </div>
                             <input
-                                type="number"
                                 name="gaji"
                                 id="gaji"
+                                type="text"
+                                inputMode="numeric"
+                                value={gaji}
+                                onChange={(e) => setGaji(formatIDRNumber(e.target.value))}
                                 className="block w-full rounded-md border border-gray-300 pl-10 py-3 text-gray-900
                                 focus:border-brand-blue focus:ring-brand-blue sm:text-sm"
                                 placeholder="Masukkan gaji kamu"
@@ -74,6 +141,13 @@ const KalkulatorBudgetPage: React.FC = () => {
                         <p className="mt-2 text-xs text-gray-500">
                             Masukkan nominal gaji kamu tanpa koma atau titik.
                         </p>
+                        {/* Loading */}
+                        {loading && <p className="text-sm text-gray-500">Memuat hasil...</p>}
+                        {error && (
+                        <p className="mt-3 text-sm text-red-600 font-medium">
+                            {error}
+                        </p>
+                        )}
                         </form>
 
                 </div>
@@ -98,9 +172,12 @@ const KalkulatorBudgetPage: React.FC = () => {
                                 <WalletIcon className="h-5 w-5 text-gray-400" />
                             </div>
                             <input
-                                type="number"
                                 name="gaji"
                                 id="gaji"
+                                type="text"
+                                inputMode="numeric"
+                                value={gaji}
+                                onChange={(e) => setGaji(formatIDRNumber(e.target.value))}
                                 className="block w-full rounded-md border border-gray-300 pl-10 py-3 text-gray-900
                                 focus:border-brand-blue focus:ring-brand-blue sm:text-sm"
                                 placeholder="Masukkan gaji kamu"
@@ -109,6 +186,13 @@ const KalkulatorBudgetPage: React.FC = () => {
                             <p className="mb-2 text-xs text-gray-500">
                                 Masukkan nominal gaji kamu tanpa koma atau titik.
                             </p>
+                            {/* Loading */}
+                            {loading && <p className="text-sm text-gray-500">Memuat hasil...</p>}
+                            {error && (
+                                <p className="mt-3 text-sm text-red-600 font-medium">
+                                    {error}
+                                </p>
+                                )}
                             
                         </div>
 
@@ -127,6 +211,16 @@ const KalkulatorBudgetPage: React.FC = () => {
                         </form>
 
                 </div>
+
+          {/* Cards */}
+            {!loading && !error && (
+                <div className="flex gap-4 overflow-x-auto pb-2">
+                {results.map((kost) => (
+                    <KostCard key={kost.id} kost={kost} />
+                ))}
+                </div>
+            )}  
+            <SubscriptionModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };
