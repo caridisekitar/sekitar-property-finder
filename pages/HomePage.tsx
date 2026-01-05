@@ -29,23 +29,23 @@ const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
 const testimonials: Testimonial[] = [
     {
         id: 1,
-        quote: "Setelah daftarin kos di caridisekitar.com, pendaftarannya gampang banget, dan kos saya cepat muncul di hasil pencarian.",
-        author: "Candra Haris",
-        role: "Pemilik Kos Dahlia",
+        quote: "Hasil survey nya quite good. Helpful & bisa jadi advisor terkait kebutuhan cari kos. Result survey nya very clear dan detail, termasuk dijelasin juga plus minus nya. Which good!",
+        author: "Faisal R",
+        role: "Pegawai Swasta",
         imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
         id: 2,
-        quote: "Fitur kalkulator budget sangat membantu saya dalam merencanakan pengeluaran bulanan. Sangat direkomendasikan!",
-        author: "Jane Doe",
-        role: "Mahasiswa",
+        quote: "Hasil survey nya sangat helpful!",
+        author: "Marsha D",
+        role: "Pegawai swasta, perantauan",
         imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
         id: 3,
-        quote: "Fitur Maps sangat membantu saya mencari kos yang strategis, dekat dengan kantor dan fasilitas umum. Prosesnya cepat dan tidak ribet sama sekali.",
-        author: "Budi Santoso",
-        role: "Pekerja Kantoran",
+        quote: "Aku dulu pembeli e-book rekomendasi kost nya, beneran super helpfull😭🫶🏻!",
+        author: "S",
+        role: "Followers tiktok @caridisekitar.com",
         imageUrl: "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
 ];
