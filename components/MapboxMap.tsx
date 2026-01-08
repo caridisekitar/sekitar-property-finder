@@ -5,13 +5,18 @@ import PropertyCard from './PropertyCard';
 mapboxgl.accessToken = process.env.MAPBOX_TOKEN;
 
 type Property = {
-  id: string;
   title: string;
-  price: number;
+  location: string;
+  price_monthly: number;
   lng: number;
   lat: number;
   image: string;
   type: string;
+};
+
+type PropertyCardProps = {
+  property: Property;
+  onClose: () => void;
 };
 
 const MapPage: React.FC = () => {

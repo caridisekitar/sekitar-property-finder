@@ -1,16 +1,22 @@
 import { useNavigate } from 'react-router-dom';
+import { formatHargaRange } from '@/lib/helper';
 
 type Property = {
   title: string;
   location: string;
-  price: number;
+  price_monthly: number;
   lng: number;
   lat: number;
   image: string;
   type: string;
 };
 
-const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
+type PropertyCardProps = {
+  property: Property;
+  onClose: () => void;
+};
+
+const PropertyCard: React.FC<{ property: Property }> = ({ property, onClose }) => {
     const navigate = useNavigate();
   return (
     <div className="absolute
@@ -20,6 +26,15 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
     bg-white rounded-xl shadow-xl
     overflow-visible
     z-50">
+      {/* CLOSE BUTTON */}
+      <button
+        onClick={onClose}
+        className="absolute top-3 right-3 z-50
+                  bg-white/90 hover:bg-white
+                  rounded-full p-2 shadow"
+      >
+        ✕
+      </button>
       {/* IMAGE */}
       <div className="relative h-56">
         <img
@@ -59,7 +74,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property }) => {
 
           {/* PRICE */}
           <div className="mt-4 bg-sky-50 rounded-xl py-2 text-center text-xl font-bold text-gray-900">
-            Rp{property.price.toLocaleString('id-ID')}
+            Rp {formatHargaRange(property.price_monthly)}
           </div>
         </div>
       </div>
