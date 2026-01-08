@@ -65,9 +65,11 @@ const HomePage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [kosts, setKosts] = useState<Kost[]>([]);
+    const [kostBasic, setKostBasic] = useState<Kost[]>([]);
     const { subscription } = useAuth();
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT);
+    const [kostsRecommendation, setKostsRecommendation] = useState<Kost[]>([]);
 
     // 🔹 Fetch data from API
       useEffect(() => {
@@ -81,6 +83,14 @@ const HomePage: React.FC = () => {
             page: currentPage,
             limit: ITEMS_PER_PAGE,
           });
+
+          // Get kost recommendation
+          const dataRecommendation = await secureGet('/kost/recommendations');
+          setKostsRecommendation(dataRecommendation.data);
+
+          // Get kost basic
+          const kostBasic = await secureGet('/kost/basic');
+          setKostBasic(kostBasic.data);
   
           setKosts(data);
         } catch (err) {
@@ -202,7 +212,7 @@ const HomePage: React.FC = () => {
                         "
                         style={{ scrollbarWidth: "none" }}
                       >
-                        {mockKostData.slice(0,5).map(kost => <KostCard key={kost.id} kost={kost} />)}
+                        {kostsRecommendation.map(kost => <KostCard key={kost.id} kost={kost} />)}
                     </div>
                 </div>
             </div>
@@ -250,10 +260,15 @@ const HomePage: React.FC = () => {
           sm:overflow-visible sm:px-0 sm:mx-0
         "
         style={{ scrollbarWidth: 'none' }}
-      >
-        {kosts.slice(0, visibleCount).map((kost) => (
-          <KostCard key={kost.id} kost={kost} />
-        ))}
+      >{
+        !isSubscribed
+          ? kostBasic.map((kost) => (
+              <KostCard key={kost.id} kost={kost} />
+            ))
+          : kosts.slice(0, visibleCount).map((kost) => (
+              <KostCard key={kost.id} kost={kost} />
+            ))
+      }
       </div>
 
       {/* LOCKED DATA */}

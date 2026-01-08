@@ -5,6 +5,10 @@ export function formatHargaRange(range: unknown): string {
   if (!str) return "";
 
   const format = (value: number) => {
+    if (value < 1_000_000) {
+      return `${value.toLocaleString("id-ID")}`;
+    }
+
     const jt = value / 1_000_000;
     return Number.isInteger(jt)
       ? `${jt}jt`
@@ -24,6 +28,7 @@ export function formatHargaRange(range: unknown): string {
   const num = Number(str.replace(/[^\d]/g, ""));
   return isNaN(num) ? str : format(num);
 }
+
 
 export function formatHargaRangeID(range: unknown): string {
   if (range === null || range === undefined) return "";
