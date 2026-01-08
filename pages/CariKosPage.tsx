@@ -14,6 +14,7 @@ const MAX_FREE = 5;
 
 const CariKosPage: React.FC = () => {
   const [kosts, setKosts] = useState<Kost[]>([]);
+  const [kostBasic, setKostBasic] = useState<Kost[]>([]);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { subscription } = useAuth();
@@ -22,10 +23,10 @@ const CariKosPage: React.FC = () => {
 
   const visibleKosts = isPremium
     ? kosts
-    : kosts.slice(0, MAX_FREE);
+    : kostBasic;
 
   const Ca = !isPremium
-    ? kosts.slice(MAX_FREE, MAX_FREE + 10)
+    ? kostBasic
     : [];
 
   useEffect(() => {
@@ -36,11 +37,16 @@ const CariKosPage: React.FC = () => {
         sort: "latest",
       });
 
+      // Get kost basic
+      const kostBasic = await secureGet('/kost/basic');
+      setKostBasic(kostBasic.data);
+
       setKosts(res.data ?? res);
     } catch (e) {
       console.error("Initial fetch failed", e);
     }
   };
+  
 
   fetchInitialKosts();
 }, []);
