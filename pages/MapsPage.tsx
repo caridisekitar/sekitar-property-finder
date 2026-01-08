@@ -6,6 +6,8 @@ import CrosshairIcon from '../components/icons/CrosshairIcon';
 import KostCard from '../components/KostCard';
 import Pagination from '../components/Pagination';
 import MapboxMap from '@/components/MapboxMap';
+import { useAuth } from "@/hooks/useAuth";
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 // Mock data for demonstration
 const mockKostData: Kost[] = Array.from({ length: 68 }, (_, i) => ({
@@ -21,11 +23,14 @@ const mockKostData: Kost[] = Array.from({ length: 68 }, (_, i) => ({
 
 const MapsPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 8;
+    const { subscription } = useAuth();
+    const isPremium = subscription?.plan === "PREMIUM";
+    const ITEMS_PER_PAGE = isPremium ? 8 : 4;
 
     const totalPages = Math.ceil(mockKostData.length / ITEMS_PER_PAGE);
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const currentItems = mockKostData.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const [open, setOpen] = useState(false);
     
     const handlePageChange = (page: number) => {
         if (page > 0 && page <= totalPages) {
@@ -67,15 +72,44 @@ const MapsPage: React.FC = () => {
                 <span>Lokasi di sekitarmu</span>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                 {currentItems.map(kost => (
+            {/* Locked */}
+            {!isPremium && currentItems.length > 0 && (
+                <div className="relative mt-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 blur-md pointer-events-none">
+                    {currentItems.map((kost) => (
                     <KostCard key={kost.id} kost={kost} />
-                ))}
-            </div>
+                    ))}
+                </div>
 
-            <div className="mt-8">
-                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
-            </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
+                    <img
+                        src="/images/icons/icon-locked.png"
+                        className="w-16 h-16 mx-auto mb-4"
+                    />
+                    <h3 className="text-xl font-bold mb-2">Yah terkunci nih!</h3>
+                    <p className="text-gray-600 mb-6">
+                        Akses ratusan kost dengan berlangganan premium.
+                    </p>
+                    <button
+                        onClick={() => setOpen(true)}
+                        className="px-6 py-3 bg-[#96C8E2] text-white rounded-xl"
+                    >
+                        Mulai langganan
+                    </button>
+                    </div>
+                </div>
+                </div>
+            )}
+
+            <SubscriptionModal open={open} onClose={() => setOpen(false)} />
+
+            {isPremium && (
+                <div className="mt-8">
+                    <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                </div>    
+            )}
+            
 
         </div>
 
@@ -99,11 +133,6 @@ const MapsPage: React.FC = () => {
 
              <div className="w-full h-96 lg:h-full bg-gray-200 rounded-2xl shadow-lg overflow-hidden">
                 <MapboxMap />
-                {/* <img 
-                    src="https://www.google.com/maps/d/u/0/thumbnail?mid=1_2S-5722A1251817479708_9652562&hl=en" 
-                    alt="Map of Jakarta with property locations" 
-                    className="w-full h-full object-cover"
-                /> */}
             </div>
         </div>
 
