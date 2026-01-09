@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import PropertyCard from './PropertyCard';
+import { secureGet } from '@/lib/secureGet';
+import { formatHargaRange } from '@/lib/helper';
 
 mapboxgl.accessToken = process.env.MAPBOX_TOKEN;
 
 type Property = {
-  title: string;
-  location: string;
+  name: string;
+  slug: string;
+  city: string;
   price_monthly: number;
-  lng: number;
-  lat: number;
-  image: string;
+  longitude: number;
+  latitude: number;
+  img_cover: string;
   type: string;
 };
 
@@ -22,81 +25,12 @@ type PropertyCardProps = {
 const MapPage: React.FC = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
+  const [kostBasic, setKostBasic] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
-
-    const map = new mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [106.816666, -6.200000],
-      zoom: 12,
-    });
-
-    mapRef.current = map;
-
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    const properties: Property[] = [
-    {
-        id: '1',
-        title: 'Modern Apartment Menteng',
-        price: 2500000,
-        lng: 106.816666,
-        lat: -6.200000,
-        image: 'https://picsum.photos/seed/apt1/400/300',
-        type: 'kost apartment',
-    },
-    {
-        id: '2',
-        title: 'Minimalist House Kemang',
-        price: 1800000,
-        lng: 106.8105,
-        lat: -6.2615,
-        image: 'https://picsum.photos/seed/house2/400/300',
-        type: 'kost campuran',
-    },
-    {
-        id: '3',
-        title: 'Cozy Studio Sudirman',
-        price: 2200000,
-        lng: 106.8230,
-        lat: -6.2146,
-        image: 'https://picsum.photos/seed/studio3/400/300',
-        type: 'kost putri',
-    },
-    {
-        id: '4',
-        title: 'Luxury Residence SCBD',
-        price: 3500000,
-        lng: 106.8069,
-        lat: -6.2275,
-        image: 'https://picsum.photos/seed/lux4/400/300',
-        type: 'kost putra',
-    },
-    {
-        id: '5',
-        title: 'Family House Tebet',
-        price: 2000000,
-        lng: 106.8566,
-        lat: -6.2262,
-        image: 'https://picsum.photos/seed/family5/400/300',
-        type: 'kost campuran',
-    },
-    {
-        id: '6',
-        title: 'Affordable Kost Cikini',
-        price: 1200000,
-        lng: 106.8413,
-        lat: -6.1921,
-        image: 'https://picsum.photos/seed/kost6/400/300',
-        type: 'kost putri',
-    },
-    ];
-
-    function formatPriceJt(price: number): string {
+  function formatPriceJt(price: number): string {
     if (price >= 1_000_000) {
         const jt = price / 1_000_000;
 
@@ -111,48 +45,65 @@ const MapPage: React.FC = () => {
     return price.toLocaleString('id-ID');
     }
 
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+    let isMounted = true;
 
+    const initMap = async () => {
+      const res = await secureGet('/kost/basic');
+      if (!isMounted) return;
 
-    properties.forEach((property) => {
-        // 1. Root marker element
+      // setKostBasic(res.data);
+
+      const map = new mapboxgl.Map({
+        container: mapContainerRef.current!,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [106.816666, -6.200000],
+        zoom: 11.5,
+      });
+
+      mapRef.current = map;
+      map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+      res.data.forEach((property: Property) => {
         const el = document.createElement('div');
         el.className =
-            'flex items-center gap-1 bg-[#18181B] px-3 py-1 rounded-full shadow-md text-sm font-semibold cursor-pointer border border-gray-200 text-white';
+          'flex items-center gap-1 bg-[#18181B] px-3 py-1 rounded-full shadow-md text-sm font-semibold cursor-pointer border border-gray-200 text-white';
 
-        // 2. SVG icon (inline)
         const icon = document.createElement('img');
-        icon.src = '/images/icons/icon-map.svg'; // <-- your SVG path
-        icon.alt = 'Property';
+        icon.src = '/images/icons/icon-map.svg';
         icon.className = 'w-6 h-6';
 
-        // 3. Price text
         const price = document.createElement('span');
-        price.innerText = `Rp ${formatPriceJt(property.price)} `;
+        price.innerText = `Rp ${formatHargaRange(property.price_monthly)}`;
 
-        // 4. Append icon + price
         el.appendChild(icon);
         el.appendChild(price);
 
-        // 5. Click handler
         el.onclick = () => {
-            setSelectedProperty(property);
-
-            map.flyTo({
-            center: [property.lng, property.lat],
+          setSelectedProperty(property);
+          map.flyTo({
+            center: [property.longitude, property.latitude],
             zoom: 15,
-            offset: [0, 10], // space for card + arrow
-            });
+            offset: [0, 120],
+          });
         };
 
-        // 6. Add marker to map
-        new mapboxgl.Marker(el)
-            .setLngLat([property.lng, property.lat])
-            .addTo(map);
-        });
+        const marker = new mapboxgl.Marker(el)
+          .setLngLat([property.longitude, property.latitude])
+          .addTo(map);
 
+        markersRef.current.push(marker);
+      });
+    };
 
-    return () => {
-      map.remove();
+    initMap();
+
+  return () => {
+      isMounted = false;
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
+      mapRef.current?.remove();
       mapRef.current = null;
     };
   }, []);

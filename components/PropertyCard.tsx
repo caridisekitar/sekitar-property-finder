@@ -2,12 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { formatHargaRange } from '@/lib/helper';
 
 type Property = {
-  title: string;
-  location: string;
+  name: string;
+  slug: string;
+  city: string;
   price_monthly: number;
-  lng: number;
-  lat: number;
-  image: string;
+  longitude: number;
+  latitude: number;
+  img_cover: string;
   type: string;
 };
 
@@ -38,8 +39,8 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property, onClose }) =
       {/* IMAGE */}
       <div className="relative h-56">
         <img
-          src={property.image}
-          alt={property.title}
+          src={property.img_cover}
+          alt={property.name}
           className="h-full w-full object-cover rounded-t-xl"
         />
 
@@ -54,7 +55,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property, onClose }) =
       <div className="relative -mt-14 px-4">
         <div className="bg-white rounded-2xl p-4 shadow-md">
           <h3 className="text-lg font-semibold text-gray-900">
-            {property.title}
+            {property.name}
           </h3>
 
           {/* LOCATION */}
@@ -69,7 +70,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property, onClose }) =
               <path d="M12 21s-6-5.686-6-10a6 6 0 1112 0c0 4.314-6 10-6 10z" />
               <circle cx="12" cy="11" r="2" />
             </svg>
-            {property.location}
+            {property.city}
           </div>
 
           {/* PRICE */}
@@ -82,7 +83,7 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property, onClose }) =
       {/* CTA BUTTON */}
       <div className="px-4 pb-4">
         <button
-        onClick={() => navigate(`/kost/${property.id}`)}
+        onClick={() => navigate(`/kost/${property.slug}`)}
         className="w-full mt-4 bg-gray-900 text-white py-3 rounded-xl font-medium"
         >
         Lihat detail
