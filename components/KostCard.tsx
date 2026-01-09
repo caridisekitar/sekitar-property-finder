@@ -5,7 +5,6 @@ import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatHargaRange } from '@/lib/helper';
 
-
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
   <div>
     {/* <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center"> */}
@@ -70,20 +69,19 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
     <Link to={`/kost/${kost.slug}`}>
     <div className="relative lg:hidden
     flex-shrink-0
-    w-[280px] sm:w-[320px]
     overflow-hidden rounded-xl
     bg-gray-200 snap-start">
       {/* Background Image */}
       <img
         src="https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1600&auto=format&fit=crop"
         alt="Kost Room"
-        className="h-[160px] w-full object-cover sm:h-[320px]"
+        className="h-[250px] w-full object-cover sm:h-[320px]"
       />
 
       {/* Overlay Card */}
-      <div className="absolute right-4 top-1/2 w-[170px] -translate-y-1/2 rounded-xl bg-white p-3 shadow-xl sm:right-8 sm:w-[320px]">
+      <div className="w-full rounded-xl bg-white p-3 shadow-xl px-2">
         {/* Type */}
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-medium">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-medium truncate">
           <svg
             className="h-4 w-4"
             fill="none"
@@ -98,7 +96,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
         </div>
 
         {/* Title */}
-        <h3 className="text-sm font-bold text-gray-900">
+        <h3 className="text-xs font-bold text-gray-900 truncate">
           {kost.name || ''}
         </h3>
 
@@ -119,7 +117,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
 
         {/* Price */}
         <div className="mt-1 rounded-lg bg-[#F0F9FF] py-2 text-center text-sm font-bold text-gray-900">
-          Rp {kost.price_monthly.toLocaleString('id-ID')}
+          Rp {formatHargaRange(kost.price_monthly)}
         </div>
       </div>
     </div>
