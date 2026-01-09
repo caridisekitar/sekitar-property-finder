@@ -58,7 +58,7 @@ export default function SubscriptionModal({
         {/* Pricing Cards */}
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-5xl">
           {/* BASIC */}
-          <div className="border rounded-2xl p-8 shadow-sm flex flex-col justify-between">
+          <div className="border rounded-2xl p-8 shadow-sm flex flex-col justify-between order-2 lg:order-1">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -86,7 +86,7 @@ export default function SubscriptionModal({
           </div>
 
           {/* PREMIUM */}
-          <div className="relative border-2 border-blue-400 rounded-2xl p-8 shadow-lg flex flex-col justify-between">
+          <div className="relative border-2 border-blue-400 rounded-2xl p-8 shadow-lg flex flex-col justify-between order-1 lg:order-2">
             {/* Badge */}
             <span className="absolute -top-4 right-4 bg-black text-white text-xs px-3 py-1 rounded-full">
               Recommended for you

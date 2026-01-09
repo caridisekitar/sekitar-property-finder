@@ -5,7 +5,7 @@ import { BUSINESSES } from '@/constants';
 const BusinessSection: React.FC = () => {
   return (
     <div className="relative">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 blur-lg">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 blur-lg">
           {BUSINESSES.map((biz) => (
             <div key={biz.id} className="relative rounded-xl overflow-hidden bg-white shadow-md">
                 <a href={`/business/`+ biz.id}>

@@ -62,7 +62,7 @@ const KalkulatorBudgetPage: React.FC = () => {
 
             console.log(res.data)
             // 4️⃣ Limit to max 5 cards (backend already limits, but safe on frontend)
-            setResults((res.data || []).slice(0, 5));
+            setResults((res.data || []));
         } catch (err: any) {
             setError(
             err?.message ||
@@ -214,7 +214,7 @@ const KalkulatorBudgetPage: React.FC = () => {
 
           {/* Cards */}
             {!loading && !error && (
-                <div className="flex gap-4 overflow-x-auto pb-2">
+                <div className="flex gap-4 overflow-x-auto pb-2 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 {results.map((kost) => (
                     <KostCard key={kost.id} kost={kost} />
                 ))}
