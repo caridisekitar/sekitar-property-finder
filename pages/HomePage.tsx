@@ -190,7 +190,7 @@ const HomePage: React.FC = () => {
         <div className="container px-4 lg:px-0 mx-auto py-8 sm:ps-6 lg:ps-8 bg-gray-50 rounded-xl">
             <p className="text-sm font-bold tracking-widest mb-2 inline-flex items-center gap-2">
                 <StarIcon className="w-4 h-4"/> HIGHLIGHT</p>
-            <div className="grid lg:grid-cols-[30%_70%]">
+            <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[30%_70%] lg:gap-0">
                 <div className="flex flex-col justify-between h-full">
                     <div className="mb-6 md:mb-0">
                         <h2 className="text-2xl md:text-4xl font-bold">5 Kost Pilihan Kami</h2>
@@ -206,9 +206,9 @@ const HomePage: React.FC = () => {
                         ref={kostCarouselRef}
                         className="
                           flex gap-4 overflow-x-auto pb-4
-    snap-x snap-mandatory
-    touch-pan-x
-    overscroll-x-contain
+                          snap-x snap-mandatory
+                          touch-pan-x
+                          overscroll-x-contain
                         "
                         style={{ scrollbarWidth: "none" }}
                       >
