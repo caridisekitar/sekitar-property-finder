@@ -4,6 +4,7 @@ import BedIcon from '@/components/icons/BedIcon';
 import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatHargaRange } from '@/lib/helper';
+import { getVideoPoster, getImageCover } from "@/lib/image";
 
 const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
   <div>
@@ -21,7 +22,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
         {/* IMAGE */}
       <div className="relative lg:h-[360px] w-auto">
         <img
-              src={kost.img_cover || ''}
+              src={getImageCover(kost.images) || kost.img_cover}
               alt={kost.name}
               className="h-full w-full object-cover"
             />
@@ -73,7 +74,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
     bg-gray-200 snap-start">
       {/* Background Image */}
       <img
-        src="https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1600&auto=format&fit=crop"
+        src={getImageCover(kost.images) || kost.img_cover}
         alt="Kost Room"
         className="h-[250px] w-full object-cover sm:h-[320px]"
       />

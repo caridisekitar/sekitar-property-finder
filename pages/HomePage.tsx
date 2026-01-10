@@ -115,7 +115,7 @@ const HomePage: React.FC = () => {
         }, [subscription]);
     
     
-    const visibleData = kosts.slice(0, visibleCount);
+    // const visibleData = kosts.slice(0, visibleCount);
     const lockedData = mockKostData.slice(visibleCount, visibleCount * 2);
 
     const nextTestimonial = () => {

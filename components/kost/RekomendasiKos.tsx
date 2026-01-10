@@ -12,8 +12,8 @@ export default function RekomendasiKos() {
   useEffect(() => {
     const fetchRecommendations = async () => {
       try {
-        const data = await secureGet("/kosts/kost_recommendations");
-        setKosts(data);
+        const dataRecommendation = await secureGet('/kost/recommendations');
+        setKosts(dataRecommendation.data);
       
       } catch (err) {
         setError((err as Error).message);

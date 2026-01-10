@@ -102,7 +102,7 @@ const KosDetailPage: React.FC = () => {
 
         {/* LEFT */}
         <div className="lg:col-span-2">
-          <ImageGallery images={kost.images ?? [kost.img_cover]} />
+          <ImageGallery images={["https://picsum.photos/seed/1/400/301"]} />
 
           <h1 className="mt-4 text-xl font-semibold text-gray-900">
             Lorem Ipsum
@@ -277,7 +277,7 @@ const KosDetailPage: React.FC = () => {
       <nav className="text-sm text-gray-500 mb-4">
         <Link to="/" className="hover:text-gray-800">Home</Link> /
         <Link to="/cari-kost" className="mx-1 hover:text-gray-800">Kost</Link> /
-        <span className="mx-1 text-gray-800 font-medium">{kost.city}</span>
+        <span className="mx-1 text-gray-800 font-medium">{kost.name}</span>
       </nav>
 
       {/* Header */}
@@ -285,7 +285,18 @@ const KosDetailPage: React.FC = () => {
 
         {/* LEFT */}
         <div className="lg:col-span-2">
-          <ImageGallery images={kost.images ?? [kost.img_cover]} />
+          <ImageGallery
+              images={
+                kost.images
+                  ?.filter(img => !img.is_video_poste)
+                  .map(img => img.image_url) ?? [kost.img_cover]
+              }
+              videoPoster={
+                kost.images?.find(img => img.is_video_poster)?.image_url
+              }
+              videoURL={kost.video_url}
+            />
+
 
           <h1 className="mt-4 text-xl font-semibold text-gray-900">
             {kost.name}

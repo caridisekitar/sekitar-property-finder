@@ -110,4 +110,3 @@ export function formatIDRNumber(value: string | number): string {
   if (!numeric) return '';
   return new Intl.NumberFormat('id-ID').format(Number(numeric));
 }
-

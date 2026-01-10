@@ -1,37 +1,54 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { X, Play, ChevronLeft, ChevronRight } from "lucide-react";
 
-const galleryImages = [
-  `https://picsum.photos/seed/1/400/300`,
-  `https://picsum.photos/seed/2/400/300`,
-  `https://picsum.photos/seed/3/400/300`,
-  `https://picsum.photos/seed/4/400/300`,
-];
+type ImageGalleryProps = {
+  images: string[];
+  videoPoster?: string;
+  videoURL?: string;
+};
 
-export default function ImageGallery() {
+export default function ImageGallery({
+  images,
+  videoPoster,
+  videoURL
+}: ImageGalleryProps) {
   const [showVideo, setShowVideo] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [imageLoading, setImageLoading] = useState(true);
 
-  const nextSlide = () =>
-    setActiveIndex((prev) => (prev + 1) % galleryImages.length);
 
-  const prevSlide = () =>
-    setActiveIndex(
-      (prev) => (prev - 1 + galleryImages.length) % galleryImages.length
-    );
+  // ✅ safe images
+  const galleryImages = useMemo(
+    () => (images && images.length > 0 ? images : []),
+    [images]
+  );
+
+  if (galleryImages.length === 0) return null;
+
+  const nextSlide = () => {
+  setImageLoading(true);
+  setActiveIndex((prev) => (prev + 1) % galleryImages.length);
+};
+
+const prevSlide = () => {
+  setImageLoading(true);
+  setActiveIndex(
+    (prev) => (prev - 1 + galleryImages.length) % galleryImages.length
+  );
+};
 
   return (
     <>
       {/* Gallery Wrapper */}
-      <div className="grid grid-cols-3 gap-2 rounded-xl overflow-hidden">
-        {/* video image poster, clickable into modal popup show youtube video link */}
+      <div className="grid grid-cols-3 gap-2 rounded-xl overflow-hidden h-[350px]">
+        {/* VIDEO POSTER */}
         <div
-          className="relative col-span-1 cursor-pointer group"
+          className="relative col-span-1 cursor-pointer group h-[350px]"
           onClick={() => setShowVideo(true)}
         >
           <img
-            src="/images/video-poster.webp"
+            src={videoPoster ?? "/images/video-poster.webp"}
             className="object-cover h-full w-full"
             alt="Video preview"
           />
@@ -40,31 +57,45 @@ export default function ImageGallery() {
             <Play className="w-12 h-12 text-white" />
           </div>
         </div>
-        {/* end of video image */}
 
-        {/* start gallery carousel */}
-        <div className="relative col-span-2">
-          <img
-            src={galleryImages[activeIndex]}
-            className="object-cover h-full w-full cursor-pointer"
-            alt="Gallery"
-            onClick={() => setShowImage(true)}
-          />
+        {/* IMAGE CAROUSEL */}
+        <div className="relative col-span-2 h-[350px]">
+          {/* Loading Spinner */}
+            {imageLoading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/20">
+                <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+              </div>
+            )}
+
+            <img
+              src={galleryImages[activeIndex]}
+              className={`object-cover h-full w-full cursor-pointer transition-opacity duration-300 ${
+                imageLoading ? "opacity-0" : "opacity-100"
+              }`}
+              alt={`Gallery ${activeIndex + 1}`}
+              onLoad={() => setImageLoading(false)}   // ✅ SAFE
+              onError={() => setImageLoading(false)}  // ✅ SAFE
+              onClick={() => setShowImage(true)}
+            />
 
           {/* Controls */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 p-2 rounded-full text-white"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
+          {galleryImages.length > 1 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 p-2 rounded-full text-white"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
 
-          <button
-            onClick={nextSlide}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 p-2 rounded-full text-white"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 p-2 rounded-full text-white"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </>
+          )}
 
           {/* Indicators */}
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
@@ -78,7 +109,6 @@ export default function ImageGallery() {
             ))}
           </div>
         </div>
-        {/* end gallery carousel */}
       </div>
 
       {/* VIDEO MODAL */}
@@ -86,23 +116,15 @@ export default function ImageGallery() {
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
           <div className="relative bg-black rounded-xl w-full max-w-sm aspect-[9/16]">
             <button
-              className="absolute top-2 right-2 text-white bg-black/50 hover:bg-black/60 p-2 rounded-full"
+              className="absolute top-2 right-2 text-white bg-black/50 p-2 rounded-full"
               onClick={() => setShowVideo(false)}
             >
               <X className="w-6 h-6" />
             </button>
 
-            {/* <div class="w-full max-w-md mx-auto">
-              <video
-                class="w-full h-auto"
-                controls
-                src="https://customer-u8becv1dx82s1frs.cloudflarestream.com/4e3231c03fe40637c713ba840367b72b/watch"
-              ></video>
-            </div> */}
-
             <iframe
               className="w-full h-full rounded-xl"
-              src="https://customer-u8becv1dx82s1frs.cloudflarestream.com/4e3231c03fe40637c713ba840367b72b/watch?autoplay=1"
+              src={videoURL}
               title="Kos Video"
               frameBorder="0"
               allow="autoplay; encrypted-media"
