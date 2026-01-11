@@ -81,6 +81,7 @@ const SearchKost: React.FC<SearchKostProps> = ({
               "Jakarta Pusat",
               "Jakarta Barat",
               "Jakarta Timur",
+              "Jakarta Utara",
             ]}
             value={lokasi}
             onChange={setLokasi}

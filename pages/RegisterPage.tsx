@@ -17,6 +17,8 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const paramPlan = params.get("new");
+  const isUpgrade = Boolean(paramPlan);
+
 
   const selectedPlan: Plan =
     ALLOWED_PLANS.includes(paramPlan as Plan)
@@ -31,19 +33,24 @@ export default function Register() {
      CHECK EXISTING SESSION
   =============================== */
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+  const token = localStorage.getItem('token');
+  if (!token) return;
 
-    (async () => {
-      try {
-        await secureGet('/auth/me');
-        navigate('/profile', { replace: true });
-      } catch {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
-    })();
-  }, [navigate]);
+  // 👇 if upgrading, DO NOT redirect
+  if (paramPlan) 
+    return alert('Upgrade');
+
+  (async () => {
+    try {
+      await secureGet('/auth/me');
+      navigate('/profile', { replace: true });
+    } catch {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
+  })();
+}, [navigate, paramPlan]);
+
 
   /* ===============================
      SUBMIT REGISTER

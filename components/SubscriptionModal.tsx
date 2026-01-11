@@ -1,18 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { upgradeToPremium } from "@/lib/upgradeSubscription";
+import { useAuth } from "@/hooks/useAuth";
 
 type SubscriptionModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
+type TargetPlan = "basic" | "premium";
+
 export default function SubscriptionModal({
   open,
   onClose,
 }: SubscriptionModalProps) {
+  const { user, subscription } = useAuth();
+  const plan = subscription?.plan ?? "FREE"; // FREE | BASIC | PREMIUM
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  // Disable background scroll
+
+  /* ===============================
+     LOCK BODY SCROLL
+  =============================== */
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
     return () => {
@@ -20,9 +29,34 @@ export default function SubscriptionModal({
     };
   }, [open]);
 
-    const handleSubscribe = (plan: 'basic' | 'premium') => {
-        navigate(`/register?new=${plan}`);
+  /* ===============================
+     SUBSCRIBE / UPGRADE HANDLER
+  =============================== */
+  const handleSubscribe = async (targetPlan: TargetPlan) => {
+    // 🟡 Already premium → do nothing
+    if (plan === "PREMIUM") return;
+
+    // 🟢 BASIC → PREMIUM (SKIP REGISTER)
+    if (targetPlan === "premium" && plan === "BASIC") {
+      if (!user) {
+        alert("User tidak ditemukan, silakan login ulang.");
+        return;
+      }
+
+      try {
+        await upgradeToPremium({
+          user,
+          onLoading: setLoading,
+        });
+      } catch (err: any) {
+        alert(err?.message || "Gagal memproses pembayaran");
+      }
+      return;
     }
+
+    // 🔵 FREE USER → REGISTER FLOW
+    navigate(`/register?new=${targetPlan}`);
+  };
 
   if (!open) return null;
 
@@ -40,10 +74,11 @@ export default function SubscriptionModal({
       <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
         {/* Logo */}
         <div className="flex items-center gap-2 mb-2">
-          {/* <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-500">
-            
-          </div> */}
-          <img src="/images/logo-header-sekitar.png" alt="Logo" className="h-16 w-auto" />
+          <img
+            src="/images/logo-header-sekitar.png"
+            alt="Logo"
+            className="h-16 w-auto"
+          />
         </div>
 
         {/* Title */}
@@ -57,12 +92,12 @@ export default function SubscriptionModal({
 
         {/* Pricing Cards */}
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-5xl">
-          {/* BASIC */}
+          {/* ================= BASIC ================= */}
           <div className="border rounded-2xl p-8 shadow-sm flex flex-col justify-between order-2 lg:order-1">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <img src="/images/icons/basic.png" alt="basic" />
+                  <img src="/images/icons/basic.png" alt="basic" />
                 </div>
                 <div>
                   <p className="font-semibold">Basic</p>
@@ -78,14 +113,15 @@ export default function SubscriptionModal({
               <FeatureList basic />
             </div>
 
-            <button 
-            onClick={() => handleSubscribe('basic')}
-            className="mt-8 w-full py-3 rounded-xl bg-black text-white font-semibold">
+            <button
+              onClick={() => handleSubscribe("basic")}
+              className="mt-8 w-full py-3 rounded-xl bg-black text-white font-semibold"
+            >
               Gratis
             </button>
           </div>
 
-          {/* PREMIUM */}
+          {/* ================= PREMIUM ================= */}
           <div className="relative border-2 border-blue-400 rounded-2xl p-8 shadow-lg flex flex-col justify-between order-1 lg:order-2">
             {/* Badge */}
             <span className="absolute -top-4 right-4 bg-black text-white text-xs px-3 py-1 rounded-full">
@@ -95,7 +131,7 @@ export default function SubscriptionModal({
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                    <img src="/images/icons/premium.png" alt="premium" />
+                  <img src="/images/icons/premium.png" alt="premium" />
                 </div>
                 <div>
                   <p className="font-semibold">Premium</p>
@@ -128,10 +164,20 @@ export default function SubscriptionModal({
             </div>
 
             <button
-              onClick={() => handleSubscribe('premium')}
-              className="mt-8 w-full py-3 rounded-xl bg-blue-400 text-white font-semibold hover:bg-blue-500 transition"
+              onClick={() => handleSubscribe("premium")}
+              disabled={loading || plan === "PREMIUM"}
+              className={`mt-8 w-full py-3 rounded-xl font-semibold transition
+                ${
+                  loading || plan === "PREMIUM"
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-blue-400 text-white hover:bg-blue-500"
+                }`}
             >
-              Mulai langganan
+              {loading
+                ? "Mengalihkan ke pembayaran..."
+                : plan === "PREMIUM"
+                ? "Sudah Premium"
+                : "Mulai langganan"}
             </button>
           </div>
         </div>
