@@ -404,7 +404,7 @@ const HomePage: React.FC = () => {
              <span className="text-xl">✦</span> BISNIS
           </div>
           <h2 className="text-2xl md:text-[48px] lg:text-[48px] font-bold text-gray-900 mb-4">Bisnis Teman Sekitar</h2>
-          <p className="text-[#1E1E1E] max-w-4xl mx-auto text-md md:text-md lg:text-md text-opacity-50">Kami percaya setiap usaha layak untuk tumbuh. Karena itu, kami bantu #TemanSekitar mempromosikan bisnis kecil/UMKM secara gratis di website ini. 🩵</p>
+          <p className="text-[#1E1E1E] max-w-4xl mx-auto text-md md:text-md lg:text-md text-opacity-50">Kami percaya setiap usaha layak untuk tumbuh. Karena itu, kami bantu #TemanSekitar mempromosikan bisnis kecil/UMKM secara gratis di website ini.</p>
         </div>
         
         <BusinessSection />
