@@ -13,6 +13,7 @@ import KostCard from '../components/KostCard';
 import { secureGet } from '@/lib/secureGet';
 import BusinessSection from '@/components/BusinessSection';
 import HeroSearch from '@/components/HeroSearch';
+import Pagination from '@/components/Pagination';
 
 
 const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
@@ -52,8 +53,6 @@ const testimonials: Testimonial[] = [
 
 const VISIBLE_COUNT = 5;
 
-// const isSubscribed = false; // 🔐 change to true after payment/login
-
 
 const HomePage: React.FC = () => {
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
@@ -61,8 +60,10 @@ const HomePage: React.FC = () => {
     const kostCarouselRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 15;
-    const [loading, setLoading] = useState(true);
+    const ITEMS_PER_PAGE = 10;
+    const [lastPage, setLastPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [kosts, setKosts] = useState<Kost[]>([]);
     const [kostBasic, setKostBasic] = useState<Kost[]>([]);
@@ -73,35 +74,40 @@ const HomePage: React.FC = () => {
 
     // 🔹 Fetch data from API
       useEffect(() => {
-      const fetchKosts = async () => {
-        try {
-          setLoading(true);
-          setError(null);
-  
-          // 🔐 secured GET request
-          const data = await secureGet('/kosts', {
-            page: currentPage,
-            limit: ITEMS_PER_PAGE,
-          });
+        const fetchKosts = async () => {
+          try {
+            setLoading(true);
+            setError(null);
 
-          // Get kost recommendation
-          const dataRecommendation = await secureGet('/kost/recommendations');
-          setKostsRecommendation(dataRecommendation.data);
+            const res = await secureGet('/search', {
+              page: currentPage,
+              per_page: ITEMS_PER_PAGE,
+            });
 
-          // Get kost basic
-          const kostBasic = await secureGet('/kost/basic');
-          setKostBasic(kostBasic.data);
-  
-          setKosts(data);
-        } catch (err) {
-          setError((err as Error).message || 'Failed to fetch data');
-        } finally {
-          setLoading(false);
-        }
-      };
-  
-      fetchKosts();
-    }, [currentPage]);
+            // paginated kost list
+            setKosts(res.data);
+            setCurrentPage(res.current_page);
+            setLastPage(res.last_page);
+            setTotal(res.total);
+
+            // recommendation (no pagination)
+            const dataRecommendation = await secureGet('/kost/recommendations');
+            setKostsRecommendation(dataRecommendation.data);
+
+            // basic (free preview)
+            const basic = await secureGet('/kost/basic');
+            setKostBasic(basic.data);
+          } catch (err) {
+            setError((err as Error).message || 'Failed to fetch data');
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        fetchKosts();
+      }, [currentPage]);
+
+
 
     useEffect(() => {
         if (
@@ -235,32 +241,37 @@ const HomePage: React.FC = () => {
 
     {/* Search Component */}
     <SearchKost
-      setIsFilterMenuOpen={setIsFilterMenuOpen}
-      onResult={(results) => {
-        setKosts(results);
-        setVisibleCount(isSubscribed ? results.length : VISIBLE_COUNT);
-      }}
-    />
+        setIsFilterMenuOpen={setIsFilterMenuOpen}
+        onResult={(res) => {
+          // supports both paginated & non-paginated responses
+          setKosts(res.data ?? res);
+          setCurrentPage(res.current_page ?? 1);
+          setLastPage(res.last_page ?? 1);
+          setTotal(res.total ?? (res.data?.length ?? res.length));
+
+          setVisibleCount(
+            isSubscribed
+              ? (res.data?.length ?? res.length)
+              : VISIBLE_COUNT
+          );
+        }}
+      />
+
+
 
     {/* RESULT */}
     <div className="mt-10">
       {/* COUNT */}
       <p className="text-gray-600 mb-6">
-        Menampilkan {Math.min(visibleCount, kosts.length)} dari {kosts.length} hasil pencarian
+        Menampilkan {Math.min(visibleCount, kosts.length)} dari {total} hasil pencarian
       </p>
 
       {/* VISIBLE DATA */}
-      <div
-        className="
-          flex gap-4 overflow-x-auto snap-x snap-mandatory
-          px-4 -mx-4
-          sm:grid sm:grid-cols-2
+      <div className="px-2
+          grid grid-cols-2
           md:grid-cols-3
-          lg:grid-cols-5
-          sm:overflow-visible sm:px-0 sm:mx-0
-        "
-        style={{ scrollbarWidth: 'none' }}
-      >{
+          lg:grid-cols-5 gap-4">
+        {
         !isSubscribed
           ? kostBasic.map((kost) => (
               <KostCard key={kost.id} kost={kost} />
@@ -270,6 +281,29 @@ const HomePage: React.FC = () => {
             ))
       }
       </div>
+
+      {/* HERE */}
+
+      {isSubscribed && lastPage > 1 && (
+          <div className="mt-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={lastPage}
+              onPageChange={(page) => {
+                if (page !== currentPage && !loading) {
+                  setCurrentPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
+            />
+          </div>
+        )}
+
+
+
+      {/* Adjustment END */}
+
+
 
       {/* LOCKED DATA */}
       {!isSubscribed && kosts.length > visibleCount && (

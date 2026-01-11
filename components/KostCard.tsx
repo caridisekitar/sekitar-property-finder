@@ -71,16 +71,16 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
     <div className="relative lg:hidden
     flex-shrink-0
     overflow-hidden rounded-xl
-    bg-gray-200 snap-start">
+    bg-gray-200 snap-start shadow-md">
       {/* Background Image */}
       <img
         src={getImageCover(kost.images) || kost.img_cover}
         alt="Kost Room"
-        className="min-h-[200px] w-full object-cover"
+        className="max-h-[200px] w-full object-cover"
       />
 
       {/* Overlay Card */}
-      <div className="w-full rounded-xl bg-white p-3 shadow-xl px-2">
+      <div className="w-full rounded-b-xl bg-white p-3 shadow-xl px-2">
         {/* Type */}
         <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-medium truncate">
           <svg
