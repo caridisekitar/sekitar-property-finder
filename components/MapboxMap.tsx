@@ -27,7 +27,6 @@ const MapPage: React.FC = () => {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  const [kostBasic, setKostBasic] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
 
   function formatPriceJt(price: number): string {
@@ -52,8 +51,6 @@ const MapPage: React.FC = () => {
     const initMap = async () => {
       const res = await secureGet('/kost/basic');
       if (!isMounted) return;
-
-      // setKostBasic(res.data);
 
       const map = new mapboxgl.Map({
         container: mapContainerRef.current!,

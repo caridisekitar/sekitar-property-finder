@@ -19,6 +19,8 @@ type PropertyCardProps = {
 
 const PropertyCard: React.FC<{ property: Property }> = ({ property, onClose }) => {
     const navigate = useNavigate();
+    const videoPosterUrl = property.images?.find(img => img.is_video_poster)?.image_url ?? property.img_cover;
+
   return (
     <div className="absolute
     top-4 lg:top-auto lg:bottom-4
@@ -38,11 +40,13 @@ const PropertyCard: React.FC<{ property: Property }> = ({ property, onClose }) =
       </button>
       {/* IMAGE */}
       <div className="relative h-56">
+        
         <img
-          src={property.img_cover}
+          src={videoPosterUrl}
           alt={property.name}
           className="h-full w-full object-cover rounded-t-xl"
         />
+        
 
         {/* TYPE BADGE */}
         <div className="absolute top-4 left-4 bg-white px-3 py-1 rounded-full flex items-center gap-2 shadow">
