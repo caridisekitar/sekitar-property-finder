@@ -6,11 +6,8 @@ import KostCard from "@/components/KostCard";
 import SearchKost from "@/components/SearchKost";
 import FilterMenu from "@/components/layout/FilterMenu";
 import SubscriptionModal from "@/components/SubscriptionModal";
+import Pagination from "@/components/Pagination";
 import { secureGet } from "@/lib/secureGet";
-
-
-const MAX_FREE = 5;
-
 
 const CariKosPage: React.FC = () => {
   const [kosts, setKosts] = useState<Kost[]>([]);
@@ -19,39 +16,44 @@ const CariKosPage: React.FC = () => {
   const [open, setOpen] = useState(false);
   const { subscription } = useAuth();
 
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   const isPremium = subscription?.plan === "PREMIUM";
 
-  const visibleKosts = isPremium
-    ? kosts
-    : kostBasic;
+  const visibleKosts = isPremium ? kosts : kostBasic;
+  const lockedKosts = isPremium ? [] : kosts.slice(kostBasic.length);
 
-  const Ca = !isPremium
-    ? kostBasic
-    : [];
-
-  useEffect(() => {
-  const fetchInitialKosts = async () => {
+  const fetchKosts = async (pageNumber = 1) => {
     try {
+      setLoading(true);
+
       const res = await secureGet("/search", {
-        limit: 20,
-        sort: "latest",
+        page: pageNumber,
+        per_page: 10,
       });
 
-      // Get kost basic
-      const kostBasic = await secureGet('/kost/basic');
-      setKostBasic(kostBasic.data);
+      setKosts(res.data);
+      setPage(res.current_page);
+      setLastPage(res.last_page);
+      setTotal(res.total);
 
-      setKosts(res.data ?? res);
+      if (!isPremium) {
+        const basic = await secureGet("/kost/basic");
+        setKostBasic(basic.data);
+      }
     } catch (e) {
-      console.error("Initial fetch failed", e);
+      console.error("Fetch kost failed", e);
+    } finally {
+      setLoading(false);
     }
   };
-  
 
-  fetchInitialKosts();
-}, []);
-
-  const lockedKosts = isPremium ? [] : Ca;
+  useEffect(() => {
+    fetchKosts(1);
+  }, [isPremium]);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -63,11 +65,16 @@ const CariKosPage: React.FC = () => {
 
       <SearchKost
         setIsFilterMenuOpen={setIsFilterMenuOpen}
-        onResult={setKosts}
+        onResult={(res) => {
+          setKosts(res.data ?? res);
+          setPage(res.current_page ?? 1);
+          setLastPage(res.last_page ?? 1);
+          setTotal(res.total ?? (res.data?.length ?? 0));
+        }}
       />
 
       <p className="text-gray-600 my-6">
-        Menampilkan {visibleKosts.length} dari {kosts.length} hasil pencarian
+        Menampilkan {visibleKosts.length} dari {total} hasil pencarian
       </p>
 
       {/* Visible */}
@@ -76,6 +83,21 @@ const CariKosPage: React.FC = () => {
           <KostCard key={kost.id} kost={kost} />
         ))}
       </div>
+
+      {/* Pagination (Premium only) */}
+      {isPremium && lastPage > 1 && (
+        <div className="mt-10">
+          <Pagination
+            currentPage={page}
+            totalPages={lastPage}
+            onPageChange={(p) => {
+              if (p !== page && !loading) {
+                fetchKosts(p);
+              }
+            }}
+          />
+        </div>
+      )}
 
       {/* Locked */}
       {!isPremium && lockedKosts.length > 0 && (

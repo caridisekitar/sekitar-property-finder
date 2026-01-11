@@ -13,7 +13,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
   className="
     hidden lg:block
     flex-shrink-0
-    w-[220px]
+    w-[300px] lg:w-[220px]
     bg-white rounded-xl shadow-md
     overflow-hidden snap-start
   "
@@ -76,7 +76,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
       <img
         src={getImageCover(kost.images) || kost.img_cover}
         alt="Kost Room"
-        className="h-[250px] w-full object-cover sm:h-[320px]"
+        className="min-h-[200px] w-full object-cover"
       />
 
       {/* Overlay Card */}
