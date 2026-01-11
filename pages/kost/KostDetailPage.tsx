@@ -7,10 +7,13 @@ import RekomendasiKos from "@/components/kost/RekomendasiKos";
 import type { Kost } from "@/types";
 import NotFoundKost from "@/components/NotFoundKost";
 import { secureGet } from '@/lib/secureGet';
+import { securePost } from '@/lib/securePost';
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { formatHargaRange, formatDeposit, formatHargaRangeID } from "@/lib/helper";
 import { useAuth } from "@/hooks/useAuth";
 import SubscriptionModal from "@/components/SubscriptionModal";
+import { toggleLike, toggleBookmark } from "@/lib/kostActions";
+
 
 const KosDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -19,8 +22,17 @@ const KosDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const { subscription } = useAuth();
+  const { subscription, user } = useAuth();
   const [isSubscribed, setIsSubscribed] = useState(false);
+
+  // Liked and bookmarked
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [bookmarked, setBookmarked] = useState(false);
+
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
 
    useEffect(() => {
     if (!slug) return;
@@ -29,8 +41,18 @@ const KosDetailPage: React.FC = () => {
       try {
         setLoading(true);
 
-        const data = await secureGet(`/kosts/${slug}`);
+        // const data = await secureGet(`/kosts/${slug}`);
+        const data = await securePost(`/kosts/${slug}`,
+          "POST",
+          {
+            user_id: user?.id
+          }
+        );
         setKost(data);
+        setLiked(data.is_liked_by_me);
+        setLikesCount(data.likes_count);
+        setBookmarked(data.is_bookmarked_by_me);
+
       } catch (err) {
         console.error(err);
         setError("Kost not found");
@@ -74,6 +96,55 @@ const KosDetailPage: React.FC = () => {
     window.open(whatsappUrl, "_blank");
     
   };
+
+  const handleLike = async () => {
+      if (!user || likeLoading || !kost) return;
+
+      setLikeLoading(true);
+
+      // optimistic UI (correct)
+      setLiked(prev => {
+        const next = !prev;
+        setLikesCount(c => (next ? c + 1 : c - 1));
+        return next;
+      });
+
+      try {
+        const res = await toggleLike(kost.id);
+        setLiked(res.liked);
+        setLikesCount(res.likes_count);
+      } catch {
+        // rollback
+        setLiked(liked);
+        setLikesCount(likesCount);
+      } finally {
+        setLikeLoading(false);
+      }
+    };
+
+    const handleBookmark = async () => {
+      if (!user || bookmarkLoading || !kost) return;
+
+      setBookmarkLoading(true);
+
+      // optimistic UI (correct)
+      setBookmarked(prev => {
+        const next = !prev;
+        return next;
+      });
+
+      try {
+        const res = await toggleBookmark(kost.id);
+        setBookmarked(res.bookmarked);
+      } catch {
+        // rollback
+        setBookmarked(bookmarked);
+      } finally {
+        setBookmarkLoading(false);
+      }
+    };
+
+
 
   
 
@@ -164,7 +235,7 @@ const KosDetailPage: React.FC = () => {
 
 
           <div className="flex gap-3 mt-4 justify-end">
-            <button className="p-2 border rounded-lg">
+            <button className="p-2 border border-[#18181B] rounded-lg me-2">
               <Heart className="w-5 h-5" />
             </button>
             <button className="p-2 border rounded-lg">
@@ -298,14 +369,45 @@ const KosDetailPage: React.FC = () => {
             />
 
 
-          <h1 className="mt-4 text-xl font-semibold text-gray-900">
-            {kost.name}
-          </h1>
+          <div className="grid grid-cols-2 gap-2 mt-4">
+             <div className="flex-col items-center gap-2 text-sm text-gray-500">
+              <h1 className="mt-4 text-xl font-semibold text-gray-900">
+                {kost.name}
+              </h1>
 
-          <div className="flex items-center text-sm text-gray-500 mt-1">
-            <MapPin className="w-4 h-4 mr-1" />
-            {kost.city}
+              <div className="flex items-center text-sm text-gray-500 mt-1">
+                <MapPin className="w-4 h-4 mr-1" />
+                {kost.city}
+              </div>
+             </div>
+             <div className="flex items-center gap-2 text-sm text-gray-500 justify-end">
+                <div className="flex-col gap-3 mt-4 text-right">
+                  <button
+                    onClick={handleLike}
+                    disabled={likeLoading}
+                    className="p-2 border border-[#18181B] rounded-lg me-2 disabled:opacity-50"
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition ${
+                        liked ? "fill-red-500 text-red-500" : ""
+                      }`}
+                    />
+                  </button>
+                  <button 
+                  onClick={handleBookmark}
+                  disabled={likeLoading}
+                  className="p-2 border border-[#18181B] rounded-lg">
+                    <Bookmark className={`w-5 h-5 transition ${
+                        bookmarked ? "fill-red-500 text-red-500" : ""
+                      }`}/>
+                  </button>
+                  <br />
+                  <p className="mt-2">{likesCount} orang menyukai kos ini</p>
+                </div>
+                
+             </div>
           </div>
+          
         </div>
 
         {/* RIGHT CARD */}
@@ -364,16 +466,10 @@ const KosDetailPage: React.FC = () => {
             </>
 
 
-          <div className="flex gap-3 mt-4 justify-end">
-            <button className="p-2 border rounded-lg">
-              <Heart className="w-5 h-5" />
-            </button>
-            <button className="p-2 border rounded-lg">
-              <Bookmark className="w-5 h-5" />
-            </button>
-          </div>
+          
         </div>
       </div>
+
 
       {/* TABS */}
       <Tabs active={activeTab} onChange={setActiveTab} />
