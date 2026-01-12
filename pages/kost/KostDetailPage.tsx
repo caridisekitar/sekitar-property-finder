@@ -302,7 +302,15 @@ const KosDetailPage: React.FC = () => {
 
       {/* DISCLAIMER */}
       <div className="mt-8 bg-sky-50 p-4 rounded-xl text-xs text-gray-600">
-        Semua foto milik pemilik kos. Kami tidak mengambil komisi apa pun.
+        <strong>Disclaimer:</strong>
+        <ul className="text-[#313336]">
+          <li>
+            Sekitar tidak mengambil komisi apa pun dari setiap booking kost yang dilakukan lewat website ini. Nomor WhatsApp yang tercantum terhubung langsung kepada pemilik kost, bukan pihak ketiga/pihak Sekitar.
+          </li>
+          <li>
+            Semua foto dan video di website Sekitar dimiliki dan dilindungi oleh hak cipta milik caridisekitar.com. Mohon untuk tidak menggunakan atau mendistribusikan ulang konten kami tanpa izin. Kami menghargai upaya bersama dalam menjaga orisinalitas dan kredibilitas konten.
+          </li>
+        </ul>
       </div>
 
       {/* REKOMENDASI */}
@@ -550,7 +558,15 @@ const KosDetailPage: React.FC = () => {
 
       {/* DISCLAIMER */}
       <div className="mt-8 bg-sky-50 p-4 rounded-xl text-xs text-gray-600">
-        Semua foto milik pemilik kos. Kami tidak mengambil komisi apa pun.
+        <strong>Disclaimer:</strong>
+        <ul className="text-[#313336]">
+          <li>
+            Sekitar tidak mengambil komisi apa pun dari setiap booking kost yang dilakukan lewat website ini. Nomor WhatsApp yang tercantum terhubung langsung kepada pemilik kost, bukan pihak ketiga/pihak Sekitar.
+          </li>
+          <li>
+            Semua foto dan video di website Sekitar dimiliki dan dilindungi oleh hak cipta milik caridisekitar.com. Mohon untuk tidak menggunakan atau mendistribusikan ulang konten kami tanpa izin. Kami menghargai upaya bersama dalam menjaga orisinalitas dan kredibilitas konten.
+          </li>
+        </ul>
       </div>
 
       {/* REKOMENDASI */}
