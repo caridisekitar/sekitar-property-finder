@@ -34,7 +34,7 @@ const AppContent: React.FC = () => {
                              location.pathname === '/register';
 
     return (
-        <div className="bg-white text-brand-dark">
+        <div className="bg-white">
             {!hideHeaderFooter && <Header />}
             <main className={hideHeaderFooter ? '' : 'md:min-h-[600px] lg:min-h-[600px]'}>
                 <Routes>

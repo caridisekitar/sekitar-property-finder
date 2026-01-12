@@ -79,6 +79,14 @@ const MapsPage: React.FC = () => {
     }
 
     // FREE → nothing
+    if (isFree) {
+
+      const mapRes = await secureGet('/search', {
+        per_page: 1000,
+      });
+
+      setMapKosts(mapRes.data);
+    }
   } catch (err) {
     console.error('Failed to fetch kost data', err);
   } finally {
@@ -86,8 +94,8 @@ const MapsPage: React.FC = () => {
   }
 };
 
-
   useEffect(() => {
+    
   if (page !== 1) {
     fetchData(page);
   }
