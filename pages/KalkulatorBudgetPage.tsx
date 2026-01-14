@@ -7,13 +7,16 @@ import { securePost } from "@/lib/securePost";
 import KostCard from "@/components/KostCard";
 import { formatIDRNumber } from '@/lib/helper';
 import SubscriptionModal from '@/components/SubscriptionModal';
+import Pagination from '@/components/Pagination';
 
 const KalkulatorBudgetPage: React.FC = () => {
+    const [results, setResults] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const { subscription } = useAuth();
     const isPremiumUser = subscription?.plan === 'PREMIUM';
     const [error, setError] = useState<React.ReactNode | null>(null);
     const [gaji, setGaji] = useState<string>('');
-    const [results, setResults] = useState<number[]>([]);
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [maxRangeBudget, setMaxRangeBudget] = useState(0);
@@ -29,51 +32,67 @@ const KalkulatorBudgetPage: React.FC = () => {
         </>
         );
 
-
+    
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError('');
+        setError(null);
 
-        // 1️⃣ Check subscription
-            if (!isPremiumUser) {
-                setError(premiumError);
-                return;
-            }
-        
-        // 2️⃣ Sanitize input (numbers only)
-            const sanitized = gaji.replace(/\D/g, '');
-            const salary = Number(sanitized);
+        if (!isPremiumUser) {
+            setError(premiumError);
+            return;
+        }
 
-            if (!salary || salary <= 0) {
-                setError('Masukkan nominal gaji yang valid.');
-                return;
-            }
+        const salary = Number(gaji.replace(/\D/g, ''));
+        if (!salary) {
+            setError('Masukkan nominal gaji yang valid.');
+            return;
+        }
 
-        // 3️⃣ Budget logic (example: max 30% of salary)
         const maxBudget = Math.floor(salary * 0.3);
+
+        // ✅ update state for UI
         setMaxRangeBudget(maxBudget);
+        setPage(1);
+        setResults([]);
+
+        // ✅ pass value directly
+        await fetchResults(1, maxBudget);
+        };
+
+
+    const fetchResults = async (
+        pageNumber = 1,
+        budgetOverride?: number
+        ) => {
+        setLoading(true);
 
         try {
             const res = await securePost(
             '/kost/search_by_salary',
             'POST',
             {
-                max_budget: maxBudget,
+                max_budget: budgetOverride ?? maxRangeBudget,
+                page: pageNumber,
+                per_page: 10
             }
             );
-            // 4️⃣ Limit to max 5 cards (backend already limits, but safe on frontend)
-            setResults((res.data || []));
-        } catch (err: any) {
-            setError(
-            err?.message ||
-            'Terjadi kesalahan saat mencari kost. Silakan coba lagi.'
-            );
-        }
 
-    };
+            setResults(res.data || []);
+            setPage(res.meta?.current_page || pageNumber);
+            setTotalPages(res.meta?.last_page || 1);
+        } catch {
+            setError('Gagal memuat data kost.');
+        } finally {
+            setLoading(false);
+        }
+        };
+
+
 
     const handleReset = () => {
         setResults([]);
+        setPage(1);
+        setTotalPages(1);
         setGaji('');
         setError(null);
         setLoading(false);
@@ -276,18 +295,34 @@ const KalkulatorBudgetPage: React.FC = () => {
                 </div>
 
           {/* Cards */}
-            {!loading && !error && results.length > 0 && (
-                <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center my-2">
-                            Ini Rekomendasi Kos yang Sesuai Budget Kamu
+            {!loading && results.length > 0 && (
+                <div id="kost-results">
+                    <h2 className="text-xl md:text-2xl font-bold text-center my-4">
+                    Ini Rekomendasi Kos yang Sesuai Budget Kamu
                     </h2>
-                    <div className="flex gap-4 overflow-x-auto pb-2 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 my-4">
                     {results.map((kost) => (
                         <KostCard key={kost.id} kost={kost} />
                     ))}
                     </div>
+
+                    {totalPages > 1 && (
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={(p) => {
+                        if (p === page || loading) return;
+                        fetchResults(p);
+                        document
+                            .getElementById('kost-results')
+                            ?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                    />
+                    )}
                 </div>
-            )}  
+                )}
+
             <SubscriptionModal open={open} onClose={() => setOpen(false)} />
     </div>
   );

@@ -8,7 +8,7 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
     const getPageNumbers = () => {
-        const pages = [];
+        const pages: (number | string)[] = [];
         const maxPagesToShow = 3;
         
         if (totalPages <= maxPagesToShow) {
@@ -49,7 +49,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
     };
 
     return (
-        <nav className="flex items-center justify-center md:justify-between flex-wrap gap-4">
+        <nav aria-label="Pagination" className="flex items-center justify-center md:justify-between flex-wrap gap-4">
             <button
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
