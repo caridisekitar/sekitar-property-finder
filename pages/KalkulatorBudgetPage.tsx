@@ -115,7 +115,7 @@ const KalkulatorBudgetPage: React.FC = () => {
         </nav>
         <div className="w-full border-b border-gray-200 py-2"></div>
       
-        <div className="relative bg-cover bg-center rounded-2xl shadow-lg p-8 md:p-8 lg:p-8 my-8 overflow-hidden h-[30vh] md:h-[330px] lg:h-[450px]" style={{ backgroundImage: "url('/images/hero-image-bg.webp')" }}>
+        <div className="relative bg-cover bg-center rounded-2xl shadow-lg p-8 md:p-8 lg:p-8 my-8 overflow-hidden h-[70vh] md:h-[330px] lg:h-[450px]" style={{ backgroundImage: "url('/images/hero-image-bg.webp')" }}>
             
                 <div className="relative z-10 flex flex-col items-center justify-center text-center text-white">
                     <h1 className="text-2xl md:text-3xl font-bold">Kalkulator Budget</h1>
