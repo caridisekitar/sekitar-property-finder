@@ -303,7 +303,7 @@ const KosDetailPage: React.FC = () => {
       {/* DISCLAIMER */}
       <div className="mt-8 bg-sky-50 p-4 rounded-xl text-xs text-gray-600">
         <strong>Disclaimer:</strong>
-        <ul className="text-[#313336]">
+        <ul className="text-[#313336] list-disc pl-5 space-y-2 mt-2">
           <li>
             Sekitar tidak mengambil komisi apa pun dari setiap booking kost yang dilakukan lewat website ini. Nomor WhatsApp yang tercantum terhubung langsung kepada pemilik kost, bukan pihak ketiga/pihak Sekitar.
           </li>
@@ -559,7 +559,7 @@ const KosDetailPage: React.FC = () => {
       {/* DISCLAIMER */}
       <div className="mt-8 bg-sky-50 p-4 rounded-xl text-xs text-gray-600">
         <strong>Disclaimer:</strong>
-        <ul className="text-[#313336]">
+        <ul className="text-[#313336] list-disc pl-5 space-y-2 mt-2">
           <li>
             Sekitar tidak mengambil komisi apa pun dari setiap booking kost yang dilakukan lewat website ini. Nomor WhatsApp yang tercantum terhubung langsung kepada pemilik kost, bukan pihak ketiga/pihak Sekitar.
           </li>

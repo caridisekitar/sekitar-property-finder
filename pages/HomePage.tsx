@@ -10,6 +10,7 @@ import SparklesIcon from '@/components/icons/SparklesIcon';
 import SearchKost from '@/components/SearchKost';
 import SubscriptionModal from '@/components/SubscriptionModal';
 import KostCard from '../components/KostCard';
+import KostCardCarousel from '../components/KostCardCarousel';
 import { secureGet } from '@/lib/secureGet';
 import BusinessSection from '@/components/BusinessSection';
 import HeroSearch from '@/components/HeroSearch';
@@ -207,18 +208,19 @@ const HomePage: React.FC = () => {
                         <button onClick={() => scrollKostCarousel('right')} aria-label="Next Kost" className="w-12 h-12 bg-brand-dark text-white rounded-full p-3 hover:bg-gray-800 transition-colors">&rarr;</button>
                     </div>
                 </div>
-                <div className="">
+                <div className="relative overflow-hidden">
                     <div
                         ref={kostCarouselRef}
                         className="
                           flex gap-4 overflow-x-auto pb-4
-                          snap-x snap-mandatory
-                          touch-pan-x
-                          overscroll-x-contain
+    snap-x snap-mandatory
+    touch-pan-x
+    overscroll-x-contain
+    px-4
                         "
                         style={{ scrollbarWidth: "none" }}
                       >
-                        {kostsRecommendation.map(kost => <KostCard key={kost.id} kost={kost} />)}
+                        {kostsRecommendation.map(kost => <KostCardCarousel key={kost.id} kost={kost} />)}
                     </div>
                 </div>
             </div>

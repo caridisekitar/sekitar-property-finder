@@ -278,7 +278,7 @@ const KalkulatorBudgetPage: React.FC = () => {
           {/* Cards */}
             {!loading && !error && results.length > 0 && (
                 <div>
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center my-2">
                             Ini Rekomendasi Kos yang Sesuai Budget Kamu
                     </h2>
                     <div className="flex gap-4 overflow-x-auto pb-2 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">

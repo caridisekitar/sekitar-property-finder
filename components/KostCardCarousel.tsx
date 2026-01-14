@@ -4,6 +4,7 @@ import BedIcon from '@/components/icons/BedIcon';
 import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatHargaRange } from '@/lib/helper';
+import { getVideoPoster, getImageCover } from "@/lib/image";
 
 
 const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
@@ -12,7 +13,7 @@ const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
         className="
           hidden lg:block
           flex-shrink-0
-          w-[220px]
+          w-[300px] lg:w-[220px]
           bg-white rounded-xl shadow-md
           overflow-hidden snap-start
         "
@@ -21,7 +22,7 @@ const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
         {/* IMAGE */}
       <div className="relative lg:h-[360px] w-auto">
         <img
-              src={kost.img_cover || ''}
+              src={getImageCover(kost.images) || kost.img_cover}
               alt={kost.name}
               className="h-full w-full object-cover"
             />
@@ -69,20 +70,21 @@ const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
     <Link to={`/kost/${kost.slug}`}>
     <div className="relative lg:hidden
     flex-shrink-0
-    w-[280px] sm:w-[320px]
+    min-w-[calc(50vw-1rem)]
+    max-w-[calc(50vw-1rem)]
     overflow-hidden rounded-xl
-    bg-gray-200 snap-start">
+    bg-gray-200 snap-start shadow-md">
       {/* Background Image */}
       <img
-        src="https://images.unsplash.com/photo-1615873968403-89e068629265?q=80&w=1600&auto=format&fit=crop"
+        src={getImageCover(kost.images) || kost.img_cover}
         alt="Kost Room"
-        className="h-[160px] w-full object-cover sm:h-[320px]"
+        className="h-[200px] w-full object-cover"
       />
 
       {/* Overlay Card */}
-      <div className="absolute right-4 top-1/2 w-[170px] -translate-y-1/2 rounded-xl bg-white p-3 shadow-xl sm:right-8 sm:w-[320px]">
+      <div className="w-full rounded-b-xl bg-white p-3 shadow-xl px-2">
         {/* Type */}
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-medium">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#F0F9FF] px-3 py-1 text-xs font-medium truncate">
           <svg
             className="h-4 w-4"
             fill="none"
@@ -97,12 +99,12 @@ const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
         </div>
 
         {/* Title */}
-        <h3 className="text-sm font-bold text-gray-900">
+        <h3 className="text-sm font-bold text-gray-900 line-clamp-2">
           {kost.name || ''}
         </h3>
 
         {/* Location */}
-        <p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
+        <p className="mt-1 flex items-center gap-1 text-xs text-gray-400 truncate">
           <svg
             className="h-4 w-4"
             fill="none"
@@ -118,7 +120,7 @@ const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
 
         {/* Price */}
         <div className="mt-1 rounded-lg bg-[#F0F9FF] py-2 text-center text-sm font-bold text-gray-900">
-          Rp {kost.price_monthly.toLocaleString('id-ID')}
+          Rp {formatHargaRange(kost.price_monthly)}
         </div>
       </div>
     </div>
