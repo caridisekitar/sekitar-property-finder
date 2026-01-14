@@ -37,32 +37,24 @@ const KosDetailPage: React.FC = () => {
    useEffect(() => {
     if (!slug) return;
 
-    const fetchKostDetail = async () => {
-      try {
-        setLoading(true);
+        const fetchKostDetail = async () => {
+        try {
+          setLoading(true);
+          const data = await secureGet(`/kosts/${slug}`);
+          setKost(data);
 
-        // const data = await secureGet(`/kosts/${slug}`);
-        const data = await securePost(`/kosts/${slug}`,
-          "POST",
-          {
-            user_id: user?.id
-          }
-        );
-        setKost(data);
-        setLiked(data.is_liked_by_me);
-        setLikesCount(data.likes_count);
-        setBookmarked(data.is_bookmarked_by_me);
+          setLiked(data.is_liked_by_me);
+          setLikesCount(data.likes_count);
+          setBookmarked(data.is_bookmarked_by_me);
+        } catch {
+          setError("Kost not found");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-      } catch (err) {
-        console.error(err);
-        setError("Kost not found");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchKostDetail();
-  }, [slug]);
+      fetchKostDetail();
+    }, [slug]);
 
   // ✅ EFFECT 2 — subscription status
   useEffect(() => {

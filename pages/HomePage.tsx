@@ -213,11 +213,10 @@ const HomePage: React.FC = () => {
                         ref={kostCarouselRef}
                         className="
                           flex gap-4 overflow-x-auto pb-4
-    snap-x snap-mandatory
-    touch-pan-x
-    overscroll-x-contain
-    px-4
-                        "
+                          snap-x snap-mandatory
+                          touch-pan-x
+                          overscroll-x-contain
+                          px-4"
                         style={{ scrollbarWidth: "none" }}
                       >
                         {kostsRecommendation.map(kost => <KostCardCarousel key={kost.id} kost={kost} />)}
