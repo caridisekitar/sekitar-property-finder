@@ -352,10 +352,10 @@ const KosDetailPage: React.FC = () => {
       </nav>
 
       {/* Header */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
 
         {/* LEFT */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span">
           <ImageGallery
               images={
                 kost.images
@@ -408,6 +408,149 @@ const KosDetailPage: React.FC = () => {
              </div>
           </div>
           
+              {/* TABS */}
+              <Tabs active={activeTab} onChange={setActiveTab} />
+
+              {/* TAB CONTENT */}
+              <div className="mt-6">
+
+                {activeTab === "fasilitas" && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                        {kost.facilities.length > 0 ? (
+                        kost.facilities.map((facility) => (
+                            <div
+                            key={facility.id}
+                            className="flex items-center gap-2"
+                            >
+                            <img
+                                src={`/images/icons/${facility.icon}`}
+                                alt={facility.name}
+                                className="w-4 h-4 object-contain"
+                            />
+                            <span>{facility.name}</span>
+                            </div>
+                        ))
+                        ) : (
+                        <p className="col-span-full text-gray-500">
+                            Fasilitas belum tersedia
+                        </p>
+                        )}
+                    </div>
+                    )}
+
+
+                {activeTab === "lokasi" && (
+                  <div>
+                    <div className="bg-[#DCF4FF] rounded-xl h-[250px] flex items-center justify-center">
+                      <iframe
+                          className="w-full h-full rounded-xl"
+                          width="100%"
+                          height="329"
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="no-referrer-when-downgrade"
+                          src={`https://www.google.com/maps?q=${kost.latitude},${kost.longitude}&z=15&output=embed`}>
+                          </iframe>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                      {kost.neartransum && (
+                          <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-full bg-[#9ED4EE] flex items-center justify-center">
+                                <img src="/images/icons/transum.svg" alt="Transum" className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-500">Transum terdekat</p>
+                                <p className="font-semibold text-gray-900 capitalize">{kost.transum_description}</p>
+                              </div>
+                            </div>
+                            {/* <span className="text-sm font-semibold text-gray-700">1 km</span> */}
+                          </div>    
+                      )}
+                    
+                    {kost.near_warteg && (
+                        <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className=" rounded-full flex items-center justify-center">
+                              <img src="/images/icons/warteg.png" alt="Warteg" className="w-12 h-12" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Warteg terdekat</p>
+                              <p className="font-semibold text-gray-900 capitalize">{kost.near_warteg}</p>
+                            </div>
+                          </div>
+                          {/* <span className="text-sm font-semibold text-gray-700">1 km</span> */}
+                        </div>
+                    )}
+
+                    
+                    
+
+                    {kost.near_laundry && (
+                        <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-full flex items-center justify-center">
+                              <img src="/images/icons/laundry.png" alt="Laundry" className="w-12 h-12" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">Laundry terdekat</p>
+                              <p className="font-semibold text-gray-900 capitalize">{kost.near_laundry}</p>
+                            </div>
+                          </div>
+                          {/* <span className="text-sm font-semibold text-gray-700">1 km</span> */}
+                        </div>
+                    )}
+                    
+                  </div>
+
+                  </div>
+                )}
+
+                {activeTab === "insight" && (
+                    <div className="space-y-4">
+                        {kost.insights && kost.insights.length > 0 ? (
+                        kost.insights.map((insight) => (
+                            <div
+                            key={insight.id}
+                            className="border rounded-xl p-4 text-sm text-gray-700"
+                            >
+
+                            <p className="mt-2">
+                                {insight.content}
+                            </p>
+
+                            {/* <span className="block mt-2 text-xs text-gray-400">
+                                {new Date(insight.created_at).toLocaleDateString("id-ID", {
+                                day: "numeric",
+                                month: "long",
+                                year: "numeric",
+                                })}
+                            </span> */}
+                            </div>
+                        ))
+                        ) : (
+                        <div className="border rounded-xl p-4 text-sm text-gray-500">
+                            Belum ada insight untuk kos ini.
+                        </div>
+                        )}
+                    </div>
+                    )}
+
+              </div>
+
+              {/* DISCLAIMER */}
+              <div className="mt-8 bg-[#DCF4FF] p-4 rounded-xl text-xs text-gray-600">
+                <strong>Disclaimer:</strong>
+                <ul className="text-[#313336] list-disc pl-5 space-y-2 mt-2">
+                  <li>
+                    Sekitar tidak mengambil komisi apa pun dari setiap booking kost yang dilakukan lewat website ini. Nomor WhatsApp yang tercantum terhubung langsung kepada pemilik kost, bukan pihak ketiga/pihak Sekitar.
+                  </li>
+                  <li>
+                    Semua foto dan video di website Sekitar dimiliki dan dilindungi oleh hak cipta milik caridisekitar.com. Mohon untuk tidak menggunakan atau mendistribusikan ulang konten kami tanpa izin. Kami menghargai upaya bersama dalam menjaga orisinalitas dan kredibilitas konten.
+                  </li>
+                </ul>
+              </div>
+      
         </div>
 
         {/* RIGHT CARD */}
@@ -444,7 +587,6 @@ const KosDetailPage: React.FC = () => {
                     </p>
               </div>
             </div>
-            
           </div>
 
 
@@ -468,98 +610,14 @@ const KosDetailPage: React.FC = () => {
 
           
         </div>
+
+
+        
       </div>
 
+      
 
-      {/* TABS */}
-      <Tabs active={activeTab} onChange={setActiveTab} />
-
-      {/* TAB CONTENT */}
-      <div className="mt-6">
-
-        {activeTab === "fasilitas" && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                {kost.facilities.length > 0 ? (
-                kost.facilities.map((facility) => (
-                    <div
-                    key={facility.id}
-                    className="flex items-center gap-2"
-                    >
-                    <img
-                        src={`/images/icons/${facility.icon}`}
-                        alt={facility.name}
-                        className="w-4 h-4 object-contain"
-                    />
-                    <span>{facility.name}</span>
-                    </div>
-                ))
-                ) : (
-                <p className="col-span-full text-gray-500">
-                    Fasilitas belum tersedia
-                </p>
-                )}
-            </div>
-            )}
-
-
-        {activeTab === "lokasi" && (
-          <div className="bg-sky-100 rounded-xl h-[250px] flex items-center justify-center">
-            <iframe
-                className="w-full h-full rounded-xl"
-                width="100%"
-                height="250"
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                src={`https://www.google.com/maps?q=${kost.latitude},${kost.longitude}&z=15&output=embed`}>
-                </iframe>
-          </div>
-        )}
-
-        {activeTab === "insight" && (
-            <div className="space-y-4">
-                {kost.insights && kost.insights.length > 0 ? (
-                kost.insights.map((insight) => (
-                    <div
-                    key={insight.id}
-                    className="border rounded-xl p-4 text-sm text-gray-700"
-                    >
-
-                    <p className="mt-2">
-                        {insight.content}
-                    </p>
-
-                    {/* <span className="block mt-2 text-xs text-gray-400">
-                        {new Date(insight.created_at).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                        })}
-                    </span> */}
-                    </div>
-                ))
-                ) : (
-                <div className="border rounded-xl p-4 text-sm text-gray-500">
-                    Belum ada insight untuk kos ini.
-                </div>
-                )}
-            </div>
-            )}
-
-      </div>
-
-      {/* DISCLAIMER */}
-      <div className="mt-8 bg-sky-50 p-4 rounded-xl text-xs text-gray-600">
-        <strong>Disclaimer:</strong>
-        <ul className="text-[#313336] list-disc pl-5 space-y-2 mt-2">
-          <li>
-            Sekitar tidak mengambil komisi apa pun dari setiap booking kost yang dilakukan lewat website ini. Nomor WhatsApp yang tercantum terhubung langsung kepada pemilik kost, bukan pihak ketiga/pihak Sekitar.
-          </li>
-          <li>
-            Semua foto dan video di website Sekitar dimiliki dan dilindungi oleh hak cipta milik caridisekitar.com. Mohon untuk tidak menggunakan atau mendistribusikan ulang konten kami tanpa izin. Kami menghargai upaya bersama dalam menjaga orisinalitas dan kredibilitas konten.
-          </li>
-        </ul>
-      </div>
+      
 
       {/* REKOMENDASI */}
       <RekomendasiKos />
