@@ -338,8 +338,7 @@ const HomePage: React.FC = () => {
               <h3 className="text-xl font-bold mb-2">Yah terkunci nih!</h3>
 
               <p className="text-gray-600 mb-6">
-                Jangan khawatir, kamu bisa akses ratusan informasi kost
-                dengan harga bersahabat.
+                Tenang, ratusan informasi kost sudah siap kamu akses. Langganan sekarang, biar cari kost jadi lebih gampang! Sssst, bikin akun nya gratis!🤫
               </p>
 
               <button
