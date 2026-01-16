@@ -105,12 +105,13 @@ const CariKosPage: React.FC = () => {
 
       <SearchKost
         setIsFilterMenuOpen={setIsFilterMenuOpen}
-        onResult={(res) => {
-          setKosts(res.data ?? res);
-          setPage(res.current_page ?? 1);
-          setLastPage(res.last_page ?? 1);
-          setTotal(res.total ?? (res.data?.length ?? 0));
-        }}
+        onSearch={fetchSearchWithFilters}
+        // onResult={(res) => {
+        //   setKosts(res.data ?? res);
+        //   setPage(res.current_page ?? 1);
+        //   setLastPage(res.last_page ?? 1);
+        //   setTotal(res.total ?? (res.data?.length ?? 0));
+        // }}
       />
 
       <p className="text-gray-600 my-6">

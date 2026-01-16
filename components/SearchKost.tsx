@@ -44,12 +44,24 @@ const SearchKost: React.FC<SearchKostProps> = ({
       return;
     }
 
-    onSearch({
-      q: keyword || undefined,
-      lokasi: lokasi.length ? lokasi.join(",") : undefined,
-      tipe: tipe.length ? tipe.join(",") : undefined,
-      ...parsePriceRange(priceRange),
-    });
+    const params: {
+        q?: string;
+        lokasi?: string;
+        tipe?: string;
+        min_price?: number;
+        max_price?: number;
+      } = {
+        ...(lokasi.length && { lokasi: lokasi.join(",") }),
+        ...(tipe.length && { tipe: tipe.join(",") }),
+        ...parsePriceRange(priceRange),
+      };
+
+      if (keyword.trim()) {
+        params.q = keyword.trim();
+      }
+
+      onSearch(params);
+
   };
 
   const lokasiOptions = [
