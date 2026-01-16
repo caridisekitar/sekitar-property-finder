@@ -440,7 +440,7 @@ const KosDetailPage: React.FC = () => {
                               className="flex items-center gap-2"
                               >
                               <img
-                                  src={`/images/icons/lemari.svg`}
+                                  src={`/images/icons/jendela.svg`}
                                   className="w-4 h-4 object-contain"
                               />
                               <span className="capitalize">{kost.window_description}</span>
