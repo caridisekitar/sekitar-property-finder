@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import KostCard from "@/components/KostCard";
+import KostCardCarousel from "@/components/KostCardCarousel";
 import type { Kost } from "@/types";
 import { secureGet } from '@/lib/secureGet';
 
@@ -44,7 +44,7 @@ export default function RekomendasiKos() {
       {!loading && !error && (
         <div className="flex gap-4 overflow-x-auto pb-2">
           {kosts.map((kost) => (
-            <KostCard key={kost.id} kost={kost} />
+            <KostCardCarousel key={kost.id} kost={kost} />
           ))}
         </div>
       )}
