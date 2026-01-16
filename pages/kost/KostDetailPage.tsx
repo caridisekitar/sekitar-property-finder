@@ -479,8 +479,12 @@ const KosDetailPage: React.FC = () => {
                       {kost.neartransum && (
                           <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-full bg-[#9ED4EE] flex items-center justify-center">
-                                <img src="/images/icons/transum.svg" alt="Transum" className="w-6 h-6" />
+                              <div className="h-12 w-12 rounded-full bg-[#9ED4EE] flex items-center justify-center overflow-hidden">
+                                <img
+                                  src="/images/icons/transum.png"
+                                  alt="Transum"
+                                  className="w-auto h-auto"
+                                />
                               </div>
                               <div>
                                 <p className="text-sm text-gray-500">Transum terdekat</p>
@@ -494,8 +498,8 @@ const KosDetailPage: React.FC = () => {
                     {kost.near_warteg && (
                         <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
                           <div className="flex items-center gap-3">
-                            <div className=" rounded-full flex items-center justify-center">
-                              <img src="/images/icons/warteg.png" alt="Warteg" className="w-12 h-12" />
+                            <div className="h-12 w-12 rounded-full flex items-center justify-center overflow-hidden">
+                              <img src="/images/icons/warteg.png" alt="Warteg" className="w-auto h-auto" />
                             </div>
                             <div>
                               <p className="text-sm text-gray-500">Warteg terdekat</p>
@@ -505,15 +509,11 @@ const KosDetailPage: React.FC = () => {
                           {/* <span className="text-sm font-semibold text-gray-700">1 km</span> */}
                         </div>
                     )}
-
-                    
-                    
-
                     {kost.near_laundry && (
                         <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
                           <div className="flex items-center gap-3">
-                            <div className="rounded-full flex items-center justify-center">
-                              <img src="/images/icons/laundry.png" alt="Laundry" className="w-12 h-12" />
+                            <div className="h-12 w-12 rounded-full flex items-center justify-center overflow-hidden">
+                              <img src="/images/icons/laundry.png" alt="Laundry" className="w-auto h-auto" />
                             </div>
                             <div>
                               <p className="text-sm text-gray-500">Laundry terdekat</p>
