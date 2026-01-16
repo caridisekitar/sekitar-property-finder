@@ -52,6 +52,7 @@ const testimonials: Testimonial[] = [
     },
 ];
 
+const ITEMS_PER_PAGE = 10;
 const VISIBLE_COUNT = 5;
 
 
@@ -61,7 +62,6 @@ const HomePage: React.FC = () => {
     const kostCarouselRef = useRef<HTMLDivElement>(null);
     const [open, setOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 10;
     const [lastPage, setLastPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -72,6 +72,12 @@ const HomePage: React.FC = () => {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT);
     const [kostsRecommendation, setKostsRecommendation] = useState<Kost[]>([]);
+    const [activeFilters, setActiveFilters] = useState<{
+      lokasi?: string;
+      tipe?: string;
+      min_price?: number;
+      max_price?: number;
+    }>({});
 
     // 🔹 Fetch data from API
       useEffect(() => {
@@ -83,6 +89,7 @@ const HomePage: React.FC = () => {
             const res = await secureGet('/search', {
               page: currentPage,
               per_page: ITEMS_PER_PAGE,
+              ...activeFilters,
             });
 
             // paginated kost list
@@ -106,7 +113,7 @@ const HomePage: React.FC = () => {
         };
 
         fetchKosts();
-      }, [currentPage]);
+      }, [currentPage, activeFilters]);
 
 
 
@@ -121,8 +128,6 @@ const HomePage: React.FC = () => {
           }
         }, [subscription]);
     
-    
-    // const visibleData = kosts.slice(0, visibleCount);
     const lockedData = mockKostData.slice(visibleCount, visibleCount * 2);
 
     const nextTestimonial = () => {
@@ -142,6 +147,42 @@ const HomePage: React.FC = () => {
             });
         }
     };
+
+    const fetchSearchWithFilters = async (params: {
+        lokasi: string;
+        tipe: string;
+        min_price?: number;
+        max_price?: number;
+      }) => {
+        try {
+          setLoading(true);
+          setError(null);
+
+          setActiveFilters(params);
+
+          const res = await secureGet("/search", {
+            page: 1,
+            per_page: ITEMS_PER_PAGE,
+            ...params,
+          });
+
+          setKosts(res.data ?? res);
+          setCurrentPage(res.current_page ?? 1);
+          setLastPage(res.last_page ?? 1);
+          setTotal(res.total ?? (res.data?.length ?? res.length));
+
+          setVisibleCount(
+            isSubscribed
+              ? (res.data?.length ?? res.length)
+              : VISIBLE_COUNT
+          );
+        } catch (err) {
+          setError("Failed to fetch search result");
+        } finally {
+          setLoading(false);
+        }
+      };
+
 
 
   return (
@@ -243,18 +284,21 @@ const HomePage: React.FC = () => {
     {/* Search Component */}
     <SearchKost
         setIsFilterMenuOpen={setIsFilterMenuOpen}
-        onResult={(res) => {
-          // supports both paginated & non-paginated responses
-          setKosts(res.data ?? res);
-          setCurrentPage(res.current_page ?? 1);
-          setLastPage(res.last_page ?? 1);
-          setTotal(res.total ?? (res.data?.length ?? res.length));
+        // onResult={(res) => {
+        //   // supports both paginated & non-paginated responses
+        //   setKosts(res.data ?? res);
+        //   setCurrentPage(res.current_page ?? 1);
+        //   setLastPage(res.last_page ?? 1);
+        //   setTotal(res.total ?? (res.data?.length ?? res.length));
 
-          setVisibleCount(
-            isSubscribed
-              ? (res.data?.length ?? res.length)
-              : VISIBLE_COUNT
-          );
+        //   setVisibleCount(
+        //     isSubscribed
+        //       ? (res.data?.length ?? res.length)
+        //       : VISIBLE_COUNT
+        //   );
+        // }}
+        onSearch={(params) => {
+          fetchSearchWithFilters(params);
         }}
       />
 
@@ -354,8 +398,10 @@ const HomePage: React.FC = () => {
 
       {/* EMPTY STATE */}
       {kosts.length === 0 && !loading && (
-        <div className="text-center py-16 text-gray-500">
-          Belum ada hasil pencarian. Yuk mulai cari kost 👀
+        <div className="px-5 py-16 flex flex-col items-center justify-center bg-white">
+            <img src="/images/not-found-kost.png" alt="Kost Not Found" className="w-[300px] h-[300px]" />
+            <h5 className="mt-3 font-bold text-[24px]">Belum ada hasil yang cocok!</h5>
+            <p className="text-gray-500 mt-1 text-[14px]">Coba ubah kata pencarian, perlebar area, atau hilangkan beberapa filter untuk lihat pilihan lainnya.</p>
         </div>
       )}
     </div>
@@ -452,7 +498,14 @@ const HomePage: React.FC = () => {
       </section>
 
     </div>
-    <FilterMenu isOpen={isFilterMenuOpen} setIsOpen={setIsFilterMenuOpen} />
+    <FilterMenu
+      isOpen={isFilterMenuOpen}
+      setIsOpen={setIsFilterMenuOpen}
+      onApply={(params) => {
+        fetchSearchWithFilters(params);
+  }}
+/>
+
     </>
   );
 };

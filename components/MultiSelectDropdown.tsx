@@ -1,9 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
+type Option = {
+  label: string;
+  value: string;
+};
+
 type Props = {
   label: string;
-  options: string[];
+  options: Option[];
   value: string[];
   onChange: (value: string[]) => void;
 };
@@ -28,11 +33,11 @@ export default function MultiSelectDropdown({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const toggle = (option: string) => {
+  const toggle = (val: string) => {
     onChange(
-      value.includes(option)
-        ? value.filter((v) => v !== option)
-        : [...value, option]
+      value.includes(val)
+        ? value.filter((v) => v !== val)
+        : [...value, val]
     );
   };
 
@@ -47,7 +52,9 @@ export default function MultiSelectDropdown({
         className="w-full flex justify-between items-center py-3 px-4 bg-white border border-gray-300 rounded-lg focus:ring focus:ring-brand-blue"
       >
         <span className="truncate">
-          {value.length > 0 ? value.join(", ") : `Pilih ${label}`}
+          {value.length > 0
+            ? value.join(", ")
+            : `Pilih ${label}`}
         </span>
         <ChevronDown className="w-4 h-4 text-gray-400" />
       </button>
@@ -55,20 +62,24 @@ export default function MultiSelectDropdown({
       {/* Dropdown */}
       {open && (
         <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-auto">
-          {options.map((opt) => (
-            <label
-              key={opt}
-              className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                checked={value.includes(opt)}
-                onChange={() => toggle(opt)}
-                className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
-              />
-              {opt}
-            </label>
-          ))}
+          {options.map((opt) => {
+            const checked = value.includes(opt.value);
+
+            return (
+              <label
+                key={opt.value} // ✅ UNIQUE & STABLE
+                className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggle(opt.value)}
+                  className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
+                />
+                <span>{opt.label}</span> {/* ✅ render label */}
+              </label>
+            );
+          })}
         </div>
       )}
     </div>

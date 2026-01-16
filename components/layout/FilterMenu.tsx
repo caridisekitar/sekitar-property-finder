@@ -1,124 +1,239 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import LockedOverlay from "@/components/LockedOverlay";
+import SubscriptionModal from "@/components/SubscriptionModal";
+
 
 interface FilterMenuProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  onApply?: (params: {
+    lokasi: string;
+    tipe: string;
+    min_price?: number;
+    max_price?: number;
+  }) => void;
 }
 
-const propertyTypes = ['Kost', 'Villa', 'Apartemen'];
-const rentalDurations = ['Harian', 'Bulanan', 'Tahunan'];
-const sortOptions = ['Harga Terendah', 'Harga Tertinggi'];
+/* ======================
+   OPTION DEFINITIONS
+====================== */
 
-const locations = ['Jakarta Selatan', 'Jakarta Pusat', 'Jakarta Timur', 'Jakarta Barat', 'Jakarta Utara'];
-const kostType = ['Kost Putri', 'Kost Putra', 'Kost Campur', 'Jendela luar', 'KM Dalam', 'Dekat transum'];
-const priceRange = ['1000000 - 2000000', '2000000 - 3000000', '3000000 - 5000000', 'Diatas 5jt (eksklusif)'];
-
-const FilterMenu: React.FC<FilterMenuProps> = ({ isOpen, setIsOpen }) => {
-  // const [selectedLocation, setSelectedLocation] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<string[]>([]);
-  const [selectedType, setSelectedType] = useState(false);
-  const [selectedPrice, setSelectedPrice] = useState(false);
-
-  const toggleLocation = (location: string) => {
-  setSelectedLocation(prev =>
-    prev.includes(location)
-      ? prev.filter(l => l !== location) // remove
-      : [...prev, location]              // add
-  );
+type Option = {
+  label: string;
+  value: string;
 };
+
+type PriceOption = {
+  label: string;
+  min: number;
+  max?: number;
+};
+
+const locationOptions: Option[] = [
+  { label: "Jakarta Selatan", value: "Jakarta Selatan" },
+  { label: "Jakarta Pusat", value: "Jakarta Pusat" },
+  { label: "Jakarta Timur", value: "Jakarta Timur" },
+  { label: "Jakarta Barat", value: "Jakarta Barat" },
+  { label: "Jakarta Utara", value: "Jakarta Utara" },
+];
+
+const kostTypeOptions: Option[] = [
+  { label: "Kos Putri", value: "Putri" },
+  { label: "Kos Putra", value: "Putra" },
+  { label: "Kos Campur", value: "Campur" },
+  { label: "Kost Pet Friendly", value: "Pet Friendly" },
+  { label: "Jendela Luar", value: "Jendela Luar" },
+  { label: "Kamar Mandi Dalam", value: "Kamar Mandi Dalam" },
+];
+
+const priceOptions: PriceOption[] = [
+  { label: "1 - 2 jt", min: 1_000_000, max: 2_000_000 },
+  { label: "2 - 3 jt", min: 2_000_000, max: 3_000_000 },
+  { label: "3 - 5 jt", min: 3_000_000, max: 5_000_000 },
+  { label: "> 5 jt", min: 5_000_000 },
+];
+
+/* ======================
+   COMPONENT
+====================== */
+
+const FilterMenu: React.FC<FilterMenuProps> = ({
+  isOpen,
+  setIsOpen,
+  onApply,
+}) => {
+  const { subscription } = useAuth();
+  const [selectedLocation, setSelectedLocation] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<string[]>([]);
+  const [selectedPrice, setSelectedPrice] = useState<PriceOption | null>(null);
+  const [showLocked, setShowLocked] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  /* ======================
+     HELPERS
+  ====================== */
+
+  const toggleMulti = (
+    value: string,
+    state: string[],
+    setState: (v: string[]) => void
+  ) => {
+    setState(
+      state.includes(value)
+        ? state.filter((v) => v !== value)
+        : [...state, value]
+    );
+  };
 
   const handleReset = () => {
     setSelectedLocation([]);
-    setSelectedType(false);
-    setSelectedPrice(false);
+    setSelectedType([]);
+    setSelectedPrice(null);
   };
 
   const handleApply = () => {
-    // Apply filter logic here
+    if (!subscription || subscription?.plan !== "PREMIUM") {
+      setShowLocked(true);
+      return;
+    }
+
+    const params = {
+      lokasi: selectedLocation.join(","),
+      tipe: selectedType.join(","),
+      min_price: selectedPrice?.min,
+      max_price: selectedPrice?.max,
+    };
+
+    onApply?.(params);
     setIsOpen(false);
   };
 
+  /* ======================
+     RENDER
+  ====================== */
 
   return (
     <>
+    {showLocked && (
+            <LockedOverlay
+              message="Please subscribe to unlock search"
+              onClose={() => setShowLocked(false)}
+              onSubscribe={() => setOpen(true)}
+            />
+          )}
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300 ease-in-out ${
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity ${
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsOpen(false)}
-        aria-hidden="true"
-      ></div>
+      />
 
       {/* Menu */}
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-2xl shadow-2xl p-6 transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-y-0' : 'translate-y-full'
+        className={`fixed bottom-0 left-0 right-0 bg-white z-50 rounded-t-2xl shadow-2xl p-6 transform transition-transform duration-300 ${
+          isOpen ? "translate-y-0" : "translate-y-full"
         }`}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="filter-menu-title"
       >
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
-            <h2 id="filter-menu-title" className="text-xl font-bold">Filter</h2>
-            <button onClick={() => setIsOpen(false)} className="text-gray-500 text-4xl" aria-label="Close filter menu">&times;</button>
+          <h2 className="text-xl font-bold">Filter</h2>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-gray-500 text-3xl"
+          >
+            &times;
+          </button>
         </div>
-        
+
         <div className="space-y-6">
-            {/* Tipe properti */}
-            <div>
-                <h3 className="font-semibold mb-3">Tipe properti</h3>
-                <div className="flex flex-wrap gap-2">
-                    {locations.map(location => (
-                        <button
-                            key={location}
-                            onClick={() => toggleLocation(location)}
-                            className={`px-4 py-2 text-xs rounded-lg border transition-colors ${
-                              selectedLocation.includes(location)
-                                ? 'bg-brand-dark text-white border-brand-dark'
-                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            {location}
-                          </button>
-                    ))}
-                </div>
+          {/* Lokasi */}
+          <div>
+            <h3 className="font-semibold mb-3">Lokasi</h3>
+            <div className="flex flex-wrap gap-2">
+              {locationOptions.map((loc) => (
+                <button
+                  key={loc.value}
+                  onClick={() =>
+                    toggleMulti(
+                      loc.value,
+                      selectedLocation,
+                      setSelectedLocation
+                    )
+                  }
+                  className={`px-4 py-2 text-xs rounded-lg border ${
+                    selectedLocation.includes(loc.value)
+                      ? "bg-brand-dark text-white border-brand-dark"
+                      : "bg-white text-gray-700 border-gray-300"
+                  }`}
+                >
+                  {loc.label}
+                </button>
+              ))}
             </div>
+          </div>
 
-            {/* Durasi Sewa */}
-            <div>
-                <h3 className="font-semibold mb-3">Tipe Kos</h3>
-                <div className="flex flex-wrap gap-2">
-                    {kostType.map(type => (
-                        <button key={type} onClick={() => setSelectedType(type)} className={`px-4 py-2 text-xs rounded-lg border transition-colors ${selectedType === type ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
-                            {type}
-                        </button>
-                    ))}
-                </div>
+          {/* Tipe Kos */}
+          <div>
+            <h3 className="font-semibold mb-3">Tipe Kos</h3>
+            <div className="flex flex-wrap gap-2">
+              {kostTypeOptions.map((type) => (
+                <button
+                  key={type.value}
+                  onClick={() =>
+                    toggleMulti(type.value, selectedType, setSelectedType)
+                  }
+                  className={`px-4 py-2 text-xs rounded-lg border ${
+                    selectedType.includes(type.value)
+                      ? "bg-brand-dark text-white border-brand-dark"
+                      : "bg-white text-gray-700 border-gray-300"
+                  }`}
+                >
+                  {type.label}
+                </button>
+              ))}
             </div>
+          </div>
 
-             {/* Urutkan */}
-            <div>
-                <h3 className="font-semibold mb-3">Harga</h3>
-                <div className="flex flex-wrap gap-2">
-                    {priceRange.map(price => (
-                        <button key={price} onClick={() => setSelectedPrice(price)} className={`px-4 py-2 text-xs rounded-lg border transition-colors ${selectedPrice === price ? 'bg-brand-dark text-white border-brand-dark' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
-                            {price}
-                        </button>
-                    ))}
-                </div>
+          {/* Harga */}
+          <div>
+            <h3 className="font-semibold mb-3">Harga</h3>
+            <div className="flex flex-wrap gap-2">
+              {priceOptions.map((price) => (
+                <button
+                  key={price.label}
+                  onClick={() => setSelectedPrice(price)}
+                  className={`px-4 py-2 text-xs rounded-lg border ${
+                    selectedPrice?.label === price.label
+                      ? "bg-brand-dark text-white border-brand-dark"
+                      : "bg-white text-gray-700 border-gray-300"
+                  }`}
+                >
+                  {price.label}
+                </button>
+              ))}
             </div>
+          </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-gray-200 grid grid-cols-2 gap-3">
-             <button onClick={handleReset} className="w-full text-center px-4 py-3 text-brand-dark border border-gray-300 rounded-md hover:bg-gray-100 transition-colors font-semibold">
-                Reset
-              </button>
-              <button onClick={handleApply} className="w-full text-center px-4 py-3 text-white bg-brand-dark rounded-md hover:bg-gray-800 transition-colors font-semibold">
-                Terapkan
-              </button>
+        {/* Actions */}
+        <div className="mt-8 pt-6 border-t grid grid-cols-2 gap-3">
+          <button
+            onClick={handleReset}
+            className="px-4 py-3 border rounded-md font-semibold text-brand-dark"
+          >
+            Reset
+          </button>
+          <button
+            onClick={handleApply}
+            className="px-4 py-3 bg-brand-dark text-white rounded-md font-semibold"
+          >
+            Terapkan
+          </button>
         </div>
       </div>
+      <SubscriptionModal open={open} onClose={() => setOpen(false)} />
     </>
   );
 };

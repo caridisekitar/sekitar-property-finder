@@ -434,6 +434,30 @@ const KosDetailPage: React.FC = () => {
                             Fasilitas belum tersedia
                         </p>
                         )}
+                        {/* if jendela is true */}
+                        {kost.window_description && (
+                            <div
+                              className="flex items-center gap-2"
+                              >
+                              <img
+                                  src={`/images/icons/lemari.svg`}
+                                  className="w-4 h-4 object-contain"
+                              />
+                              <span className="capitalize">{kost.window_description}</span>
+                              </div>
+                        )}
+                        {kost.garage && (
+                            <div
+                              className="flex items-center gap-2"
+                              >
+                              <img
+                                  src={`/images/icons/garasi.svg`}
+                                  className="w-4 h-4 object-contain"
+                              />
+                              <span className="capitalize">{kost.garage}</span>
+                              </div>
+                        )}
+                        
                     </div>
                     )}
 

@@ -1,66 +1,87 @@
-import React, { useEffect, useState } from "react";
-import SearchIcon from "@/components/icons/SearchIcon"; 
-import FilterIcon from '@/components/icons/FilterIcon';
+import React, { useState } from "react";
+import SearchIcon from "@/components/icons/SearchIcon";
+import FilterIcon from "@/components/icons/FilterIcon";
 import MultiSelectDropdown from "./MultiSelectDropdown";
-import { secureGet } from "@/lib/secureGet";
-import type { Kost } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
+import LockedOverlay from "./LockedOverlay";
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 interface SearchKostProps {
   setIsFilterMenuOpen: (value: boolean) => void;
-  onResult: (data: Kost[]) => void;
+  onSearch: (params: {
+    q?: string;
+    lokasi?: string;
+    tipe?: string;
+    min_price?: number;
+    max_price?: number;
+  }) => void;
 }
 
 const SearchKost: React.FC<SearchKostProps> = ({
   setIsFilterMenuOpen,
-  onResult,
+  onSearch,
 }) => {
+  const { subscription } = useAuth();
   const [lokasi, setLokasi] = useState<string[]>([]);
   const [tipe, setTipe] = useState<string[]>([]);
   const [keyword, setKeyword] = useState("");
   const [priceRange, setPriceRange] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [showLocked, setShowLocked] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const parsePriceRange = (value: string) => {
     if (!value) return {};
-
     if (value.endsWith("+")) {
       return { min_price: parseInt(value.replace("+", "")) };
     }
-
     const [min, max] = value.split("-").map(Number);
     return { min_price: min, max_price: max };
   };
 
-  const doSearch = async () => {
-    setLoading(true);
-    try {
-      const res = await secureGet("/search", {
-        q: keyword,
-        lokasi,
-        tipe,
-        ...parsePriceRange(priceRange),
-      });
-
-      onResult(res.data ?? res);
-    } catch (err) {
-      console.error("Search error", err);
-    } finally {
-      setLoading(false);
+  const doSearch = () => {
+    if (!subscription || subscription?.plan !== "PREMIUM") {
+      setShowLocked(true);
+      return;
     }
+
+    onSearch({
+      q: keyword || undefined,
+      lokasi: lokasi.length ? lokasi.join(",") : undefined,
+      tipe: tipe.length ? tipe.join(",") : undefined,
+      ...parsePriceRange(priceRange),
+    });
   };
 
-  useEffect(() => {
-    if (!keyword.trim()) return;
-    const t = setTimeout(doSearch, 400);
-    return () => clearTimeout(t);
-  }, [keyword, lokasi, tipe, priceRange]);
+  const lokasiOptions = [
+    { label: "Jakarta Selatan", value: "Jakarta Selatan" },
+    { label: "Jakarta Pusat", value: "Jakarta Pusat" },
+    { label: "Jakarta Barat", value: "Jakarta Barat" },
+    { label: "Jakarta Timur", value: "Jakarta Timur" },
+    { label: "Jakarta Utara", value: "Jakarta Utara" },
+  ];
+
+  const tipeOptions = [
+    { label: "Kos Putri", value: "Putri" },
+    { label: "Kos Putra", value: "Putra" },
+    { label: "Kos Campur", value: "Campur" },
+    { label: "Kost Pet Friendly", value: "Pet Friendly" },
+    { label: "Jendela Luar", value: "Jendela Luar" },
+    { label: "Kamar Mandi Dalam", value: "Kamar Mandi Dalam" },
+  ];
 
   return (
     <>
+      {showLocked && (
+        <LockedOverlay
+          message="Please subscribe to unlock search"
+          onClose={() => setShowLocked(false)}
+          onSubscribe={() => setOpen(true)}
+        />
+      )}
+
       {/* Desktop */}
       <div className="hidden md:block bg-brand-light-blue p-6 rounded-2xl shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
-          {/* Keyword */}
           <div className="lg:col-span-2">
             <label className="font-semibold text-sm mb-2 block">Cari</label>
             <div className="relative">
@@ -69,34 +90,21 @@ const SearchKost: React.FC<SearchKostProps> = ({
                 type="text"
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="Cari kos .."
-                className="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300 focus:border-brand-blue focus:ring focus:ring-brand-blue focus:ring-opacity-50 text-sm"
+                className="w-full pl-10 pr-4 py-3 rounded-lg border-gray-300"
               />
             </div>
           </div>
 
           <MultiSelectDropdown
             label="Lokasi"
-            options={[
-              "Jakarta Selatan",
-              "Jakarta Pusat",
-              "Jakarta Barat",
-              "Jakarta Timur",
-              "Jakarta Utara",
-            ]}
+            options={lokasiOptions}
             value={lokasi}
             onChange={setLokasi}
           />
 
           <MultiSelectDropdown
             label="Tipe"
-            options={[
-              "Kos Putri",
-              "Kos Putra",
-              "Kos Campur",
-              "Kost Pet Friendly",
-              "Jendela Luar",
-              "Kamar Mandi Dalam",
-            ]}
+            options={tipeOptions}
             value={tipe}
             onChange={setTipe}
           />
@@ -118,10 +126,9 @@ const SearchKost: React.FC<SearchKostProps> = ({
 
           <button
             onClick={doSearch}
-            disabled={loading}
-            className="w-full bg-brand-dark text-white font-bold py-3 rounded-lg disabled:opacity-50"
+            className="w-full bg-brand-dark text-white font-bold py-3 rounded-lg"
           >
-            {loading ? "Mencari..." : "Cari"}
+            Cari
           </button>
         </div>
       </div>
@@ -143,6 +150,8 @@ const SearchKost: React.FC<SearchKostProps> = ({
           </button>
         </div>
       </div>
+
+      <SubscriptionModal open={open} onClose={() => setOpen(false)} />
     </>
   );
 };

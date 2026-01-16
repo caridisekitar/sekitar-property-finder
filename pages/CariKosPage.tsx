@@ -20,11 +20,20 @@ const CariKosPage: React.FC = () => {
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const isPremium = subscription?.plan === "PREMIUM";
 
   const visibleKosts = isPremium ? kosts : kostBasic;
   const lockedKosts = isPremium ? [] : kosts.slice(kostBasic.length);
+  const [activeFilters, setActiveFilters] = useState<{
+        lokasi?: string;
+        tipe?: string;
+        min_price?: number;
+        max_price?: number;
+      }>({});
 
   const fetchKosts = async (pageNumber = 1) => {
     try {
@@ -33,6 +42,7 @@ const CariKosPage: React.FC = () => {
       const res = await secureGet("/search", {
         page: pageNumber,
         per_page: 10,
+        ...activeFilters,
       });
 
       setKosts(res.data);
@@ -54,6 +64,36 @@ const CariKosPage: React.FC = () => {
   useEffect(() => {
     fetchKosts(1);
   }, [isPremium]);
+
+  const fetchSearchWithFilters = async (params: {
+          lokasi: string;
+          tipe: string;
+          min_price?: number;
+          max_price?: number;
+        }) => {
+          try {
+            setLoading(true);
+            setError(null);
+
+            setActiveFilters(params);
+  
+            const res = await secureGet("/search", {
+              page: 1,
+              per_page: ITEMS_PER_PAGE,
+              ...params,
+            });
+  
+            setKosts(res.data ?? res);
+            setCurrentPage(res.current_page ?? 1);
+            setLastPage(res.last_page ?? 1);
+            setTotal(res.total ?? (res.data?.length ?? res.length));
+  
+          } catch (err) {
+            setError("Failed to fetch search result");
+          } finally {
+            setLoading(false);
+          }
+        };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -133,7 +173,11 @@ const CariKosPage: React.FC = () => {
       <FilterMenu
         isOpen={isFilterMenuOpen}
         setIsOpen={setIsFilterMenuOpen}
-      />
+        onApply={(params) => {
+          fetchSearchWithFilters(params);
+        }}
+/>
+
     </div>
   );
 };
