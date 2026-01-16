@@ -5,7 +5,7 @@ export const BUSINESSES: Business[] = [
     id: 1,
     name: "Kopi Calva",
     priceRange: "Rp10.000",
-    image: "/images/kopi-calva.jpg"
+    image: "/images/kopi-calva.webp"
   },
   {
     id: 2,
@@ -17,13 +17,13 @@ export const BUSINESSES: Business[] = [
     id: 3,
     name: "Warung Makan Enak",
     priceRange: "Rp150.000",
-    image: "/images/warung-makan.jpg"
+    image: "/images/warung-makan.webp"
   },
   {
     id: 4,
     name: "Gym Sehat",
     priceRange: "Rp10.000",
-    image: "/images/gym-sehat.jpg"
+    image: "/images/gym-sehat.webp"
   }
 ];
 
