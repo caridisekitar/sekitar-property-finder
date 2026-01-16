@@ -115,7 +115,7 @@ const KalkulatorBudgetPage: React.FC = () => {
         </nav>
         <div className="w-full border-b border-gray-200 py-2"></div>
       
-        <div className="relative bg-cover bg-center rounded-2xl shadow-lg p-8 md:p-8 lg:p-8 my-8 overflow-hidden h-[70vh] md:h-[330px] lg:h-[450px]" style={{ backgroundImage: "url('/images/hero-image-bg.webp')" }}>
+        <div className="relative bg-cover bg-center rounded-2xl shadow-lg p-8 md:p-8 lg:p-8 my-8 overflow-hidden h-[30vh] md:h-[330px] lg:h-[450px]" style={{ backgroundImage: "url('/images/hero-image-bg.webp')" }}>
             
                 <div className="relative z-10 flex flex-col items-center justify-center text-center text-white">
                     <h1 className="text-2xl md:text-3xl font-bold">Kalkulator Budget</h1>
@@ -180,7 +180,7 @@ const KalkulatorBudgetPage: React.FC = () => {
                     </div>
                     )}
                     {results.length > 0 && !loading && (
-                    <div className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl px-6 py-4 md:px-8 lg:py-8 text-center">
+                    <div className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl px-6 py-4 md:px-8 lg:py-8 text-center hidden md:block lg:block">
                         {/* Title */}
                         <h2 className="text-xl md:text-2xl font-bold text-gray-900">
                             Hasil perhitungan
@@ -237,7 +237,64 @@ const KalkulatorBudgetPage: React.FC = () => {
 
         </div>
 
+        {results.length > 0 && !loading && (
+        
+        <div className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl px-6 py-6 md:px-8 lg:py-8 text-center md:hidden lg:hidden">
+  
+            {/* Title */}
+            <h2 className="text-xl font-bold text-gray-900">
+                Hasil perhitungan
+            </h2>
+            <p className="text-gray-500 text-sm mt-1">
+                Ini dia hasil perhitungan dan budget ideal untuk kos kamu!
+            </p>
+
+            {/* Budget Box */}
+            <div className="mt-6 bg-[#E6F7FF] rounded-2xl px-6 py-6 flex flex-col items-center gap-4">
+                
+                {/* Icon */}
+                <div className="w-12 h-12 rounded-full bg-[#9ED4EE] flex items-center justify-center">
+                <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                >
+                    <path d="M3 9.75L12 3l9 6.75V21a.75.75 0 01-.75.75H3.75A.75.75 0 013 21V9.75z" />
+                    <path d="M9 22V12h6v10" />
+                </svg>
+                </div>
+
+                {/* Label */}
+                <p className="text-md font-semibold text-gray-900">
+                Budget ideal untuk kos kamu
+                </p>
+
+                {/* Price */}
+                <div>
+                <span className="text-2xl font-bold text-gray-900">
+                    Rp{formatIDRNumber(maxRangeBudget.toString())}
+                </span>
+                <span className="text-md text-gray-500 ml-1">/bulan</span>
+                </div>
+            </div>
+
+            {/* Button */}
+            <div className="mt-8">
+                <button
+                onClick={handleReset}
+                className="px-10 py-4 rounded-xl border border-gray-900 font-semibold text-md hover:bg-gray-100 transition text-[#18181B]"
+                >
+                Hitung ulang
+                </button>
+            </div>
+            </div>
+            )}
+
+
         {/* form mobile */}
+        {!results.length && (
             <div className="md:hidden lg:hidden mt-8 w-full max-w-4xl mx-auto text-left">
                     <form onSubmit={handleSubmit}>
                         <label
@@ -293,6 +350,7 @@ const KalkulatorBudgetPage: React.FC = () => {
                         </form>
 
                 </div>
+                )}
 
           {/* Cards */}
             {!loading && results.length > 0 && (
