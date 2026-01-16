@@ -49,6 +49,12 @@ const MapsPage: React.FC = () => {
   try {
     setLoading(true);
 
+    // 🔹 MAP PINS → ALL USERS
+    const mapRes = await secureGet("/search", {
+      per_page: 1000,
+    });
+    setMapKosts(mapRes.data);
+
     // PREMIUM → list + map
     if (isPremium) {
       const res = await secureGet('/search', {
@@ -59,11 +65,6 @@ const MapsPage: React.FC = () => {
       setKosts(res.data);
       setLastPage(res.last_page);
 
-      const mapRes = await secureGet('/search', {
-        per_page: 1000,
-      });
-
-      setMapKosts(mapRes.data);
     }
 
     // BASIC → limited list, FULL map
@@ -74,19 +75,10 @@ const MapsPage: React.FC = () => {
       const mapRes = await secureGet('/search', {
         per_page: 1000,
       });
+      setLastPage(1);
 
-      setMapKosts(mapRes.data);
     }
 
-    // FREE → nothing
-    if (isFree) {
-
-      const mapRes = await secureGet('/search', {
-        per_page: 1000,
-      });
-
-      setMapKosts(mapRes.data);
-    }
   } catch (err) {
     console.error('Failed to fetch kost data', err);
   } finally {
@@ -225,15 +217,11 @@ const MapsPage: React.FC = () => {
         <div className="lg:w-1/2 xl:w-3/5 lg:h-[calc(100vh-150px)] lg:sticky lg:top-24 order-first lg:order-last">
           <div className="w-full h-96 lg:h-full bg-gray-200 rounded-2xl shadow-lg overflow-hidden">
             <MapboxMap
-                key={plan} // good: remount on plan change
-                properties={
-                    isPremium || isBasic
-                    ? mapKosts
-                    : dummyKosts
-                }
-                plan={plan}
-                onUpgrade={() => setOpen(true)}
-                />
+              key={plan}
+              properties={mapKosts}
+              plan={plan}
+              onUpgrade={() => setOpen(true)}
+            />
 
           </div>
         </div>
