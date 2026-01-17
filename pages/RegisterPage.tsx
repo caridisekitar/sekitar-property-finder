@@ -214,7 +214,7 @@ export default function Register() {
               <input 
               id="phone-number" 
               name="phone" 
-              type="phone" 
+              type="tel" 
               required 
               placeholder="Masukkan no telepon kamu yang terhubung ke WhatsApp, contoh: 08xxxxxxxxx" 
               className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
