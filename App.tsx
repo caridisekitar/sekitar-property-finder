@@ -31,7 +31,6 @@ import ResetPassword from './pages/ResetPassword';
 const AppContent: React.FC = () => {
     const location = useLocation();
     const hideHeaderFooter = location.pathname.startsWith('/login') ||
-                             location.pathname === '/forgot-password' ||
                              location.pathname === '/reset-password' ||
                              location.pathname === '/register';
 
@@ -43,7 +42,6 @@ const AppContent: React.FC = () => {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/cari-kost" element={<CariKosPage />} />
                     <Route path="/maps" element={<MapsPage />} />

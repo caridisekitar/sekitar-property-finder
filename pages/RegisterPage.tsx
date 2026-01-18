@@ -134,7 +134,7 @@ export default function Register() {
   } finally {
     setLoading(false);
   }
-  
+
   };
 
 
@@ -259,7 +259,7 @@ export default function Register() {
               name="password" 
               type="password" 
               required 
-              placeholder="Masukkan kata sandi kamu" 
+              placeholder="Buat kata sandi kamu" 
               className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
               value={password} onChange={(e) => setPassword(e.target.value)} />
               

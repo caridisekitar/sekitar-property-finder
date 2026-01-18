@@ -167,10 +167,10 @@ export default function Login() {
             <Link to="/register" className="font-medium text-blue-600">
               Daftar sekarang
             </Link>
-            <span className="mx-2">atau</span>
+            {/* <span className="mx-2">atau</span>
             <Link to="/forgot-password" className="font-medium text-blue-600">
               Lupa Password
-            </Link>
+            </Link> */}
           </p>
 
         </div>
