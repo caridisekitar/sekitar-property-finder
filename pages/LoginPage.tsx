@@ -1,113 +1,69 @@
-import React, { useEffect, useState, cache } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Info, Phone } from 'lucide-react';
-import { secureGet } from '@/lib/secureGet';
-import { securePost } from '@/lib/securePost';
-import { generateUUID } from '@/lib/uuid';
-import { useAuth } from '@/hooks/useAuth';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Mail, Lock } from "lucide-react";
+import { securePost } from "@/lib/securePost";
+import { getDeviceId } from "@/lib/device";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /* -------------------------
+   * AUTO REDIRECT IF LOGGED IN
+   * ------------------------- */
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-  
-    const checkSession = async () => {
-      try {
-        // If token is valid → returns user data
-        const data = cache(useAuth());
-
-        // Optional: sync user data
-        localStorage.setItem("user", JSON.stringify(data));
-
-        // Session valid
-        navigate("/profile", { replace: true });
-
-      } catch (err) {
-        // Session invalid / expired / tampered
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
-    };
-
-    checkSession();
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/profile", { replace: true });
+    }
   }, [navigate]);
 
-  if (!localStorage.getItem('device_id')) {
-      localStorage.setItem('device_id', generateUUID());
-    }
-
-
-  const normalizePhone = (value: string): string | null => {
-  const cleaned = value.replace(/\s|-/g, '');
-
-  if (/^08\d{8,11}$/.test(cleaned)) {
-    return '62' + cleaned.substring(1);
-  }
-
-  if (/^\+62\d{8,11}$/.test(cleaned)) {
-    return cleaned.substring(1);
-  }
-
-  if (/^62\d{8,11}$/.test(cleaned)) {
-    return cleaned;
-  }
-
-  return null;
-};
-
-
+  /* -------------------------
+   * SUBMIT LOGIN
+   * ------------------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
-    if (!phone) {
-      setError('Nomor telepon wajib diisi');
+    if (!email || !password) {
+      setError("Email dan password wajib diisi");
       return;
     }
 
     try {
       setLoading(true);
-      setError(null);
 
-      const normalizedPhone = normalizePhone(phone);
+      const deviceId = getDeviceId(); // ✅ always same per device
 
-      if (!normalizedPhone) {
-        setError('Format nomor tidak valid. Gunakan 08xxxx, 62xxxx, atau +62xxxx');
+      const res = await securePost(
+        "/auth/login",
+        "POST",
+        {
+          email,
+          password,
+        },
+        {
+          "X-Device-Id": deviceId,
+        }
+      );
+
+      if (!res.success) {
+        setError(res.message || "Login gagal");
         return;
       }
 
-      const response = await securePost(
-          "/otp/generate",
-          "POST",
-          { phone: normalizedPhone,
-            device_id: localStorage.getItem('device_id')
-           }
-        );
+      // ✅ store auth
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
-
-      // console.log("OTP sent:", response);
-      // console.log(response.status);
-
-      // 🔴 Rate limit detected
-      if (response.status === 429 || response.status != 200) {
-        // const data = await response.json();
-        
-        setError(response.message || "Terlalu banyak permintaan. Coba lagi besok.");
-        return;
-      }
-
-      // ✅ Success
-      navigate('/confirm-otp', {
-        state: { phone: normalizedPhone },
-      });
+      navigate("/profile", { replace: true });
 
     } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan');
+      setError(err.message || "Email atau password salah");
     } finally {
       setLoading(false);
     }
@@ -140,19 +96,44 @@ export default function Login() {
           </div>
 
           <form className="mt-3 space-y-6" onSubmit={handleSubmit}>
-            {/* PHONE */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nomor Telepon
+
+            {/* EMAIL */}
+            <div className="mb-4">
+              <label
+                htmlFor="email-address"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Email address
               </label>
               <div className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm">
-                <Phone size={20} className="text-gray-500" />
+                <Mail size={20} className="w-6 h-6 text-gray-500"/>
+                
+                <input 
+                id="email-address" 
+                name="email" 
+                type="email" 
+                autoComplete="email" 
+                required 
+                placeholder="Masukkan e-mail kamu" 
+                className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} />
+              </div>
+            </div>
+
+            {/* PASSWORD */}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">
+                Password
+              </label>
+              <div className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm">
+                <Lock size={18} className="text-gray-500" />
                 <input
-                  type="tel"
-                  placeholder="Masukkan nomor telepon kamu"
-                  className="w-full outline-none px-3 py-1 text-sm"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  type="password"
+                  className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
@@ -163,20 +144,20 @@ export default function Login() {
             )}
 
             {/* INFO */}
-            <div className="bg-[#E0F2FE] rounded-lg p-3 flex gap-2">
+            {/* <div className="bg-[#E0F2FE] rounded-lg p-3 flex gap-2">
               <Info size={32} className="text-gray-500" />
               <p className="text-xs text-gray-600">
                 OTP dikirim via WhatsApp. Pastikan nomor kamu aktif WhatsApp.
               </p>
-            </div>
+            </div> */}
 
             {/* BUTTON */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 disabled:opacity-50"
+              className="w-full py-3 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
             >
-              {loading ? 'Mengirim OTP...' : 'Kirim OTP'}
+              {loading ? "Masuk..." : "Masuk"}
             </button>
           </form>
 
@@ -186,6 +167,10 @@ export default function Login() {
             <Link to="/register" className="font-medium text-blue-600">
               Daftar sekarang
             </Link>
+            {/* <span className="mx-2">atau</span>
+            <Link to="/forgot-password" className="font-medium text-blue-600">
+              Lupa Password
+            </Link> */}
           </p>
 
         </div>

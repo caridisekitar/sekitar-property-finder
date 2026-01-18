@@ -44,12 +44,17 @@ export const PAYMENT_METHODS = [
 
 
 export default function SubscriptionsPage() {
-  const [user, setUser] = useState<User | null>(null);
+  // const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const [loading, setLoading] = useState(true);
-    const { subscription } = useAuth();
-    const [invoices, setInvoices] = useState<any[]>([]);
+    const { subscription, user } = useAuth();
+    const [invoices, setInvoices] = useState<{
+      orders: any[];
+      subscription?: any;
+    }>({
+      orders: [],
+    });
 
     const downloadInvoice = async (invoiceId: number) => {
       const res = await secureGet(`/invoices/${invoiceId}/${user.id}/signed-url`);
@@ -61,52 +66,46 @@ export default function SubscriptionsPage() {
 
   
     useEffect(() => {
-        if (!token) {
-          navigate('/login', { replace: true });
-          return;
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      const fetchProfile = async () => {
+        try {
+          const res = await secureGet("/auth/me");
+        } catch {
+          localStorage.clear();
+          navigate("/login", { replace: true });
+        } finally {
+          setLoading(false);
         }
-  
-        const fetchProfile = async () => {
-                try {
-                  const data = await secureGet("/auth/me");
-        
-                    // Adjust based on your API response shape
-                    setUser(data.user ?? data);
-        
-                } catch (err) {
-                    // Token invalid / expired / unauthorized
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-        
-                    navigate("/login", { replace: true });
-                } finally {
-                    setLoading(false);
-                }
-            };
-        
-  
-        fetchProfile();
-      }, [token, navigate]);
+      };
+
+      fetchProfile();
+    }, [token, navigate]);
 
 
       useEffect(() => {
-        if (!user?.id) return;
+      if (!user?.id) return;
 
-        const fetchInvoices = async () => {
-          try {
-            const dataInvoices = await secureGet(
-              `/invoices/listing/${user.id}`
-            );
-            setInvoices(dataInvoices.invoices || []);
-          } catch (error) {
-            console.error("Failed to fetch invoices", error);
-          }
-        };
+      const fetchInvoices = async () => {
+        try {
+          const res = await secureGet(`/invoices/listing/${user.id}`);
+          setInvoices({
+              orders: Array.isArray(res.invoices?.orders)
+                ? res.invoices.orders
+                : [],
+              subscription: res.invoices?.subscription,
+            });
+        } catch (err) {
+          console.error("Failed to fetch invoices", err);
+        }
+      };
 
-        fetchInvoices();
-      }, [user]);
+      fetchInvoices();
+    }, [user]);
 
-  
       if (loading) return <LoadingOverlay message="Memuat data Langgananmu..." />;
   
       if (!user) return null;
@@ -168,7 +167,7 @@ export default function SubscriptionsPage() {
 
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
-              Riwayat Langganan
+              Riwayat Langganan 
             </h2>
           </div>
 
@@ -197,10 +196,15 @@ export default function SubscriptionsPage() {
 
 
           {Array.isArray(invoices?.orders) && invoices.orders.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-gray-50 text-gray-600 font-medium">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
+                {/* Scroll hint (mobile only) */}
+                <div className="px-4 py-2 text-xs text-gray-400 md:hidden">
+                  Geser ke kanan untuk melihat tabel →
+                </div>
+
+                <div className="relative overflow-x-auto">
+                  <table className="min-w-[900px] md:min-w-full w-full text-sm text-left">
+                    <thead className="bg-gray-50 text-gray-600 font-medium sticky top-0 z-10">
                       <tr>
                         <th className="px-6 py-4">No</th>
                         <th className="px-6 py-4">Tipe</th>
@@ -216,38 +220,27 @@ export default function SubscriptionsPage() {
                       {invoices.orders.map((order, index) => (
                         <tr key={order.id} className="border-t">
                           <td className="px-6 py-4">{index + 1}</td>
-
-                          <td className="px-6 py-4">
-                            {order.product_name ?? "-"}
-                          </td>
-
-                          <td className="px-6 py-4">
-                            {formatDateID(order.created_at)}
-                          </td>
-
+                          <td className="px-6 py-4">{order.product_name ?? "-"}</td>
+                          <td className="px-6 py-4">{formatDateID(order.created_at)}</td>
                           <td className="px-6 py-4">
                             {formatDateID(invoices.subscription?.ends_at)}
                           </td>
-
                           <td className="px-6 py-4">
                             <span className="inline-flex px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
                               {order.status}
                             </span>
                           </td>
-
                           <td className="px-6 py-4">
-                            { order.payment_code && (
+                            {order.payment_code ? (
                               <span className="inline-flex px-3 py-1 text-xs text-green-800">
-                                 {getPaymentLabel(order.payment_code)}
+                                {getPaymentLabel(order.payment_code)}
                               </span>
-                            )}
-                            {!order.payment_code && (
+                            ) : (
                               <span className="inline-flex px-3 py-1 text-xs text-red-800">
-                                 -
+                                -
                               </span>
                             )}
                           </td>
-
                           <td className="px-6 py-4 text-right">
                             <button
                               onClick={() => downloadInvoice(order.id)}
@@ -262,6 +255,7 @@ export default function SubscriptionsPage() {
                   </table>
                 </div>
               </div>
+
             )}
 
 

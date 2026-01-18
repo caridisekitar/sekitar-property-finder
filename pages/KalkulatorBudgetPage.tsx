@@ -31,7 +31,6 @@ const KalkulatorBudgetPage: React.FC = () => {
             </button>
         </>
         );
-
     
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
