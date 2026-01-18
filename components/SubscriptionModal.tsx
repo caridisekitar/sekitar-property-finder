@@ -15,9 +15,13 @@ export default function SubscriptionModal({
   onClose,
 }: SubscriptionModalProps) {
   const { user, subscription } = useAuth();
-  const plan = subscription?.plan ?? "FREE"; // FREE | BASIC | PREMIUM
+  const plan = subscription?.plan; // BASIC | PREMIUM | undefined
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const isBasicActive = plan === "BASIC";
+  const isPremiumActive = plan === "PREMIUM";
+  const isVisitor = !user;
+
 
   /* ===============================
      LOCK BODY SCROLL
@@ -33,16 +37,28 @@ export default function SubscriptionModal({
      SUBSCRIBE / UPGRADE HANDLER
   =============================== */
   const handleSubscribe = async (targetPlan: TargetPlan) => {
-    // 🟡 Already premium → do nothing
-    if (plan === "PREMIUM") return;
+    /* ===============================
+     * VISITOR (NOT LOGIN)
+     * =============================== */
+    if (!user) {
+      navigate("/login", {
+        state: { redirect: "subscribe", targetPlan },
+      });
+      return;
+    }
 
-    // 🟢 BASIC → PREMIUM (SKIP REGISTER)
-    if (targetPlan === "premium" && plan === "BASIC") {
-      if (!user) {
-        alert("User tidak ditemukan, silakan login ulang.");
-        return;
-      }
+    /* ===============================
+     * ALREADY PREMIUM
+     * =============================== */
+    if (plan === "PREMIUM") {
+      alert("Akun kamu sudah Premium");
+      return;
+    }
 
+    /* ===============================
+     * BASIC → PREMIUM
+     * =============================== */
+    if (plan === "BASIC" && targetPlan === "premium") {
       try {
         await upgradeToPremium({
           user,
@@ -54,8 +70,12 @@ export default function SubscriptionModal({
       return;
     }
 
-    // 🔵 FREE USER → REGISTER FLOW
-    navigate(`/register?new=${targetPlan}`);
+    /* ===============================
+     * BASIC → BASIC (NO-OP)
+     * =============================== */
+    if (plan === "BASIC" && targetPlan === "basic") {
+      alert("Akun kamu sudah Basic");
+    }
   };
 
   if (!open) return null;
@@ -115,9 +135,17 @@ export default function SubscriptionModal({
 
             <button
               onClick={() => handleSubscribe("basic")}
-              className="mt-8 w-full py-3 rounded-xl bg-black text-white font-semibold"
+              disabled={isBasicActive || isPremiumActive}
+              className={`mt-8 w-full py-3 rounded-xl font-semibold transition
+                ${
+                  isBasicActive
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-black text-white hover:bg-gray-800"
+                }`}
             >
-              Gratis
+              {isBasicActive
+                ? "Paket Aktif"
+                : "Gratis"}
             </button>
           </div>
 
@@ -165,19 +193,19 @@ export default function SubscriptionModal({
 
             <button
               onClick={() => handleSubscribe("premium")}
-              disabled={loading || plan === "PREMIUM"}
+              disabled={loading || isPremiumActive}
               className={`mt-8 w-full py-3 rounded-xl font-semibold transition
                 ${
-                  loading || plan === "PREMIUM"
+                  loading || isPremiumActive
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                     : "bg-blue-400 text-white hover:bg-blue-500"
                 }`}
             >
               {loading
                 ? "Mengalihkan ke pembayaran..."
-                : plan === "PREMIUM"
-                ? "Sudah Premium"
-                : "Mulai langganan"}
+                : isPremiumActive
+                ? "Paket Aktif"
+                : "Upgrade ke Premium"}
             </button>
           </div>
         </div>

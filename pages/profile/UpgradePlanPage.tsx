@@ -22,10 +22,10 @@ export default function UpgradePlanPage() {
   
         const fetchProfile = async () => {
             try {
-              const data = await secureGet("/auth/me");
+              const res = await secureGet("/auth/me");
     
                 // Adjust based on your API response shape
-                setUser(data.user ?? data);
+                setUser(res.data ?? res.user ?? res);
     
             } catch (err) {
                 // Token invalid / expired / unauthorized
@@ -56,10 +56,10 @@ export default function UpgradePlanPage() {
                 {
                   amount: 99000,
                   product_name: "Subscription Premium",
-                  user_id: user.id,
-                  email: user.email,
-                  phone: user.phone,
-                  name: user.name,
+                  user_id: user.user.id,
+                  email: user.user.email,
+                  phone: user.user.phone,
+                  name: user.user.name,
                 } 
               );
         // Redirect ke halaman pembayaran Duitku
@@ -111,8 +111,7 @@ export default function UpgradePlanPage() {
                     <Feature text="Akses fitur Daftarkan Kost Mu" disabled />
                     <Feature text="Akses fitur Daftarkan Kost Bisnis Mu" disabled />
                     <Feature text="Jumlah list kost akan terus bertambah setiap bulan" disabled />
-                    { subscription?.plan === 'BASIC' && (
-                        
+                    { user.subscription?.plan === 'BASIC' && (
                         <div className="mt-auto pt-8">
                             <div className="w-full bg-gray-500 text-white py-3 rounded-lg font-medium text-center opacity-50 cursor-not-allowed">
                             Plan sekarang
@@ -160,7 +159,7 @@ export default function UpgradePlanPage() {
                     <Feature text="Jumlah list kost terus bertambah setiap bulan" />
 
                     <div className="mt-auto pt-8">
-                        {subscription?.plan === 'BASIC' ? (
+                        {user.subscription?.plan === 'BASIC' ? (
                           <button
                               onClick={handleUpgrade}
                               disabled={loading}

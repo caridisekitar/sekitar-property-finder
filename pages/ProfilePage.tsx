@@ -18,6 +18,7 @@ const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const token = localStorage.getItem('token');
   const [form, setForm] = useState({
     name: '',
@@ -48,7 +49,7 @@ const ProfilePage: React.FC = () => {
             const data = await secureGet("/auth/me");
 
             // Adjust based on your API response shape
-            setUser(data.user ?? data);
+            setUser(data.data.user);
 
         } catch (err) {
             // Token invalid / expired / unauthorized
@@ -70,22 +71,44 @@ const ProfilePage: React.FC = () => {
   if (!user) return null;
 
   const handleSubmitUpdate = async (e: React.FormEvent) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        try {
-            const data = await securePost(
-            "/auth/profile",
-            "PUT",
-            form
-            );
+    if (saving) return;
+    setSaving(true);
 
-            setUser(data.user ?? data);
-            alert("Profile berhasil diperbarui");
-
-        } catch (err: any) {
-            alert(err.message || "Update failed");
-        }
+    try {
+        const payload = {
+        name: form.name,
+        gender: form.gender || null,
+        occupation: form.occupation || null,
         };
+
+        const res = await securePost(
+        "/auth/profile",
+        "PUT",
+        payload
+        );
+
+        const updatedUser = res.data.user;
+
+        // ✅ update user
+        setUser(updatedUser);
+
+        // ✅ force sync form
+        setForm({
+        name: updatedUser.name || '',
+        gender: updatedUser.gender || '',
+        occupation: updatedUser.occupation || '',
+        });
+
+        alert("Profile berhasil diperbarui");
+    } catch (err: any) {
+        alert(err.message || "Update failed");
+    } finally {
+        setSaving(false);
+    }
+    };
+
 
 
   return (
@@ -174,7 +197,7 @@ const ProfilePage: React.FC = () => {
                             >
                             <option value="">Pilih Jenis Kelamin</option>
                             <option value="perempuan">Perempuan</option>
-                            <option value="laki-laki">Laki-laki</option>
+                            <option value="laki_laki">Laki-laki</option>
                             </select>
                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-700">
                             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
@@ -200,7 +223,15 @@ const ProfilePage: React.FC = () => {
 
                 <div className="flex justify-end gap-4 pt-6 mt-4 border-t border-gray-200">
                     <button type="button" className="px-6 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors">Batal</button>
-                    <button type="submit" className="px-6 py-2.5 bg-brand-dark text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors">Simpan</button>
+                    {/* <button type="submit" className="px-6 py-2.5 bg-brand-dark text-white rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors">Simpan</button> */}
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-semibold text-white transition-colors
+                            ${saving ? 'bg-gray-400' : 'bg-brand-dark hover:bg-gray-800'}`}
+                        >
+                        {saving ? 'Menyimpan...' : 'Simpan'}
+                        </button>
                 </div>
             </form>
         </div>

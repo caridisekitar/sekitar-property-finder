@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { User, Mail, Phone } from 'lucide-react';
+import { User, Mail, Phone, Lock } from 'lucide-react';
 import { secureGet } from '@/lib/secureGet';
 import { securePost } from '@/lib/securePost';
+import { getDeviceId } from '@/lib/device';
 
 type Plan = "basic" | "premium";
 const ALLOWED_PLANS: Plan[] = ["basic", "premium"];
@@ -14,6 +15,7 @@ export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const paramPlan = params.get("new");
@@ -59,8 +61,13 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    if (!name || !email || !phone) {
+    if (!name || !email || !phone || !password) {
       setError('Semua field wajib diisi');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('Password minimal 8 karakter');
       return;
     }
 
@@ -68,55 +75,66 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await securePost('/auth/register', 
-      'POST', {
+    // ✅ device_id MUST exist BEFORE request
+    const deviceId = getDeviceId();
+
+    const res = await securePost(
+      '/auth/register',
+      'POST',
+      {
         name,
         email,
         phone,
+        password,
         plan,
-      });
+      },
+      {
+        'X-Device-Id': deviceId,
+      }
+    );
 
-      if (!res.success) {
-        setError(res.message || 'Gagal mengirim OTP');
+    if (!res.success) {
+      setError(res.message || 'Registrasi gagal');
+      return;
+    }
+
+    // ✅ Store auth
+    localStorage.setItem('token', res.data.token);
+    localStorage.setItem('user', JSON.stringify(res.data.user));
+
+    // 🔥 PREMIUM → PAYMENT
+    if (plan === 'premium') {
+      const payment = await securePost(
+        '/duitku/create',
+        'POST',
+        {
+          amount: 99000,
+          product_name: 'Subscription Premium',
+          user_id: res.data.user.id,
+          email: res.data.user.email,
+          phone: res.data.user.phone,
+          name: res.data.user.name,
+        },
+        {
+          Authorization: `Bearer ${res.data.token}`,
+          'X-Device-Id': deviceId,
+        }
+      );
+
+      if (payment.paymentUrl) {
+        window.location.href = payment.paymentUrl;
         return;
       }
-      
-      // check if new user with new params and plan is PREMIUM, then redirect to upgrade page
-      /* Do this function
-      const res = await securePost(
-                      "/duitku/create",
-                      "POST",
-                      {
-                        amount: 99000,
-                        product_name: "Subscription Premium",
-                        user_id: user.id,
-                        email: user.email,
-                        phone: user.phone,
-                        name: user.name,
-                      } 
-                    );
-              // Redirect ke halaman pembayaran Duitku
-              if (res.paymentUrl) {
-                window.location.href = res.paymentUrl;
-              }
-      */
-
-      // ✅ store phone for OTP step
-      sessionStorage.setItem('otp_phone', res.data.phone);
-
-      // ✅ store intended plan (important)
-      sessionStorage.setItem('pending_plan', plan);
-
-
-      navigate('/confirm-otp', {
-        state: { phone: res.data.phone },
-      });
-
-    } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan');
-    } finally {
-      setLoading(false);
     }
+
+    navigate('/profile', { replace: true });
+
+  } catch (err: any) {
+    setError(err.message || 'Terjadi kesalahan');
+  } finally {
+    setLoading(false);
+  }
+  
   };
 
 
@@ -200,6 +218,7 @@ export default function Register() {
             </div>
           </div>
 
+
           {/* PHONE NUMBER */}
           <div className="mb-4">
             <label
@@ -224,6 +243,31 @@ export default function Register() {
 
           </div>
 
+          {/* Password */}
+          <div className="mb-4">
+            <label
+              htmlFor="password-code"
+              className="block text-sm font-medium text-gray-700 mb-1 mt-4"
+            >
+              Password
+            </label>
+            <div className="flex items-center gap-1 border border-gray-300 rounded-md px-3 py-2 bg-white shadow-sm">
+              <Lock size={20} className="w-6 h-6 text-gray-500"/>
+
+              <input 
+              id="password-code" 
+              name="password" 
+              type="password" 
+              required 
+              placeholder="Masukkan kata sandi kamu" 
+              className="w-full outline-none px-3 py-1 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm" 
+              value={password} onChange={(e) => setPassword(e.target.value)} />
+              
+            </div>
+
+          </div>
+
+
           
         </div>
         {/* ERROR MESSAGE */}
@@ -241,7 +285,7 @@ export default function Register() {
               className={`w-full flex justify-center py-3 px-4 rounded-lg text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors
                 ${loading ? 'bg-gray-400' : 'bg-gray-900 hover:bg-gray-800'}`}
             >
-              {loading ? 'Mengirim OTP...' : 'Selanjutnya'}
+              {loading ? 'Mendaftar...' : 'Daftar'}
             </button>
         </div>
       </form>

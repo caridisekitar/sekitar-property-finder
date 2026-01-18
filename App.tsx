@@ -7,7 +7,6 @@ import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import ConfirmOTPPage from './pages/ConfirmOTPPage';
 import CariKosPage from './pages/CariKosPage';
 import MapsPage from './pages/MapsPage';
 import WishlistPage from './pages/WishlistPage';
@@ -26,11 +25,14 @@ import CallbackPage from '@/pages/CallbackPage';
 import FAQPage from '@/pages/FAQPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicy';
 import PaymentSuccess from "@/pages/PaymentSuccess";
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
     const hideHeaderFooter = location.pathname.startsWith('/login') ||
-                             location.pathname === '/confirm-otp' ||
+                             location.pathname === '/forgot-password' ||
+                             location.pathname === '/reset-password' ||
                              location.pathname === '/register';
 
     return (
@@ -41,7 +43,8 @@ const AppContent: React.FC = () => {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/confirm-otp" element={<ConfirmOTPPage />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/cari-kost" element={<CariKosPage />} />
                     <Route path="/maps" element={<MapsPage />} />
                     <Route path="/wishlist" element={<WishlistPage />} />

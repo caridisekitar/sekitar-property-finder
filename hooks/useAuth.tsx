@@ -44,8 +44,8 @@ export const useAuth = () => {
       try {
         const res = await secureGet("/auth/me");
 
-        setUser(res.user);
-        setSubscription(res.subscription);
+        setUser(res.data.user);
+        setSubscription(res.data.subscription);
       } catch {
         localStorage.removeItem("token");
       } finally {

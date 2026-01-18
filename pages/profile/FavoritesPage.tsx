@@ -16,7 +16,7 @@ export default function Favorites() {
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<Kost[]>([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [loadingFavorites, setLoadingFavorites] = useState(true);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
 
   /* -------------------------
    * AUTH + PROFILE
@@ -29,10 +29,11 @@ export default function Favorites() {
 
     const fetchProfile = async () => {
       try {
-        const data = await secureGet('/auth/me');
-        setUser(data.user ?? data);
+        const res = await secureGet('/auth/me');
+        setUser(res.data.user); // ✅ FIX
       } catch {
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         navigate('/login', { replace: true });
       } finally {
         setLoadingProfile(false);
@@ -43,22 +44,25 @@ export default function Favorites() {
   }, [token, navigate]);
 
   /* -------------------------
-   * FAVORITES LIST (POST)
+   * FAVORITES LIST
    * ------------------------- */
   useEffect(() => {
     if (!user) return;
 
     const fetchFavorites = async () => {
+      setLoadingFavorites(true);
       try {
-        const res = await securePost('/me/favorites',
-          "POST", 
+        const res = await securePost(
+          '/me/favorites',
+          'POST',
           {
-            user_id: user.id,
             page: 1,
             per_page: 12,
-          });
+          }
+        );
 
-        // Laravel paginator
+        // asumsi response:
+        // { success: true, data: [...] }
         setFavorites(res.data ?? []);
       } catch (err) {
         console.error('Failed to fetch favorites', err);

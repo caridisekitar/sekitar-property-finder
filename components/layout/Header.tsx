@@ -19,7 +19,7 @@ const Header: React.FC = () => {
     { name: 'Kalkulator Budget', path: '/kalkulator-budget' },
   ];
 
-  const { subscription } = useAuth();
+  const { subscription, user } = useAuth();
 
   return (
     <>
@@ -53,7 +53,6 @@ const Header: React.FC = () => {
                     alt="avatar"
                     className="w-8 h-8 rounded-full hover:bg-gray-100"
                   />
-
                   {subscription?.plan === "PREMIUM" && (
                     <span className="-mt-2 text-xs font-bold text-[#F59E0B] border border-[#FDE68A] px-2 py-0.5 rounded-full bg-[#FFFBEB]">
                       PREMIUM
