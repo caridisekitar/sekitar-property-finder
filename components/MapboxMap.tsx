@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import PropertyCard from './PropertyCard';
 import { formatHargaRange } from '@/lib/helper';
+import LockedOverlay from './LockedOverlay';
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 mapboxgl.accessToken = process.env.MAPBOX_TOKEN as string;
 
@@ -30,6 +32,9 @@ const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, onUpgrade }) =>
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [blockedProperty, setBlockedProperty] = useState<Property | null>(null);
+  const [showLocked, setShowLocked] = useState(false);
+  const [open, setOpen] = useState(false);
+
 
   /* =========================
      INIT MAP (ONCE)
@@ -128,30 +133,13 @@ const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, onUpgrade }) =>
 
       {/* BASIC BLOCKED MODAL */}
       {blockedProperty && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md">
-            <img
-              src="/images/icons/icon-locked.png"
-              className="w-16 h-16 mx-auto mb-4"
-            />
-            <h3 className="text-xl font-bold mb-2">
-              Detail terkunci
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Upgrade ke Premium untuk melihat detail lengkap kos ini.
-            </p>
-            <button
-              onClick={() => {
-                setBlockedProperty(null);
-                onUpgrade(); // 🔥 open SubscriptionModal
-              }}
-              className="px-6 py-3 bg-[#96C8E2] text-white rounded-xl"
-            >
-              Upgrade Sekarang
-            </button>
-          </div>
-        </div>
+        <LockedOverlay
+            message="Please subscribe to unlock search"
+            onClose={() => setBlockedProperty(null)}
+            onSubscribe={() => setOpen(true)}
+          />
       )}
+      <SubscriptionModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };
