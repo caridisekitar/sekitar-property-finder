@@ -83,7 +83,7 @@ const KosDetailPage: React.FC = () => {
         `Halo, saya tertarik dengan kos "${kost.name}" di ${kost.city}. Apakah masih tersedia?`
     );
 
-    const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+    const whatsappUrl = `https://wa.me/62${phone}?text=${message}`;
 
     window.open(whatsappUrl, "_blank");
     
