@@ -36,6 +36,7 @@ const locationOptions: Option[] = [
   { label: "Jakarta Timur", value: "Jakarta Timur" },
   { label: "Jakarta Barat", value: "Jakarta Barat" },
   { label: "Jakarta Utara", value: "Jakarta Utara" },
+  { label: "Tangerang", value: "Tangerang" },
 ];
 
 const kostTypeOptions: Option[] = [
