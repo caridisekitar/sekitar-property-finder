@@ -53,6 +53,7 @@ export default function Register() {
   })();
 }, [navigate, paramPlan]);
 
+const BLOCK_REGEX = /@(email\.com|gmail\.cpm|gmail\.con)$/i;
 
   /* ===============================
      SUBMIT REGISTER
@@ -63,6 +64,11 @@ export default function Register() {
 
     if (!name || !email || !phone || !password) {
       setError('Semua field wajib diisi');
+      return;
+    }
+
+    if (BLOCK_REGEX.test(email)) {
+      setError("Email kamu tidak valid");
       return;
     }
 
