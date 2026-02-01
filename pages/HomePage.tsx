@@ -337,7 +337,7 @@ const HomePage: React.FC = () => {
               onPageChange={(page) => {
                 if (page !== currentPage && !loading) {
                   setCurrentPage(page);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  // window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
             />

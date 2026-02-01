@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SearchIcon from "@/components/icons/SearchIcon";
 import FilterIcon from "@/components/icons/FilterIcon";
 import MultiSelectDropdown from "./MultiSelectDropdown";
+import SingleSelectDropdown from "./SingleSelectDropdown";
 import { useAuth } from "@/hooks/useAuth";
 import LockedOverlay from "./LockedOverlay";
 import SubscriptionModal from "@/components/SubscriptionModal";
@@ -25,18 +26,21 @@ const SearchKost: React.FC<SearchKostProps> = ({
   const [lokasi, setLokasi] = useState<string[]>([]);
   const [tipe, setTipe] = useState<string[]>([]);
   const [keyword, setKeyword] = useState("");
-  const [priceRange, setPriceRange] = useState("");
+  const [priceRange, setPriceRange] = useState<string | null>(null);
   const [showLocked, setShowLocked] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const parsePriceRange = (value: string) => {
-    if (!value) return {};
-    if (value.endsWith("+")) {
-      return { min_price: parseInt(value.replace("+", "")) };
-    }
-    const [min, max] = value.split("-").map(Number);
-    return { min_price: min, max_price: max };
-  };
+  const parsePriceRange = (value?: string | null) => {
+  if (!value) return {};
+
+  if (value.endsWith("+")) {
+    return { min_price: parseInt(value.replace("+", "")) };
+  }
+
+  const [min, max] = value.split("-").map(Number);
+  return { min_price: min, max_price: max };
+};
+
 
   const doSearch = () => {
     if (!subscription || subscription?.plan !== "PREMIUM") {
@@ -123,18 +127,31 @@ const SearchKost: React.FC<SearchKostProps> = ({
           />
 
           <div>
-            <label className="font-semibold text-sm mb-2 block">Harga</label>
-            <select
+            {/* <label className="font-semibold text-sm mb-2 block">Harga</label> */}
+            <SingleSelectDropdown
+  label="Harga"
+  value={priceRange}
+  onChange={setPriceRange}
+  options={[
+    { label: "1 - 2 jt", value: "1000000-2000000" },
+    { label: "2 - 3 jt", value: "2000000-3000000" },
+    { label: "3 - 5 jt", value: "3000000-5000000" },
+    { label: "> 5 jt", value: "5000000+" },
+  ]}
+/>
+
+
+            {/* <select
               value={priceRange}
               onChange={(e) => setPriceRange(e.target.value)}
               className="w-full py-3 px-4 rounded-lg border-gray-300 text-xs"
             >
               <option value="">Pilih harga</option>
-              <option value="1000000-2000000">1 – 2 jt</option>
+              <option value="1000000-2000000">1 - 2 jt</option>
               <option value="2000000-3000000">2 – 3 jt</option>
               <option value="3000000-5000000">3 – 5 jt</option>
               <option value="5000000+">&gt; 5 jt</option>
-            </select>
+            </select> */}
           </div>
 
           <button

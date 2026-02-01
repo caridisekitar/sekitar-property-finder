@@ -18,7 +18,7 @@ export default function Login() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/profile", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 
@@ -60,7 +60,7 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      navigate("/profile", { replace: true });
+      navigate("/", { replace: true });
 
     } catch (err: any) {
       setError(err.message || "Email atau password salah");
