@@ -223,7 +223,6 @@ function FeatureList({ basic = false }: { basic?: boolean }) {
     { text: "Akses fitur Kalkulator", ok: true, limited: basic },
     { text: "Akses fitur Maps", ok: true, limited: basic },
     { text: "Bebas request kost via fitur Wishlist", ok: true },
-    { text: "Newsletter yang dikirim personal ke email kamu setiap minggu", ok: true },
     { text: "Akses fitur Daftarkan Kost Mu", ok: !basic },
     { text: "Akses fitur Daftarkan Bisnis Mu", ok: !basic },
     {

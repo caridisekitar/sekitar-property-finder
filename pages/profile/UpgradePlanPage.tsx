@@ -107,7 +107,6 @@ export default function UpgradePlanPage() {
                     <Feature text="Akses fitur Kalkulator" limited />
                     <Feature text="Akses fitur Maps" limited />
                     <Feature text="Bebas request kost via fitur Wishlist" />
-                    <Feature text="Newsletter personal setiap minggu" />
                     <Feature text="Akses fitur Daftarkan Kost Mu" disabled />
                     <Feature text="Akses fitur Daftarkan Kost Bisnis Mu" disabled />
                     <Feature text="Jumlah list kost akan terus bertambah setiap bulan" disabled />
@@ -155,7 +154,6 @@ export default function UpgradePlanPage() {
                     <Feature text="Bebas request kost via fitur Wishlist" />
                     <Feature text="Akses fitur Daftarkan Kost Mu" />
                     <Feature text="Akses fitur Daftarkan Bisnis Mu" />
-                    <Feature text="Newsletter personal setiap minggu" />
                     <Feature text="Jumlah list kost terus bertambah setiap bulan" />
 
                     <div className="mt-auto pt-8">
