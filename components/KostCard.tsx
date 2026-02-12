@@ -3,10 +3,14 @@ import type { Kost } from '../types';
 import BedIcon from '@/components/icons/BedIcon';
 import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { formatHargaRange } from '@/lib/helper';
+import { formatHargaRange, isNewKost } from '@/lib/helper';
 import { getVideoPoster, getImageCover } from "@/lib/image";
 
-const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
+const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => {
+  const isNew = isNewKost(kost.created_at, 14);
+
+  return (
+
   <div>
     {/* <div className="flex-shrink-0 w-full lg:w-[240px] bg-white rounded-xl shadow-md overflow-hidden snap-center"> */}
     <div
@@ -37,10 +41,13 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
         </div>
 
         {/* NEW BADGE */}
-        {kost.isNew && (
-          <div className="absolute top-1 -right-2 text-white py-2 rounded-l-xl rounded-r-sm flex items-center gap-2 shadow-sm">
-            <img src="/images/new.svg" alt="new" />
+        {isNew && (
+
+        <div className="absolute top-1 -right-1 z-10">
+          <div className="relative flex items-center">
+            <img src="/images/new.svg" alt="new" className="w-16 h-16" />
           </div>
+        </div>
         )}
 
         {/* FLOATING INFO CARD */}
@@ -78,6 +85,14 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
         alt="Kost Room"
         className="max-h-[200px] w-full object-cover"
       />
+      {isNew && (
+
+        <div className="absolute top-1 -right-1 z-10">
+          <div className="relative flex items-center">
+            <img src="/images/new.svg" alt="new" className="w-16 h-16" />
+          </div>
+        </div>
+        )}
 
       {/* Overlay Card */}
       <div className="w-full rounded-b-xl bg-white p-3 shadow-xl px-2">
@@ -126,6 +141,6 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => (
 
     
   </div>
-);
+)};
 
 export default KostCard;

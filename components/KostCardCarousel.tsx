@@ -3,11 +3,14 @@ import type { Kost } from '../types';
 import BedIcon from '@/components/icons/BedIcon';
 import { MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { formatHargaRange } from '@/lib/helper';
+import { formatHargaRange, isNewKost } from '@/lib/helper';
 import { getVideoPoster, getImageCover } from "@/lib/image";
 
 
-const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
+const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => {
+  const isNew = isNewKost(kost.created_at, 14);
+
+  return (
   <div>
     <div
         className="
@@ -128,6 +131,6 @@ const KostCardCarousel: React.FC<{ kost: Kost }> = ({ kost }) => (
 
     
   </div>
-);
+)};
 
 export default KostCardCarousel;

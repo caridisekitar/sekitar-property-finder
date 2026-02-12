@@ -110,3 +110,13 @@ export function formatIDRNumber(value: string | number): string {
   if (!numeric) return '';
   return new Intl.NumberFormat('id-ID').format(Number(numeric));
 }
+
+export function isNewKost(created_at: string, days: number = 14): boolean {
+  if (!created_at) return false;
+  const createdDate = new Date(created_at).getTime();
+  const now = Date.now();
+
+  const diffDays = (now - createdDate) / (1000 * 60 * 60 * 24);
+
+  return diffDays <= days;
+}

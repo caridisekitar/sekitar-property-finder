@@ -423,7 +423,8 @@ const HomePage: React.FC = () => {
                <div className="inline-block bg-white px-3 py-1 rounded-xl text-xs font-bold mb-4">Gratis</div>
                <h3 className="text-md md:text-3xl font-bold text-white mb-4">Daftarkan Kosmu</h3>
                <p className="text-white/90 text-xs lg:text-sm mb-6">Punya kos? Yuk, daftarkan sekarang dan buat kosmu lebih mudah ditemukan oleh ribuan pencari di sekitar kamu!</p>
-               <button className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-xs lg:text-sm font-medium hover:bg-gray-800">Coming Soon!</button>
+               {/* <button className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-xs lg:text-sm font-medium hover:bg-gray-800">Coming Soon!</button> */}
+               <Link to="/daftar-kos" className="bg-gray-900 text-white px-6 py-2.5 rounded-lg text-xs lg:text-sm font-medium hover:bg-gray-800">Daftar sekarang</Link>
              </div>
           </div>
 

@@ -7,7 +7,7 @@ type Props = {
   onGoHome: () => void;
 };
 
-export default function SuccessModal({ open, onClose, onGoHome }: Props) {
+export default function ErrorModal({ open, onClose, onGoHome }: Props) {
   if (!open) return null;
 
   return (
@@ -31,26 +31,21 @@ export default function SuccessModal({ open, onClose, onGoHome }: Props) {
         {/* illustration */}
         <div className="flex justify-center mb-6">
           <img
-            src="/images/business-success.png"
-            alt="Success"
+            src="/images/not-found-kost.png"
+            alt="Error"
             className="h-40"
           />
         </div>
 
         {/* content */}
         <h2 className="text-xl font-semibold text-center mb-2">
-          Bisnismu Berhasil Didaftarkan!
+          Kos mu Gagal Didaftarkan!
         </h2>
 
         <p className="text-xs text-gray-600 text-center leading-relaxed">
-          Selamat! Bisnismu sudah berhasil didaftarkan di{" "}
-          <strong>caridisekitar.com</strong>.
-          Tim Sekitar akan meninjau dan memverifikasi informasi sebelum
-          ditampilkan kepada pengguna.
-        </p>
-
-        <p className="text-xs text-gray-600 text-center mt-3">
-          Terima kasih sudah mempercayakan promosi bisnismu bersama kami!
+          Maaf! Kos mu gagal didaftarkan.
+          <br />
+          Silahkan coba lagi.
         </p>
 
         {/* actions */}
@@ -62,8 +57,8 @@ export default function SuccessModal({ open, onClose, onGoHome }: Props) {
             Tutup
           </button>
 
-            <Link to="/profile/contributions" className="flex-1 rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 text-center">
-            Lihat Kontribusiku
+            <Link to="/" className="flex-1 rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 text-center">
+            Kembali ke Home
             </Link>
         </div>
       </div>

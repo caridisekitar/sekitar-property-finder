@@ -39,18 +39,13 @@ export default function SuccessModal({ open, onClose, onGoHome }: Props) {
 
         {/* content */}
         <h2 className="text-xl font-semibold text-center mb-2">
-          Bisnismu Berhasil Didaftarkan!
+          Kos mu Berhasil Didaftarkan!
         </h2>
 
         <p className="text-xs text-gray-600 text-center leading-relaxed">
-          Selamat! Bisnismu sudah berhasil didaftarkan di{" "}
-          <strong>caridisekitar.com</strong>.
-          Tim Sekitar akan meninjau dan memverifikasi informasi sebelum
-          ditampilkan kepada pengguna.
-        </p>
-
-        <p className="text-xs text-gray-600 text-center mt-3">
-          Terima kasih sudah mempercayakan promosi bisnismu bersama kami!
+          Selamat! Kos mu sudah berhasil didaftarkan.
+          <br />
+          Tim Sekitar akan meninjau datanya dan melakukan survey ke tempat mu. See you!
         </p>
 
         {/* actions */}
@@ -62,8 +57,8 @@ export default function SuccessModal({ open, onClose, onGoHome }: Props) {
             Tutup
           </button>
 
-            <Link to="/profile/contributions" className="flex-1 rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 text-center">
-            Lihat Kontribusiku
+            <Link to="/" className="flex-1 rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 text-center">
+            Kembali ke Home
             </Link>
         </div>
       </div>

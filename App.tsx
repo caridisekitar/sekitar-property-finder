@@ -27,6 +27,7 @@ import PrivacyPolicyPage from '@/pages/PrivacyPolicy';
 import PaymentSuccess from "@/pages/PaymentSuccess";
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import RegisterKos from './pages/RegisterKos';
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -55,6 +56,7 @@ const AppContent: React.FC = () => {
                     <Route path="/profile/latest" element={<LatestPage />} />
                     <Route path="/profile/upgrade" element={<UpgradePlanPage />} />
                     <Route path="/daftar-bisnis" element={<DaftarkanBisnismu />} />
+                    <Route path="/daftar-kos" element={<RegisterKos />} />
                     <Route path="/kost/:slug" element={<KostDetailPage />} />
                     <Route path="/callback" element={<CallbackPage />} />
                     <Route path="/payment/success" element={<PaymentSuccess />} />
