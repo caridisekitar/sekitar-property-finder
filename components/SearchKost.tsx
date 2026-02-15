@@ -81,6 +81,7 @@ const SearchKost: React.FC<SearchKostProps> = ({
     { label: "Kos Putri", value: "Putri" },
     { label: "Kos Putra", value: "Putra" },
     { label: "Kos Campur", value: "Campur" },
+    { label: "Kos Campur Bebas", value: "Campur Bebas" },
     { label: "Jendela Luar", value: "Jendela Luar" },
     { label: "Kamar Mandi Dalam", value: "Kamar Mandi Dalam" },
   ];
