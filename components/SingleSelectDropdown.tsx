@@ -11,6 +11,9 @@ type Props = {
   options: Option[];
   value: string | null;
   onChange: (value: string) => void;
+
+  // NEW
+  isActive?: boolean;
 };
 
 export default function SingleSelectDropdown({
@@ -18,11 +21,12 @@ export default function SingleSelectDropdown({
   options,
   value,
   onChange,
+  isActive = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // close when clicking outside
+  // Close when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) {
@@ -43,7 +47,13 @@ export default function SingleSelectDropdown({
 
   return (
     <div ref={ref} className="relative text-xs w-full">
-      <label className="font-semibold mb-2 block">{label}</label>
+      <label
+        className={`font-semibold mb-2 block ${
+          isActive ? "text-brand-dark" : ""
+        }`}
+      >
+        {label}
+      </label>
 
       {/* Trigger */}
       <button
@@ -52,16 +62,26 @@ export default function SingleSelectDropdown({
           e.stopPropagation();
           setOpen((prev) => !prev);
         }}
-        className="w-full flex justify-between items-center py-3 px-4 bg-white border border-gray-300 rounded-lg focus:ring focus:ring-brand-blue"
+        className={`w-full flex justify-between items-center py-3 px-4 bg-white rounded-lg transition
+          ${
+            isActive
+              ? "border border-brand-dark ring-1 ring-brand-dark"
+              : "border border-gray-300"
+          }
+          focus:ring focus:ring-brand-blue`}
       >
-        <span className="truncate text-left">
+        <span
+          className={`truncate text-left ${
+            selected ? "text-black font-medium" : "text-gray-400"
+          }`}
+        >
           {selected?.label || `Pilih ${label}`}
         </span>
 
         <ChevronDown
-          className={`w-4 h-4 text-gray-400 transition-transform ${
+          className={`w-4 h-4 transition-transform ${
             open ? "rotate-180" : ""
-          }`}
+          } ${isActive ? "text-brand-dark" : "text-gray-400"}`}
         />
       </button>
 
@@ -78,7 +98,11 @@ export default function SingleSelectDropdown({
                 className={`
                   px-4 py-3 cursor-pointer text-sm
                   hover:bg-gray-50
-                  ${active ? "bg-brand-blue/10 text-brand-blue font-medium" : ""}
+                  ${
+                    active
+                      ? "bg-brand-blue/10 text-brand-blue font-medium"
+                      : ""
+                  }
                 `}
               >
                 {opt.label}

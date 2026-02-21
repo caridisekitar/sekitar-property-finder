@@ -11,6 +11,9 @@ type Props = {
   options: Option[];
   value: string[];
   onChange: (value: string[]) => void;
+
+  // NEW
+  isActive?: boolean;
 };
 
 export default function MultiSelectDropdown({
@@ -18,6 +21,7 @@ export default function MultiSelectDropdown({
   options,
   value,
   onChange,
+  isActive = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -49,7 +53,13 @@ export default function MultiSelectDropdown({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center py-3 px-4 bg-white border border-gray-300 rounded-lg focus:ring focus:ring-brand-blue"
+        className={`w-full flex justify-between items-center py-3 px-4 bg-white rounded-lg transition
+          ${
+            isActive
+              ? "border border-brand-dark ring-1 ring-brand-dark"
+              : "border border-gray-300"
+          }
+          focus:ring focus:ring-brand-blue`}
       >
         <span className="truncate">
           {value.length > 0
@@ -67,7 +77,7 @@ export default function MultiSelectDropdown({
 
             return (
               <label
-                key={opt.value} // ✅ UNIQUE & STABLE
+                key={opt.value}
                 className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 cursor-pointer"
               >
                 <input
@@ -76,7 +86,7 @@ export default function MultiSelectDropdown({
                   onChange={() => toggle(opt.value)}
                   className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
                 />
-                <span>{opt.label}</span> {/* ✅ render label */}
+                <span>{opt.label}</span>
               </label>
             );
           })}

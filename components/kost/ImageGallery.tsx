@@ -140,9 +140,9 @@ const prevSlide = () => {
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           onClick={() => setShowImage(false)}
         >
-          <div className="relative max-w-5xl w-full">
+          <div className="relative">
             <button
-              className="absolute -top-10 right-0 text-white"
+              className="absolute top-3 right-3 text-white bg-black/50 p-2 rounded-full"
               onClick={() => setShowImage(false)}
             >
               <X className="w-6 h-6" />
@@ -151,7 +151,7 @@ const prevSlide = () => {
             <img
               src={galleryImages[activeIndex]}
               alt="Preview"
-              className="w-full rounded-xl object-contain"
+              className="h-full rounded-xl object-contain"
             />
           </div>
         </div>

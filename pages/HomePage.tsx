@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import type { Kost, Business, Testimonial } from '../types';
 import { useAuth } from '@/hooks/useAuth';
+import { useSearchParams } from 'react-router-dom';
 import SearchIcon from '../components/icons/SearchIcon';
 import FilterMenu from '../components/layout/FilterMenu';
 import HouseLogo from '@/components/icons/HouseLogo';
@@ -72,12 +73,39 @@ const HomePage: React.FC = () => {
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT);
     const [kostsRecommendation, setKostsRecommendation] = useState<Kost[]>([]);
-    const [activeFilters, setActiveFilters] = useState<{
+    const [searchParams, setSearchParams] = useSearchParams();
+    const filters = {
+      q: searchParams.get('q') || '',
+      lokasi: searchParams.get('lokasi') || '',
+      tipe: searchParams.get('tipe') || '',
+      min_price: searchParams.get('min_price') || '',
+      max_price: searchParams.get('max_price') || '',
+      page: parseInt(searchParams.get('page') || '1'),
+    };
+
+    const updateFilters = (params: {
+      q?: string;
       lokasi?: string;
       tipe?: string;
       min_price?: number;
       max_price?: number;
-    }>({});
+    }) => {
+      setSearchParams({
+        q: params.q || "",
+        lokasi: params.lokasi || "",
+        tipe: params.tipe || "",
+        min_price: params.min_price?.toString() || "",
+        max_price: params.max_price?.toString() || "",
+        page: "1",
+      });
+    };
+    // const [activeFilters, setActiveFilters] = useState<{
+    //   q?: string;
+    //   lokasi?: string;
+    //   tipe?: string;
+    //   min_price?: number;
+    //   max_price?: number;
+    // }>({});
 
     // 🔹 Fetch data from API
       useEffect(() => {
@@ -87,24 +115,27 @@ const HomePage: React.FC = () => {
             setError(null);
 
             const res = await secureGet('/search', {
-              page: currentPage,
+              page: filters.page,
               per_page: ITEMS_PER_PAGE,
-              ...activeFilters,
+              q: filters.q || '',
+              lokasi: filters.lokasi || '',
+              tipe: filters.tipe || '',
+              min_price: filters.min_price || '',
+              max_price: filters.max_price || '',
             });
 
-            // paginated kost list
             setKosts(res.data);
-            setCurrentPage(res.current_page);
             setLastPage(res.last_page);
             setTotal(res.total);
 
-            // recommendation (no pagination)
             const dataRecommendation = await secureGet('/kost/recommendations');
             setKostsRecommendation(dataRecommendation.data);
 
-            // basic (free preview)
             const basic = await secureGet('/kost/basic');
             setKostBasic(basic.data);
+
+            setCurrentPage(filters.page);
+
           } catch (err) {
             setError((err as Error).message || 'Failed to fetch data');
           } finally {
@@ -113,7 +144,7 @@ const HomePage: React.FC = () => {
         };
 
         fetchKosts();
-      }, [currentPage, activeFilters]);
+      }, [searchParams]);
 
 
 
@@ -148,40 +179,22 @@ const HomePage: React.FC = () => {
         }
     };
 
-    const fetchSearchWithFilters = async (params: {
-        lokasi: string;
-        tipe: string;
-        min_price?: number;
-        max_price?: number;
-      }) => {
-        try {
-          setLoading(true);
-          setError(null);
-
-          setActiveFilters(params);
-
-          const res = await secureGet("/search", {
-            page: 1,
-            per_page: ITEMS_PER_PAGE,
-            ...params,
-          });
-
-          setKosts(res.data ?? res);
-          setCurrentPage(res.current_page ?? 1);
-          setLastPage(res.last_page ?? 1);
-          setTotal(res.total ?? (res.data?.length ?? res.length));
-
-          setVisibleCount(
-            isSubscribed
-              ? (res.data?.length ?? res.length)
-              : VISIBLE_COUNT
-          );
-        } catch (err) {
-          setError("Failed to fetch search result");
-        } finally {
-          setLoading(false);
-        }
-      };
+    const fetchSearchWithFilters = (params: {
+  q?: string;
+  lokasi?: string;
+  tipe?: string;
+  min_price?: number;
+  max_price?: number;
+}) => {
+  setSearchParams({
+    q: params.q || '',
+    lokasi: params.lokasi || '',
+    tipe: params.tipe || '',
+    min_price: params.min_price?.toString() || '',
+    max_price: params.max_price?.toString() || '',
+    page: '1',
+  });
+};
 
 
 
@@ -282,25 +295,23 @@ const HomePage: React.FC = () => {
     </div>
 
     {/* Search Component */}
-    <SearchKost
+    {/* <SearchKost
         setIsFilterMenuOpen={setIsFilterMenuOpen}
-        // onResult={(res) => {
-        //   // supports both paginated & non-paginated responses
-        //   setKosts(res.data ?? res);
-        //   setCurrentPage(res.current_page ?? 1);
-        //   setLastPage(res.last_page ?? 1);
-        //   setTotal(res.total ?? (res.data?.length ?? res.length));
+        onSearch={fetchSearchWithFilters}
+      /> */}
 
-        //   setVisibleCount(
-        //     isSubscribed
-        //       ? (res.data?.length ?? res.length)
-        //       : VISIBLE_COUNT
-        //   );
-        // }}
-        onSearch={(params) => {
-          fetchSearchWithFilters(params);
-        }}
-      />
+      <SearchKost
+      setIsFilterMenuOpen={setIsFilterMenuOpen}
+      onSearch={updateFilters}
+      // isFilterActive={isFilterActive}
+      initialFilters={{
+        q: searchParams.get("q") || "",
+        lokasi: searchParams.get("lokasi") || "",
+        tipe: searchParams.get("tipe") || "",
+        min_price: searchParams.get("min_price") || "",
+        max_price: searchParams.get("max_price") || "",
+      }}
+    />
 
 
 
@@ -331,7 +342,7 @@ const HomePage: React.FC = () => {
 
       {isSubscribed && lastPage > 1 && (
           <div className="mt-10">
-            <Pagination
+            {/* <Pagination
               currentPage={currentPage}
               totalPages={lastPage}
               onPageChange={(page) => {
@@ -339,6 +350,20 @@ const HomePage: React.FC = () => {
                   setCurrentPage(page);
                   // window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
+              }}
+            /> */}
+            <Pagination
+              currentPage={filters.page}
+              totalPages={lastPage}
+              onPageChange={(page) => {
+                setSearchParams({
+                  q: filters.q,
+                  lokasi: filters.lokasi,
+                  tipe: filters.tipe,
+                  min_price: filters.min_price,
+                  max_price: filters.max_price,
+                  page: page.toString(),
+                });
               }}
             />
           </div>
@@ -499,13 +524,18 @@ const HomePage: React.FC = () => {
       </section>
 
     </div>
-    <FilterMenu
+    {/* <FilterMenu
       isOpen={isFilterMenuOpen}
       setIsOpen={setIsFilterMenuOpen}
       onApply={(params) => {
         fetchSearchWithFilters(params);
   }}
-/>
+/> */}
+    <FilterMenu
+        isOpen={isFilterMenuOpen}
+        setIsOpen={setIsFilterMenuOpen}
+        onApply={updateFilters}
+      />
 
     </>
   );

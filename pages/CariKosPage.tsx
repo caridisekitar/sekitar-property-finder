@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import type { Kost } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import KostCard from "@/components/KostCard";
@@ -9,44 +9,71 @@ import SubscriptionModal from "@/components/SubscriptionModal";
 import Pagination from "@/components/Pagination";
 import { secureGet } from "@/lib/secureGet";
 
+const ITEMS_PER_PAGE = 10;
+
 const CariKosPage: React.FC = () => {
+  const { subscription } = useAuth();
+  const isPremium = subscription?.plan === "PREMIUM";
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const [kosts, setKosts] = useState<Kost[]>([]);
   const [kostBasic, setKostBasic] = useState<Kost[]>([]);
-  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
-  const [open, setOpen] = useState(false);
-  const { subscription } = useAuth();
-
-  const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
+  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
-  const isPremium = subscription?.plan === "PREMIUM";
+  /* ==============================
+     URL AS SINGLE SOURCE OF TRUTH
+  ============================== */
 
-  const visibleKosts = isPremium ? kosts : kostBasic;
-  const lockedKosts = isPremium ? [] : kosts.slice(kostBasic.length);
-  const [activeFilters, setActiveFilters] = useState<{
-        lokasi?: string;
-        tipe?: string;
-        min_price?: number;
-        max_price?: number;
-      }>({});
+  const filters = useMemo(() => {
+  return {
+    q: searchParams.get("q") || "",
+    lokasi: searchParams.get("lokasi") || "",
+    tipe: searchParams.get("tipe") || "",
+    min_price: searchParams.get("min_price") || "",
+    max_price: searchParams.get("max_price") || "",
+    page: parseInt(searchParams.get("page") || "1"),
+  };
+}, [searchParams]);
 
-  const fetchKosts = async (pageNumber = 1) => {
+  /* ==============================
+     ACTIVE FILTER STATE (NEW)
+  ============================== */
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.lokasi) count++;
+    if (filters.tipe) count++;
+    if (filters.min_price) count++;
+    if (filters.max_price) count++;
+    return count;
+  }, [filters]);
+
+  const isFilterActive = activeFilterCount > 0;
+
+  /* ==============================
+     FETCH DATA
+  ============================== */
+
+  const fetchKosts = async () => {
     try {
       setLoading(true);
 
       const res = await secureGet("/search", {
-        page: pageNumber,
-        per_page: 10,
-        ...activeFilters,
+        page: filters.page,
+        per_page: ITEMS_PER_PAGE,
+        q: filters.q,
+        lokasi: filters.lokasi,
+        tipe: filters.tipe,
+        min_price: filters.min_price || undefined,
+        max_price: filters.max_price || undefined,
       });
 
       setKosts(res.data);
-      setPage(res.current_page);
       setLastPage(res.last_page);
       setTotal(res.total);
 
@@ -54,93 +81,144 @@ const CariKosPage: React.FC = () => {
         const basic = await secureGet("/kost/basic");
         setKostBasic(basic.data);
       }
-    } catch (e) {
-      console.error("Fetch kost failed", e);
+
+    } catch (error) {
+      console.error("Failed to fetch kost:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchKosts(1);
-  }, [isPremium]);
+    fetchKosts();
+  }, [searchParams, isPremium]);
 
-  const fetchSearchWithFilters = async (params: {
-          lokasi: string;
-          tipe: string;
-          min_price?: number;
-          max_price?: number;
-        }) => {
-          try {
-            setLoading(true);
-            setError(null);
+  /* ==============================
+     VISIBLE + LOCKED LOGIC
+  ============================== */
 
-            setActiveFilters(params);
-  
-            const res = await secureGet("/search", {
-              page: 1,
-              per_page: ITEMS_PER_PAGE,
-              ...params,
-            });
-  
-            setKosts(res.data ?? res);
-            setCurrentPage(res.current_page ?? 1);
-            setLastPage(res.last_page ?? 1);
-            setTotal(res.total ?? (res.data?.length ?? res.length));
-  
-          } catch (err) {
-            setError("Failed to fetch search result");
-          } finally {
-            setLoading(false);
-          }
-        };
+  const visibleKosts = isPremium ? kosts : kostBasic;
+  const lockedKosts = isPremium ? [] : kosts.slice(kostBasic.length);
+
+  /* ==============================
+     HANDLE FILTER CHANGE
+  ============================== */
+
+  const updateFilters = (params: {
+  q?: string;
+  lokasi?: string;
+  tipe?: string;
+  min_price?: number;
+  max_price?: number;
+}) => {
+  setSearchParams({
+    q: params.q || "",
+    lokasi: params.lokasi || "",
+    tipe: params.tipe || "",
+    min_price: params.min_price?.toString() || "",
+    max_price: params.max_price?.toString() || "",
+    page: "1",
+  });
+};
+
+  const handlePageChange = (page: number) => {
+    setSearchParams({
+      lokasi: filters.lokasi,
+      tipe: filters.tipe,
+      min_price: filters.min_price,
+      max_price: filters.max_price,
+      page: page.toString(),
+    });
+  };
+
+  const resetFilters = () => {
+    setSearchParams({ page: "1" });
+  };
+
+  /* ==============================
+     UI
+  ============================== */
 
   return (
     <div className="container mx-auto px-4 py-8">
       <nav className="text-sm mb-4">
-        <Link to="/" className="text-gray-500">Home</Link> / Cari Kos
+        <Link to="/" className="text-gray-500">
+          Home
+        </Link>{" "}
+        / Cari Kos
       </nav>
 
       <h1 className="text-3xl font-bold mb-4">Cari Kos</h1>
 
       <SearchKost
-        setIsFilterMenuOpen={setIsFilterMenuOpen}
-        onSearch={fetchSearchWithFilters}
-        // onResult={(res) => {
-        //   setKosts(res.data ?? res);
-        //   setPage(res.current_page ?? 1);
-        //   setLastPage(res.last_page ?? 1);
-        //   setTotal(res.total ?? (res.data?.length ?? 0));
-        // }}
-      />
+      setIsFilterMenuOpen={setIsFilterMenuOpen}
+      onSearch={updateFilters}
+      isFilterActive={isFilterActive}
+      initialFilters={{
+        q: searchParams.get("q") || "",
+        lokasi: searchParams.get("lokasi") || "",
+        tipe: searchParams.get("tipe") || "",
+        min_price: searchParams.get("min_price") || "",
+        max_price: searchParams.get("max_price") || "",
+      }}
+    />
 
       <p className="text-gray-600 my-6">
         Menampilkan {visibleKosts.length} dari {total} hasil pencarian
       </p>
 
-      {/* Visible */}
+      {/* ================= ACTIVE FILTER SUMMARY (NEW) ================= */}
+      {isFilterActive && (
+        <div className="mb-6 flex flex-wrap gap-2 items-center">
+          {filters.lokasi && (
+            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm">
+              Lokasi: {filters.lokasi}
+            </span>
+          )}
+          {filters.tipe && (
+            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm">
+              Tipe: {filters.tipe}
+            </span>
+          )}
+          {filters.min_price && (
+            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm">
+              Min: {filters.min_price}
+            </span>
+          )}
+          {filters.max_price && (
+            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm">
+              Max: {filters.max_price}
+            </span>
+          )}
+
+          <button
+            onClick={resetFilters}
+            className="px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm"
+          >
+            Reset Filter
+          </button>
+        </div>
+      )}
+
+      {/* ================= GRID ================= */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {visibleKosts.map((kost) => (
           <KostCard key={kost.id} kost={kost} />
         ))}
       </div>
 
-      {/* Pagination (Premium only) */}
+      {/* ================= PAGINATION ================= */}
       {isPremium && lastPage > 1 && (
         <div className="mt-10">
           <Pagination
-            currentPage={page}
+            currentPage={filters.page}
             totalPages={lastPage}
-            onPageChange={(p) => {
-              if (p !== page && !loading) {
-                fetchKosts(p);
-              }
-            }}
+            onPageChange={handlePageChange}
           />
         </div>
       )}
 
-      {/* Locked */}
+      {/* ================= LOCKED SECTION ================= */}
       {!isPremium && lockedKosts.length > 0 && (
         <div className="relative mt-8">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 blur-md pointer-events-none">
@@ -171,14 +249,12 @@ const CariKosPage: React.FC = () => {
       )}
 
       <SubscriptionModal open={open} onClose={() => setOpen(false)} />
+
       <FilterMenu
         isOpen={isFilterMenuOpen}
         setIsOpen={setIsFilterMenuOpen}
-        onApply={(params) => {
-          fetchSearchWithFilters(params);
-        }}
-/>
-
+        onApply={updateFilters}
+      />
     </div>
   );
 };
