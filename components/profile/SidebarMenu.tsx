@@ -28,6 +28,7 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ user }) => {
     } finally {
       localStorage.removeItem('device_id');
       localStorage.removeItem('post_login_redirect');
+      localStorage.removeItem('redirectAfterLogin');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       sessionStorage.clear();

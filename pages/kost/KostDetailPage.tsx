@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import { MapPin, Heart, Bookmark } from "lucide-react";
 import ImageGallery from "@/components/kost/ImageGallery";
 import Tabs from "@/components/kost/Tabs";
@@ -33,13 +33,24 @@ const KosDetailPage: React.FC = () => {
   const [likeLoading, setLikeLoading] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const redirectToLogin = () => {
+    localStorage.setItem("redirectAfterLogin", location.pathname);
+  };
 
    useEffect(() => {
+    if (!user) {
+        redirectToLogin();
+      }
+    
     if (!slug) return;
 
         const fetchKostDetail = async () => {
         try {
           setLoading(true);
+          
           const data = await secureGet(`/kosts/${slug}`);
           setKost(data);
 

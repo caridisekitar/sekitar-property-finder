@@ -36,6 +36,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks, is
             // always clear client
             localStorage.removeItem('device_id');
             localStorage.removeItem('post_login_redirect');
+            localStorage.removeItem('redirectAfterLogin');
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             sessionStorage.clear();
