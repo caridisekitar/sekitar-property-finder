@@ -307,6 +307,8 @@ const ProfilePage: React.FC = () => {
                     </label>
                     <div className="w-full md:w-2/3">
                         <input
+                        name="current_password"
+                        autoComplete="off"
                         type="password"
                         value={passwordForm.current_password}
                         onChange={(e) =>
@@ -324,6 +326,8 @@ const ProfilePage: React.FC = () => {
                     </label>
                     <div className="w-full md:w-2/3">
                         <input
+                        name="new_password"
+                        autoComplete="off"
                         type="password"
                         value={passwordForm.new_password}
                         onChange={(e) =>
@@ -341,6 +345,8 @@ const ProfilePage: React.FC = () => {
                     </label>
                     <div className="w-full md:w-2/3">
                         <input
+                        name="confirm_password"
+                        autoComplete="off"
                         type="password"
                         value={passwordForm.confirm_password}
                         onChange={(e) =>

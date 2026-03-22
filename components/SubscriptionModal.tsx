@@ -111,7 +111,7 @@ export default function SubscriptionModal({
         </p>
 
         {/* Pricing Cards */}
-        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-5xl">
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-5xl">
           {/* ================= BASIC ================= */}
           <div className="border rounded-2xl p-8 shadow-sm flex flex-col justify-between order-2 lg:order-1">
             <div>
@@ -126,11 +126,11 @@ export default function SubscriptionModal({
               </div>
 
               <h2 className="text-4xl font-bold mb-2">Gratis</h2>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 mb-6 text-sm">
                 Mau coba yang gratis dulu? Nggak jadi masalah, we got you!
               </p>
 
-              <FeatureList basic />
+              <FeatureList plan="basic"/>
             </div>
 
             <button
@@ -178,17 +178,17 @@ export default function SubscriptionModal({
 
               <h2 className="text-4xl font-bold mt-2">
                 Rp99.000{" "}
-                <span className="text-base font-normal text-gray-500">
+                <span className="text-sm font-normal text-gray-500">
                   per tahun
                 </span>
               </h2>
 
-              <p className="text-gray-500 mt-3 mb-6">
+              <p className="text-gray-500 mt-3 mb-6 text-sm">
                 Cuma Rp8.200 perbulan, lebih murah dari harga kopi kamu
                 sehari ☕
               </p>
 
-              <FeatureList />
+              <FeatureList plan="premium"/>
             </div>
 
             <button
@@ -208,6 +208,68 @@ export default function SubscriptionModal({
                 : "Upgrade ke Premium"}
             </button>
           </div>
+
+
+          {/* ================= PREMIUM ================= */}
+          <div className="relative border rounded-2xl p-8 shadow-lg flex flex-col justify-between order-1 lg:order-2">
+            {/* Badge */}
+            {/* <span className="absolute -top-4 right-4 bg-black text-white text-xs px-3 py-1 rounded-full">
+              Recommended for you
+            </span> */}
+
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <img src="/images/icons/premium.png" alt="premium" />
+                </div>
+                <div>
+                  <p className="font-semibold">Premium+</p>
+                  <p className="text-sm text-gray-400">Unlimited</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-red-400 line-through text-lg">
+                  Rp350.000
+                </span>
+                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
+                  Promo 🎉
+                </span>
+              </div>
+
+              <h2 className="text-4xl font-bold mt-2">
+                Rp199.000{" "}
+                <span className="text-sm font-normal text-gray-500">
+                  per tahun
+                </span>
+              </h2>
+
+              <p className="text-gray-500 mt-3 mb-6 text-sm">
+                Bebas akses ratusan kost di 3 lokasi berbeda, bisa pilih semau mu
+              </p>
+
+              <FeatureList plan="premium_plus"/>
+            </div>
+
+            <button
+              onClick={() => handleSubscribe("premium")}
+              disabled={loading || isPremiumActive}
+              className={`mt-8 w-full py-3 rounded-xl font-semibold transition
+                ${
+                  loading || isPremiumActive
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-[#96C8E2] text-white hover:bg-blue-500"
+                }`}
+            >
+              {loading
+                ? "Mengalihkan ke pembayaran..."
+                : isPremiumActive
+                ? "Paket Aktif"
+                : "Upgrade ke Premium+"}
+            </button>
+          </div>
+
+
         </div>
       </div>
     </div>
@@ -217,39 +279,102 @@ export default function SubscriptionModal({
 /* ========================= */
 /* Feature List (Internal)   */
 /* ========================= */
-function FeatureList({ basic = false }: { basic?: boolean }) {
+
+type Plan = "basic" | "premium" | "premium_plus";
+
+function FeatureList({ plan }: { plan: Plan }) {
   const features = [
-    { text: "Akses ratusan informasi kost", ok: true, limited: basic },
-    { text: "Akses fitur Kalkulator", ok: true, limited: basic },
-    { text: "Akses fitur Maps", ok: true, limited: basic },
-    { text: "Bebas request kost via fitur Wishlist", ok: true },
-    { text: "Akses fitur Daftarkan Kost Mu", ok: !basic },
-    { text: "Akses fitur Daftarkan Bisnis Mu", ok: !basic },
+    {
+      text: "Pilih 1 lokasi kost saja",
+      plans: ["premium"],
+      highlight: true,
+    },
+    {
+      text: "Pilih 3 lokasi kost",
+      plans: ["premium_plus"],
+      highlight: true,
+    },
+    {
+      text: "Akses ratusan informasi kost",
+      plans: ["basic", "premium", "premium_plus"],
+      limited: ["basic"],
+    },
+    {
+      text: "Akses fitur Kalkulator",
+      plans: ["basic", "premium", "premium_plus"],
+      limited: ["basic"],
+    },
+    {
+      text: "Akses fitur Maps",
+      plans: ["basic", "premium", "premium_plus"],
+      limited: ["basic"],
+    },
+    {
+      text: "Bebas request kost via fitur Wishlist",
+      plans: ["basic", "premium", "premium_plus"],
+    },
+    {
+      text: "Akses fitur Daftarkan Kost Mu",
+      plans: ["premium", "premium_plus"],
+    },
+    {
+      text: "Akses fitur Daftarkan Bisnis Mu",
+      plans: ["premium", "premium_plus"],
+    },
     {
       text: "Jumlah list kost akan terus bertambah ratusan setiap bulan nya",
-      ok: !basic,
+      plans: ["premium", "premium_plus"],
     },
   ];
 
   return (
     <ul className="space-y-3 text-sm">
-      {features.map((f, i) => (
-        <li key={i} className="flex gap-3 items-start">
-          <span
-            className={`mt-0.5 ${
-              f.ok ? "text-green-500" : "text-red-400"
-            }`}
-          >
-            {f.ok ? "✔" : "✖"}
-          </span>
-          <span className="text-gray-600">
-            {f.text}{" "}
-            {f.limited && (
-              <span className="text-gray-400">(terbatas)</span>
-            )}
-          </span>
-        </li>
-      ))}
+      {features
+        .filter((f) => f.plans.includes(plan))
+        .map((f, i) => {
+          const limited = f.limited?.includes(plan);
+
+          return (
+            <li key={i} className="flex gap-3 items-start">
+              <span className="mt-0.5 text-green-500">✔</span>
+
+              <span
+                className={`text-gray-600 ${
+                  f.highlight ? "font-semibold text-gray-900" : ""
+                }`}
+              >
+                {f.text}{" "}
+                {limited && (
+                  <span className="text-gray-400">(terbatas)</span>
+                )}
+              </span>
+            </li>
+          );
+        })}
+
+      {/* Show disabled features for Basic */}
+      {plan === "basic" && (
+        <>
+          <li className="flex gap-3 items-start">
+            <span className="mt-0.5 text-red-400">✖</span>
+            <span className="text-gray-600">Akses fitur Daftarkan Kost Mu</span>
+          </li>
+
+          <li className="flex gap-3 items-start">
+            <span className="mt-0.5 text-red-400">✖</span>
+            <span className="text-gray-600">
+              Akses fitur Daftarkan Bisnis Mu
+            </span>
+          </li>
+
+          <li className="flex gap-3 items-start">
+            <span className="mt-0.5 text-red-400">✖</span>
+            <span className="text-gray-600">
+              Jumlah list kost akan terus bertambah ratusan setiap bulan nya
+            </span>
+          </li>
+        </>
+      )}
     </ul>
   );
 }
