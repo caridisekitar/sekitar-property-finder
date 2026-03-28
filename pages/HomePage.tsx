@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import type { Kost, Business, Testimonial } from '../types';
 import { useAuth } from '@/hooks/useAuth';
 import { useSearchParams } from 'react-router-dom';
@@ -58,6 +58,7 @@ const VISIBLE_COUNT = 5;
 
 
 const HomePage: React.FC = () => {
+    const location = useLocation()
     const [currentTestimonial, setCurrentTestimonial] = useState(0);
     const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
     const kostCarouselRef = useRef<HTMLDivElement>(null);
@@ -106,6 +107,12 @@ const HomePage: React.FC = () => {
     //   min_price?: number;
     //   max_price?: number;
     // }>({});
+
+    // useEffect(() => {
+    //   if (location.state?.openSubscription) {
+    //     setOpen(true)
+    //   }
+    // }, [location.state])
 
     // 🔹 Fetch data from API
       useEffect(() => {

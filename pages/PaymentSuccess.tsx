@@ -102,7 +102,7 @@ Nikmati semua akses tanpa hambatan mulai sekarang!</p>
         <div className="px-5 h-screen flex flex-col items-center justify-center mx-auto">
         <img src="/images/payment-success.png" alt="Payment Success" className="w-[300px] h-[300px]" />
         <h5 className="mt-3 font-bold text-[24px]">Pembayaran Pending ⏳</h5>
-        <p className="text-gray-500 mt-1 text-[14px]">Kami akan memproses pembayaran Anda</p>
+        <p className="text-gray-500 mt-1 text-[14px]">Segera lakukan pembayaran. Kami akan memproses pembayaran Anda</p>
         </div>
       
       </div>
@@ -118,6 +118,12 @@ Nikmati semua akses tanpa hambatan mulai sekarang!</p>
         <p className="mt-2 text-gray-600">
           Silakan coba kembali
         </p>
+        <button
+          onClick={() => navigate("/profile/upgrade")}
+          className="mt-4 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
+        >
+          Coba Lagi
+        </button>
       </div>
     </div>
   );

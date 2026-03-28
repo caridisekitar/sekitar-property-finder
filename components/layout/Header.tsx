@@ -58,6 +58,11 @@ const Header: React.FC = () => {
                       PREMIUM
                     </span>
                   )}
+                  {subscription?.plan === "PREMIUM_PLUS" && (
+                    <span className="-mt-2 text-xs font-bold text-white px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500">
+                      PREMIUM+
+                    </span>
+                  )}
                 </Link>
               ) : (
                   <div>

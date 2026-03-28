@@ -13,7 +13,8 @@ const ITEMS_PER_PAGE = 10;
 
 const CariKosPage: React.FC = () => {
   const { subscription } = useAuth();
-  const isPremium = subscription?.plan === "PREMIUM";
+  // const isPaidUser = subscription?.plan === "PREMIUM";
+  const isPaidUser = subscription?.plan !== "BASIC";
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -77,7 +78,7 @@ const CariKosPage: React.FC = () => {
       setLastPage(res.last_page);
       setTotal(res.total);
 
-      if (!isPremium) {
+      if (!isPaidUser) {
         const basic = await secureGet("/kost/basic");
         setKostBasic(basic.data);
       }
@@ -91,14 +92,14 @@ const CariKosPage: React.FC = () => {
 
   useEffect(() => {
     fetchKosts();
-  }, [searchParams, isPremium]);
+  }, [searchParams, isPaidUser]);
 
   /* ==============================
      VISIBLE + LOCKED LOGIC
   ============================== */
 
-  const visibleKosts = isPremium ? kosts : kostBasic;
-  const lockedKosts = isPremium ? [] : kosts.slice(kostBasic.length);
+  const visibleKosts = isPaidUser ? kosts : kostBasic;
+  const lockedKosts = isPaidUser ? [] : kosts.slice(kostBasic.length);
 
   /* ==============================
      HANDLE FILTER CHANGE
@@ -208,7 +209,7 @@ const CariKosPage: React.FC = () => {
       </div>
 
       {/* ================= PAGINATION ================= */}
-      {isPremium && lastPage > 1 && (
+      {isPaidUser && lastPage > 1 && (
         <div className="mt-10">
           <Pagination
             currentPage={filters.page}
@@ -219,7 +220,7 @@ const CariKosPage: React.FC = () => {
       )}
 
       {/* ================= LOCKED SECTION ================= */}
-      {!isPremium && lockedKosts.length > 0 && (
+      {!isPaidUser && lockedKosts.length > 0 && (
         <div className="relative mt-8">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 blur-md pointer-events-none">
             {lockedKosts.map((kost) => (

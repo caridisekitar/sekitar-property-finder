@@ -1,26 +1,35 @@
+import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { upgradeToPremium } from "@/lib/upgradeSubscription";
 import { useAuth } from "@/hooks/useAuth";
+import { PLAN_CONFIG } from "@/constants/plans";
+import { securePost } from '@/lib/securePost';
 
 type SubscriptionModalProps = {
   open: boolean;
   onClose: () => void;
 };
 
-type TargetPlan = "basic" | "premium";
+type TargetPlan = "BASIC" | "PREMIUM" | "PREMIUM_PLUS";
 
 export default function SubscriptionModal({
   open,
   onClose,
 }: SubscriptionModalProps) {
+  const location = useLocation();
   const { user, subscription } = useAuth();
   const plan = subscription?.plan; // BASIC | PREMIUM | undefined
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const isBasicActive = plan === "BASIC";
   const isPremiumActive = plan === "PREMIUM";
+  const isPremiumPlusActive = plan === "PREMIUM_PLUS";
   const isVisitor = !user;
+  const isSubscriptionEmpty = !subscription;
+  const premium = PLAN_CONFIG.PREMIUM;
+  const premiumPlus = PLAN_CONFIG.PREMIUM_PLUS;
+  const [hasTriggered, setHasTriggered] = useState(false);
 
 
   /* ===============================
@@ -33,48 +42,86 @@ export default function SubscriptionModal({
     };
   }, [open]);
 
+  useEffect(() => {
+    if (
+      user &&
+      location.state?.openSubscription &&
+      location.state?.targetPlan &&
+      !loading &&
+      !hasTriggered
+    ) {
+      setHasTriggered(true)
+      handleSubscribe(location.state.targetPlan)
+
+      // clear state
+      navigate(location.pathname, { replace: true })
+    }
+  }, [user, location.state])
+
   /* ===============================
      SUBSCRIBE / UPGRADE HANDLER
   =============================== */
   const handleSubscribe = async (targetPlan: TargetPlan) => {
-    /* ===============================
-     * VISITOR (NOT LOGIN)
-     * =============================== */
     if (!user) {
-      navigate("/login", {
+      localStorage.setItem(
+        "postLoginAction",
+        JSON.stringify({
+          type: "SUBSCRIBE",
+          payload: { plan: targetPlan },
+        })
+      );
+
+      // navigate("/login");
+      navigate("/register", {
         state: { redirect: "subscribe", targetPlan },
       });
       return;
     }
 
-    /* ===============================
-     * ALREADY PREMIUM
-     * =============================== */
-    if (plan === "PREMIUM") {
-      alert("Akun kamu sudah Premium");
-      return;
-    }
+    if (loading) return;
 
-    /* ===============================
-     * BASIC → PREMIUM
-     * =============================== */
-    if (plan === "BASIC" && targetPlan === "premium") {
-      try {
-        await upgradeToPremium({
-          user,
-          onLoading: setLoading,
-        });
-      } catch (err: any) {
-        alert(err?.message || "Gagal memproses pembayaran");
-      }
-      return;
-    }
-
-    /* ===============================
-     * BASIC → BASIC (NO-OP)
-     * =============================== */
-    if (plan === "BASIC" && targetPlan === "basic") {
+    // BASIC → no payment
+    if (targetPlan === "BASIC") {
       alert("Akun kamu sudah Basic");
+      return;
+    }
+
+    // prevent same plan
+    if (plan === targetPlan) {
+      alert(`Akun kamu sudah ${targetPlan}`);
+      return;
+    }
+
+    // prevent downgrade
+    if (plan === "PREMIUM_PLUS" && targetPlan === "PREMIUM") {
+      alert("Tidak bisa downgrade dari Premium+");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const selected = PLAN_CONFIG[targetPlan];
+      const selectedLocations = location.state?.locations || [];
+
+      const res = await securePost("/duitku/create", "POST", {
+        amount: selected.amount,
+        product_name: selected.product_name,
+        plan: targetPlan,
+        user_id: user.id,
+        email: user.email,
+        phone: user.phone,
+        name: user.name,
+        locations: selectedLocations,
+      });
+
+      if (res.paymentUrl) {
+        window.location.href = res.paymentUrl;
+      }
+    } catch (err: any) {
+      alert(err?.message || "Gagal memproses pembayaran");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -134,7 +181,7 @@ export default function SubscriptionModal({
             </div>
 
             <button
-              onClick={() => handleSubscribe("basic")}
+              onClick={() => handleSubscribe("BASIC")}
               disabled={isBasicActive || isPremiumActive}
               className={`mt-8 w-full py-3 rounded-xl font-semibold transition
                 ${
@@ -163,7 +210,7 @@ export default function SubscriptionModal({
                 </div>
                 <div>
                   <p className="font-semibold">Premium</p>
-                  <p className="text-sm text-gray-400">Unlimited</p>
+                  <p className="text-sm text-gray-400">Unlimited for 1 Location</p>
                 </div>
               </div>
 
@@ -177,7 +224,7 @@ export default function SubscriptionModal({
               </div>
 
               <h2 className="text-4xl font-bold mt-2">
-                Rp99.000{" "}
+                Rp{premium.amount.toLocaleString("id-ID")}{" "}
                 <span className="text-sm font-normal text-gray-500">
                   per tahun
                 </span>
@@ -192,6 +239,25 @@ export default function SubscriptionModal({
             </div>
 
             <button
+              onClick={() => handleSubscribe("PREMIUM")}
+              disabled={loading || isPremiumActive || isPremiumPlusActive}
+              className={`mt-8 w-full py-3 rounded-xl font-semibold transition
+                ${
+                  loading || isPremiumActive
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-blue-400 text-white hover:bg-blue-500"
+                }`}
+            >
+              {loading
+                ? "Mengalihkan ke pembayaran..."
+                : isPremiumActive
+                ? "Paket Aktif"
+                : isSubscriptionEmpty
+                ? "Mulai Berlangganan"
+                : "Upgrade ke Premium"}
+            </button>
+
+            {/* <button
               onClick={() => handleSubscribe("premium")}
               disabled={loading || isPremiumActive}
               className={`mt-8 w-full py-3 rounded-xl font-semibold transition
@@ -206,11 +272,11 @@ export default function SubscriptionModal({
                 : isPremiumActive
                 ? "Paket Aktif"
                 : "Upgrade ke Premium"}
-            </button>
+            </button> */}
           </div>
 
 
-          {/* ================= PREMIUM ================= */}
+          {/* ================= PREMIUM PLUS ================= */}
           <div className="relative border rounded-2xl p-8 shadow-lg flex flex-col justify-between order-1 lg:order-2">
             {/* Badge */}
             {/* <span className="absolute -top-4 right-4 bg-black text-white text-xs px-3 py-1 rounded-full">
@@ -224,7 +290,7 @@ export default function SubscriptionModal({
                 </div>
                 <div>
                   <p className="font-semibold">Premium+</p>
-                  <p className="text-sm text-gray-400">Unlimited</p>
+                  <p className="text-sm text-gray-400">Unlimited for 3 Locations</p>
                 </div>
               </div>
 
@@ -238,7 +304,7 @@ export default function SubscriptionModal({
               </div>
 
               <h2 className="text-4xl font-bold mt-2">
-                Rp199.000{" "}
+                Rp{premiumPlus.amount.toLocaleString("id-ID")}{" "}
                 <span className="text-sm font-normal text-gray-500">
                   per tahun
                 </span>
@@ -252,21 +318,26 @@ export default function SubscriptionModal({
             </div>
 
             <button
-              onClick={() => handleSubscribe("premium")}
-              disabled={loading || isPremiumActive}
+              onClick={() => handleSubscribe("PREMIUM_PLUS")}
+              disabled={loading || isPremiumPlusActive}
               className={`mt-8 w-full py-3 rounded-xl font-semibold transition
                 ${
-                  loading || isPremiumActive
+                  loading || isPremiumPlusActive
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                     : "bg-[#96C8E2] text-white hover:bg-blue-500"
                 }`}
             >
               {loading
                 ? "Mengalihkan ke pembayaran..."
-                : isPremiumActive
+                : isPremiumPlusActive
                 ? "Paket Aktif"
+                : isPremiumActive
+                ? "Upgrade ke Premium+"
+                : isSubscriptionEmpty
+                ? "Mulai Berlangganan"
                 : "Upgrade ke Premium+"}
             </button>
+
           </div>
 
 
