@@ -137,6 +137,11 @@ export default function SubscriptionsPage() {
           }
         };
 
+      const onlyExpiredOrder =
+          invoices.orders.length > 0 &&
+          invoices.orders.every((o) => o.status === "EXPIRED") &&
+          invoices.orders.length === 1;
+
 
 
   return (
@@ -199,7 +204,7 @@ export default function SubscriptionsPage() {
             </h2>
           </div>
 
-          {subscription?.plan === "BASIC" && invoices.orders.length === 0 && (
+          {subscription?.plan === "BASIC" && invoices.orders.length === 0 || onlyExpiredOrder && (
             <div>
               <div className="flex justify-center mb-6">
                 <img
@@ -281,10 +286,10 @@ export default function SubscriptionsPage() {
 
                               {order.status === "PAID" && (
                                 <button
-                                  onClick={() => downloadInvoice(order.id)}
+                                  onClick={() => '#'}
                                   className="text-blue-600 hover:underline"
                                 >
-                                  Download invoice
+                                  Download invoice (Segera hadir)
                                 </button>
                               )}
 

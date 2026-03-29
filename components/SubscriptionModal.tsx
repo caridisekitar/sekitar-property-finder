@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { upgradeToPremium } from "@/lib/upgradeSubscription";
 import { useAuth } from "@/hooks/useAuth";
-import { PLAN_CONFIG } from "@/constants/plans";
+import { usePlans } from "@/hooks/usePlans"
 import { securePost } from '@/lib/securePost';
 
 type SubscriptionModalProps = {
@@ -19,6 +19,8 @@ export default function SubscriptionModal({
 }: SubscriptionModalProps) {
   const location = useLocation();
   const { user, subscription } = useAuth();
+  const { plans } = usePlans()
+
   const plan = subscription?.plan; // BASIC | PREMIUM | undefined
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -27,8 +29,6 @@ export default function SubscriptionModal({
   const isPremiumPlusActive = plan === "PREMIUM_PLUS";
   const isVisitor = !user;
   const isSubscriptionEmpty = !subscription;
-  const premium = PLAN_CONFIG.PREMIUM;
-  const premiumPlus = PLAN_CONFIG.PREMIUM_PLUS;
   const [hasTriggered, setHasTriggered] = useState(false);
 
 
@@ -45,6 +45,7 @@ export default function SubscriptionModal({
   useEffect(() => {
     if (
       user &&
+      plans && 
       location.state?.openSubscription &&
       location.state?.targetPlan &&
       !loading &&
@@ -56,7 +57,7 @@ export default function SubscriptionModal({
       // clear state
       navigate(location.pathname, { replace: true })
     }
-  }, [user, location.state])
+  }, [user, plans, location.state]);
 
   /* ===============================
      SUBSCRIBE / UPGRADE HANDLER
@@ -101,13 +102,14 @@ export default function SubscriptionModal({
     try {
       setLoading(true);
 
-      const selected = PLAN_CONFIG[targetPlan];
+      const selected = plans[targetPlan]
       const selectedLocations = location.state?.locations || [];
 
       const res = await securePost("/duitku/create", "POST", {
         amount: selected.amount,
         product_name: selected.product_name,
-        plan: targetPlan,
+        plan: selected.name,
+        plan_id: selected.id,
         user_id: user.id,
         email: user.email,
         phone: user.phone,
@@ -125,7 +127,10 @@ export default function SubscriptionModal({
     }
   };
 
-  if (!open) return null;
+  if (!open || !plans) return null;
+
+  const premium = plans.PREMIUM
+  const premiumPlus = plans.PREMIUM_PLUS
 
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto">

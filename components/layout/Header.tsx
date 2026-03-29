@@ -107,11 +107,11 @@ useEffect(() => {
               <div className="flex items-center justify-between gap-3 py-2 text-sm sm:text-base">
 
                 {/* TEXT */}
-                <p className="flex-1 text-center md:text-left font-medium">
+                <p className="flex-1 text-center md:text-left text-sm">
                   Anda belum menyelesaikan pembayaran. Lakukan Pembayaran dan Nikmati Fitur Premium Sekarang!
                   <Link
                     to="/profile/subscriptions"
-                    className="bg-white text-indigo-600 ml-2 px-3 py-1.5 rounded-md font-semibold text-xs sm:text-sm hover:bg-gray-100 transition"
+                    className="bg-white text-indigo-600 ml-2 px-3 py-1 rounded-md font-semibold text-xs sm:text-sm hover:bg-gray-100 transition"
                   >
                     Bayar Sekarang
                   </Link>

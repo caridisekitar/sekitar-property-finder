@@ -19,7 +19,7 @@ const locations: Location[] = [
   { id: "jogja", name: "Jogja", color: "bg-green-500", icon: "🏘️", image: "/images/jogja.jpg" },
   { id: "malang", name: "Malang", color: "bg-red-400", icon: "🌴", image: "/images/malang.jpg" },
   { id: "depok", name: "Depok", color: "bg-purple-400", icon: "🌉", image: "/images/depok.jpg" },
-  { id: "bogor", name: "Bogor", color: "bg-pink-300", icon: "🏖️", image: "/images/bogor.jpg" },
+  { id: "bandung", name: "Bandung", color: "bg-pink-300", icon: "🏖️", image: "/images/bogor.jpg" },
 ]
 
 const PLAN_LIMIT: Record<Plan, number> = {

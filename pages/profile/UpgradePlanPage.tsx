@@ -6,7 +6,10 @@ import { secureGet } from '@/lib/secureGet';
 import { securePost } from '@/lib/securePost';
 import { useAuth } from '@/hooks/useAuth';
 import LoadingOverlay from "@/components/LoadingOverlay";
-import { PLAN_CONFIG, PlanType } from "@/constants/plans";
+//import { PLAN_CONFIG, PlanType } from "@/constants/plans"; // will removed --- IGNORE ---
+import { usePlans } from "@/hooks/usePlans";
+
+type PlanType = "BASIC" | "PREMIUM" | "PREMIUM_PLUS";
 
 export default function UpgradePlanPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,6 +17,8 @@ export default function UpgradePlanPage() {
     const token = localStorage.getItem('token');
     const [loading, setLoading] = useState(true);
     const { subscription } = useAuth();
+    
+    const { plans, loading: plansLoading } = usePlans();
   
     useEffect(() => {
         if (!token) {
@@ -42,9 +47,9 @@ export default function UpgradePlanPage() {
         fetchProfile();
       }, [token, navigate]);
   
-      if (loading) return <LoadingOverlay message="Memuat ..." />;
+      if (loading || plansLoading) return <LoadingOverlay message="Memuat ..." />;
   
-      if (!user) return null;
+      if (!user || !plans) return null;
 
     const handleUpgrade = async (plan: PlanType) => {
       if (!user || loading) return; // ✅ prevent double hit
@@ -52,7 +57,7 @@ export default function UpgradePlanPage() {
       try {
         setLoading(true);
 
-        const selectedPlan = PLAN_CONFIG[plan];
+        const selectedPlan = plans[plan];
 
         const res = await securePost(
           "/duitku/create",
@@ -60,7 +65,8 @@ export default function UpgradePlanPage() {
           {
             amount: selectedPlan.amount,
             product_name: selectedPlan.product_name,
-            plan, // 🔥 important for backend
+            plan: selectedPlan.name,
+            plan_id: selectedPlan.id,
             user_id: user.user.id,
             email: user.user.email,
             phone: user.user.phone,
@@ -133,7 +139,9 @@ export default function UpgradePlanPage() {
                     </div>
                     <div className="text-left">
                         <p className="font-semibold text-gray-900">Premium</p>
-                        <p className="text-sm text-gray-400">Unlimited for 1 Location</p>
+                        <p className="text-sm text-gray-400">
+                          Unlimited for {plans.PREMIUM.max_locations} Location
+                        </p>
                     </div>
                     </div>
 
@@ -142,7 +150,9 @@ export default function UpgradePlanPage() {
                         Promo 🎉
                     </span>
                     <div className="flex items-end gap-2 mb-2">
-                    <h2 className="text-4xl font-bold">Rp99.000</h2>
+                    <h2 className="text-4xl font-bold">
+                      Rp{plans.PREMIUM.amount.toLocaleString("id-ID")}
+                    </h2>
                     <span className="text-gray-500 mb-1 text-xs lg:text-[10px]">per tahun</span>
                     
                     </div>
@@ -196,7 +206,9 @@ export default function UpgradePlanPage() {
                     </div>
                     <div className="text-left">
                         <p className="font-semibold text-gray-900">Premium Plus</p>
-                        <p className="text-sm text-gray-400">Unlimited for 3 Locations</p>
+                        <p className="text-sm text-gray-400">
+                          Unlimited for {plans.PREMIUM_PLUS.max_locations} Locations
+                        </p>
                     </div>
                     </div>
 
@@ -205,7 +217,9 @@ export default function UpgradePlanPage() {
                         Promo 🎉
                     </span>
                     <div className="flex items-end gap-2 mb-2">
-                    <h2 className="text-4xl font-bold">Rp199.000</h2>
+                    <h2 className="text-4xl font-bold">
+                      Rp{plans.PREMIUM_PLUS.amount.toLocaleString("id-ID")}
+                    </h2>
                     <span className="text-gray-500 mb-1 text-xs lg:text-[10px]">per tahun</span>
                     
                     </div>

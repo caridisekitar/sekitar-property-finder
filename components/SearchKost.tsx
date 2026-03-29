@@ -6,6 +6,12 @@ import SingleSelectDropdown from "./SingleSelectDropdown";
 import { useAuth } from "@/hooks/useAuth";
 import LockedOverlay from "./LockedOverlay";
 import SubscriptionModal from "@/components/SubscriptionModal";
+import { secureGet } from '@/lib/secureGet';
+
+type LocationOption = {
+  label: string
+  value: string
+}
 
 interface SearchKostProps {
   setIsFilterMenuOpen: (value: boolean) => void;
@@ -36,6 +42,7 @@ const SearchKost: React.FC<SearchKostProps> = ({
   const { subscription } = useAuth();
 
   const [lokasi, setLokasi] = useState<string[]>([]);
+  const [lokasiOptions, setLokasiOptions] = useState<LocationOption[]>([])
   const [tipe, setTipe] = useState<string[]>([]);
   const [keyword, setKeyword] = useState("");
   const [priceRange, setPriceRange] = useState<string | null>(null);
@@ -127,14 +134,37 @@ const SearchKost: React.FC<SearchKostProps> = ({
      OPTIONS
   ============================== */
 
-  const lokasiOptions = [
-    { label: "Jakarta Selatan", value: "Jakarta Selatan" },
-    { label: "Jakarta Pusat", value: "Jakarta Pusat" },
-    { label: "Jakarta Barat", value: "Jakarta Barat" },
-    { label: "Jakarta Timur", value: "Jakarta Timur" },
-    { label: "Jakarta Utara", value: "Jakarta Utara" },
-    { label: "Tangerang", value: "Tangerang" },
-  ];
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+
+        const res = await secureGet("/locations")
+
+        // 🔥 map response to select format
+        const mapped = res.data.map((item: any) => ({
+          label: item.name,
+          value: item.name,
+        }))
+
+        setLokasiOptions(mapped)
+
+      } catch (err) {
+        console.error("Failed to fetch locations", err)
+      } finally {
+        // setLoading(false)
+      }
+    }
+
+    fetchLocations()
+  }, [])
+  // const lokasiOptions = [
+  //   { label: "Jakarta Selatan", value: "Jakarta Selatan" },
+  //   { label: "Jakarta Pusat", value: "Jakarta Pusat" },
+  //   { label: "Jakarta Barat", value: "Jakarta Barat" },
+  //   { label: "Jakarta Timur", value: "Jakarta Timur" },
+  //   { label: "Jakarta Utara", value: "Jakarta Utara" },
+  //   { label: "Tangerang", value: "Tangerang" },
+  // ];
 
   const tipeOptions = [
     { label: "Kos Putri", value: "Putri" },
