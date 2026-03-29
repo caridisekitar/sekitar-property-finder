@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SidebarMenu from '@/components/profile/SidebarMenu';
 import { User } from '@/types';
 import { secureGet } from '@/lib/secureGet';
+import { securePost } from '@/lib/securePost';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDateID } from "@/lib/date";
 import LoadingOverlay from "@/components/LoadingOverlay";
@@ -56,9 +57,18 @@ export default function SubscriptionsPage() {
       orders: [],
     });
 
-    const downloadInvoice = async (invoiceId: number) => {
-      const res = await secureGet(`/invoices/${invoiceId}/${user.id}/signed-url`);
-      window.open(res.url, "_blank");
+    const downloadInvoice = async (orderId: number) => {
+      try {
+        const res = await secureGet(
+          `/invoices/${orderId}/${user?.id}/signed-url`
+        );
+
+        if (res.url) {
+          window.open(res.url, "_blank", "noopener,noreferrer");
+        }
+      } catch (err) {
+        console.error("Failed to open invoice", err);
+      }
     };
 
     const getPaymentLabel = (code) =>
@@ -109,6 +119,24 @@ export default function SubscriptionsPage() {
       if (loading) return <LoadingOverlay message="Memuat data Langgananmu..." />;
   
       if (!user) return null;
+
+      const handlePendingPayment = async (orderId: number) => {
+
+          try {
+            const res = await securePost("/payment/repayment", "POST", {
+              order_id: orderId
+            });
+
+            if (!res?.paymentUrl) {
+                throw new Error("Payment URL tidak tersedia");
+              }
+
+              window.location.href = res.paymentUrl;
+          } catch (err) {
+            console.error(err);
+          }
+        };
+
 
 
   return (
@@ -171,7 +199,7 @@ export default function SubscriptionsPage() {
             </h2>
           </div>
 
-          {subscription?.plan === "BASIC" && (
+          {subscription?.plan === "BASIC" && invoices.orders.length === 0 && (
             <div>
               <div className="flex justify-center mb-6">
                 <img
@@ -242,12 +270,34 @@ export default function SubscriptionsPage() {
                             )}
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <button
-                              onClick={() => downloadInvoice(order.id)}
-                              className="text-blue-600 hover:underline"
-                            >
-                              Download invoice
-                            </button>
+                            {order.status === "PENDING" && (
+                                <button
+                                  onClick={() => handlePendingPayment(order.id)}
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Bayar
+                                </button>
+                              )}
+
+                              {order.status === "PAID" && (
+                                <button
+                                  onClick={() => downloadInvoice(order.id)}
+                                  className="text-blue-600 hover:underline"
+                                >
+                                  Download invoice
+                                </button>
+                              )}
+
+                              {(order.status === "EXPIRED" || order.status === "FAILED") && (
+                                <p>-</p>
+                                // <button
+                                //   onClick={() => handlePendingPayment(order.id)}
+                                //   className="text-red-600 hover:underline"
+                                // >
+                                //   Bayar ulang
+                                // </button>
+                              )}
+                            
                           </td>
                         </tr>
                       ))}
