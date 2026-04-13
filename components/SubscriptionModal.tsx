@@ -5,6 +5,7 @@ import { upgradeToPremium } from "@/lib/upgradeSubscription";
 import { useAuth } from "@/hooks/useAuth";
 import { usePlans } from "@/hooks/usePlans"
 import { securePost } from '@/lib/securePost';
+import LocationSelectModal from "@/components/LocationSelectModal";
 
 type SubscriptionModalProps = {
   open: boolean;
@@ -23,6 +24,8 @@ export default function SubscriptionModal({
 
   const plan = subscription?.plan; // BASIC | PREMIUM | undefined
   const [loading, setLoading] = useState(false);
+  const [pendingPlan, setPendingPlan] = useState<TargetPlan | null>(null);
+  const [locationSelectOpen, setLocationSelectOpen] = useState(false);
   const navigate = useNavigate();
   const isBasicActive = plan === "BASIC";
   const isPremiumActive = plan === "PREMIUM";
@@ -45,17 +48,26 @@ export default function SubscriptionModal({
   useEffect(() => {
     if (
       user &&
-      plans && 
+      plans &&
       location.state?.openSubscription &&
       location.state?.targetPlan &&
       !loading &&
       !hasTriggered
     ) {
       setHasTriggered(true)
-      handleSubscribe(location.state.targetPlan)
+      const targetPlan = location.state.targetPlan as TargetPlan
+      const preSelectedLocations: { id: string }[] | undefined = location.state.locations
 
-      // clear state
+      // clear state first
       navigate(location.pathname, { replace: true })
+
+      if (preSelectedLocations && preSelectedLocations.length > 0) {
+        // RegisterPage already collected locations → go straight to payment
+        proceedWithPayment(targetPlan, preSelectedLocations.map((l) => l.id))
+      } else {
+        // LoginPage flow → open LocationSelectModal via handleSubscribe
+        handleSubscribe(targetPlan)
+      }
     }
   }, [user, plans, location.state]);
 
@@ -68,11 +80,10 @@ export default function SubscriptionModal({
         "postLoginAction",
         JSON.stringify({
           type: "SUBSCRIBE",
-          payload: { plan: targetPlan },
+          payload: { plan: targetPlan, plan_id: plans?.[targetPlan]?.id ?? null },
         })
       );
 
-      // navigate("/login");
       navigate("/register", {
         state: { redirect: "subscribe", targetPlan },
       });
@@ -81,9 +92,9 @@ export default function SubscriptionModal({
 
     if (loading) return;
 
-    // BASIC → no payment
+    // BASIC → no payment needed, just close
     if (targetPlan === "BASIC") {
-      alert("Akun kamu sudah Basic");
+      onClose();
       return;
     }
 
@@ -99,11 +110,17 @@ export default function SubscriptionModal({
       return;
     }
 
+    // Show location selection before proceeding to payment
+    setPendingPlan(targetPlan);
+    setLocationSelectOpen(true);
+  };
+
+  const proceedWithPayment = async (targetPlan: TargetPlan, selectedLocations: string[]) => {
+    if (!user || !plans) return;
     try {
       setLoading(true);
 
-      const selected = plans[targetPlan]
-      const selectedLocations = location.state?.locations || [];
+      const selected = plans[targetPlan];
 
       const res = await securePost("/duitku/create", "POST", {
         amount: selected.amount,
@@ -115,15 +132,25 @@ export default function SubscriptionModal({
         phone: user.phone,
         name: user.name,
         locations: selectedLocations,
+        is_upgrade: plan === "PREMIUM" && targetPlan === "PREMIUM_PLUS",
       });
 
       if (res.paymentUrl) {
         window.location.href = res.paymentUrl;
+      } else {
+        alert("Gagal mendapatkan link pembayaran. Silakan coba lagi.");
       }
     } catch (err: any) {
       alert(err?.message || "Gagal memproses pembayaran");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLocationSubmit = (locations: { id: string; name: string; [key: string]: any }[]) => {
+    setLocationSelectOpen(false);
+    if (pendingPlan) {
+      proceedWithPayment(pendingPlan, locations.map((l) => l.slug));
     }
   };
 
@@ -348,6 +375,18 @@ export default function SubscriptionModal({
 
         </div>
       </div>
+
+      <LocationSelectModal
+        isOpen={locationSelectOpen}
+        plan={pendingPlan ?? "BASIC"}
+        onClose={() => setLocationSelectOpen(false)}
+        onSubmit={handleLocationSubmit}
+        lockedSlugs={
+          pendingPlan === "PREMIUM_PLUS" && plan === "PREMIUM"
+            ? (subscription?.locations ?? [])
+            : []
+        }
+      />
     </div>
   );
 }

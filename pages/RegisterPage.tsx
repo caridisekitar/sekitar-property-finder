@@ -9,8 +9,10 @@ import LocationSelectModal from "@/components/LocationSelectModal"
 
 type Plan = "BASIC" | "PREMIUM" | "PREMIUM_PLUS"
 
+// Added slug — required by backend, used for location guard and subscription_locations
 type Location = {
   id: string
+  slug: string
   name: string
   image: string
 }
@@ -20,6 +22,7 @@ export default function Register() {
 
   const [open, setOpen] = useState(false)
   const [plan, setPlan] = useState<Plan>("BASIC")
+  const [planId, setPlanId] = useState<number | null>(null)
   const [locations, setLocations] = useState<Location[]>([])
 
   const [name, setName] = useState("")
@@ -42,12 +45,13 @@ export default function Register() {
       return
     }
 
-    const subs = JSON.parse(localStorage.getItem("postLoginAction") || "null")
-    const detectedPlan: Plan = subs?.payload?.plan || "BASIC"
+    const action = JSON.parse(localStorage.getItem("postLoginAction") || "null")
+    const detectedPlan: Plan = action?.payload?.plan || "BASIC"
+    const detectedPlanId: number | null = action?.payload?.plan_id || null
 
     setPlan(detectedPlan)
+    setPlanId(detectedPlanId)
 
-    // ✅ show modal first if not BASIC
     if (detectedPlan !== "BASIC") {
       setOpen(true)
     }
@@ -89,15 +93,12 @@ export default function Register() {
           email,
           phone,
           password,
-
-          // 🔥 OPTIONAL: send locations to backend
-          locations,
-          plan: 'BASIC', // always register as BASIC, upgrade happens after,
-          plan_id: 1, // always register as BASIC, upgrade happens after,
+          // null for BASIC — backend treats missing plan_id as BASIC
+          plan_id: planId ?? undefined,
+          // backend expects slugs only — modal uses `id` as slug
+          locations: locations.map((l) => l.slug),
         },
-        {
-          "X-Device-Id": deviceId,
-        }
+        { "X-Device-Id": deviceId }
       )
 
       if (!res.success) {
@@ -105,34 +106,44 @@ export default function Register() {
         return
       }
 
-      // ✅ save auth
+      // Save auth context
       localStorage.setItem("token", res.data.token)
       localStorage.setItem("user", JSON.stringify(res.data.user))
+      localStorage.removeItem("postLoginAction")
 
-      // ===============================
-      // 🔥 REDIRECT AFTER REGISTER
-      // ===============================
-      const actionRaw = localStorage.getItem("postLoginAction")
+      /* ===============================
+         ROUTING AFTER REGISTER
+         Backend tells us what to do next via next_step.
+         "payment" → call Duitku immediately with payment_context
+         "home"    → BASIC, subscription already active
+      =============================== */
+      if (res.data.next_step === "payment" && res.data.payment_context) {
+        const ctx = res.data.payment_context
 
-      if (actionRaw) {
-        const action = JSON.parse(actionRaw)
+        const paymentRes = await securePost(
+          "/duitku/create",
+          "POST",
+          {
+            plan_id:      ctx.plan_id,
+            amount:       ctx.amount,
+            product_name: ctx.product_name,
+            email:        email,
+            locations:    ctx.locations, // already slugs, echoed back from register
+          },
+          { "X-Device-Id": deviceId }
+        )
 
-        localStorage.removeItem("postLoginAction")
-
-        if (action.type === "SUBSCRIBE") {
-          navigate("/", {
-            state: {
-              openSubscription: true,
-              targetPlan: action.payload.plan,
-              locations, // optional (powerful)
-            },
-            replace: true,
-          })
+        if (!paymentRes.success || !paymentRes.paymentUrl) {
+          setError("Gagal membuat invoice pembayaran. Silakan coba lagi.")
           return
         }
+
+        // Hard redirect — leaves the app, goes to Duitku payment page
+        window.location.href = paymentRes.paymentUrl
+        return
       }
 
-      // fallback (normal register)
+      // BASIC or fallback
       navigate("/", { replace: true })
 
     } catch (err: any) {
@@ -144,15 +155,14 @@ export default function Register() {
 
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-gray-50">
-      
-      {/* ✅ LOCATION MODAL */}
+
+      {/* LOCATION MODAL */}
       <LocationSelectModal
         isOpen={open}
         plan={plan}
         onClose={() => setOpen(false)}
-        onSubmit={(selectedLocations) => {
+        onSubmit={(selectedLocations: Location[]) => {
           setLocations(selectedLocations)
-          sessionStorage.setItem("locations", JSON.stringify(selectedLocations))
           setOpen(false)
         }}
       />
@@ -185,14 +195,32 @@ export default function Register() {
             </p>
           </div>
 
-          {/* ✅ BLOCK FORM IF MODAL NOT DONE */}
-          {(plan === "BASIC" || locations.length > 0) && (
+          {/* Block form until location is picked (non-BASIC plans) */}
+          {(plan === "BASIC" || locations.length > 0) ? (
             <form className="space-y-5" onSubmit={handleSubmit}>
 
               <Input label="Nama Lengkap" icon={<User size={18} />} value={name} onChange={setName} placeholder="Masukkan nama lengkap kamu" />
               <Input label="Email" icon={<Mail size={18} />} value={email} onChange={setEmail} placeholder="Masukkan email kamu" type="email" />
               <Input label="Nomor Telepon" icon={<Phone size={18} />} value={phone} onChange={setPhone} placeholder="08xxxxxxxxx" type="tel" />
               <Input label="Password" icon={<Lock size={18} />} value={password} onChange={setPassword} placeholder="Minimal 8 karakter" type="password" />
+
+              {/* Show selected locations as confirmation for paid plans */}
+              {locations.length > 0 && (
+                <div className="text-xs text-gray-500">
+                  Lokasi dipilih:{" "}
+                  <span className="font-medium text-gray-700">
+                    {locations.map((l) => l.name).join(", ")}
+                  </span>
+                  {" · "}
+                  <button
+                    type="button"
+                    className="text-blue-500 underline"
+                    onClick={() => setOpen(true)}
+                  >
+                    Ubah
+                  </button>
+                </div>
+              )}
 
               {error && <div className="text-sm text-red-500">{error}</div>}
 
@@ -205,14 +233,21 @@ export default function Register() {
               >
                 {loading ? "Mendaftar..." : "Daftar"}
               </button>
-            </form>
-          )}
 
-          {/* UX hint */}
-          {plan !== "BASIC" && locations.length === 0 && (
+            </form>
+          ) : (
+            <div className="space-y-3">
               <p className="text-sm text-gray-500">
-                Silakan pilih lokasi terlebih dahulu
+                Pilih lokasi terlebih dahulu untuk melanjutkan pendaftaran.
               </p>
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="w-full py-3 rounded-lg border border-gray-900 text-gray-900 text-sm font-medium hover:bg-gray-50"
+              >
+                Pilih Lokasi
+              </button>
+            </div>
           )}
 
           <p className="text-sm text-gray-600">
@@ -237,23 +272,14 @@ export default function Register() {
 /* ===============================
    INPUT COMPONENT
 =============================== */
-function Input({
-  label,
-  icon,
-  value,
-  onChange,
-  placeholder,
-  type = "text",
-}: any) {
+function Input({ label, icon, value, onChange, placeholder, type = "text" }: any) {
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
-
       <div className="flex items-center gap-2 border rounded-md px-3 py-2 bg-white">
         <span className="text-gray-400">{icon}</span>
-
         <input
           type={type}
           value={value}

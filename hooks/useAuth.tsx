@@ -1,10 +1,20 @@
 import { useEffect, useState } from "react";
 import { secureGet } from "@/lib/secureGet";
 
+type PendingPayment = {
+  order_id: number;
+  amount: number;
+  product_name: string;
+  locations: string[];
+  created_at: string;
+};
+
 type Subscription = {
-  plan: "BASIC" | "PREMIUM";
+  plan: "BASIC" | "PREMIUM" | "PREMIUM_PLUS";
   ends_at: string;
   is_active: number;
+  locations: string[];          // slugs e.g. ["jogja"]
+  pending_payment: PendingPayment | null;
 };
 
 type User = {

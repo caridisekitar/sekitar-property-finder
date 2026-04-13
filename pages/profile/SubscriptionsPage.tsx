@@ -56,6 +56,8 @@ export default function SubscriptionsPage() {
     }>({
       orders: [],
     });
+    const [repayingId, setRepayingId] = useState<number | null>(null);
+    const [repayError, setRepayError] = useState<string>("");
 
     const downloadInvoice = async (orderId: number) => {
       try {
@@ -102,11 +104,12 @@ export default function SubscriptionsPage() {
       const fetchInvoices = async () => {
         try {
           const res = await secureGet(`/invoices/listing/${user.id}`);
+          console.log("[invoices raw]", res);
           setInvoices({
               orders: Array.isArray(res.invoices?.orders)
                 ? res.invoices.orders
                 : [],
-              subscription: res.invoices?.subscription,
+              subscription: res.invoices?.subscriptions?.[0] ?? null,
             });
         } catch (err) {
           console.error("Failed to fetch invoices", err);
@@ -121,19 +124,22 @@ export default function SubscriptionsPage() {
       if (!user) return null;
 
       const handlePendingPayment = async (orderId: number) => {
-
+          setRepayError("");
+          setRepayingId(orderId);
           try {
             const res = await securePost("/payment/repayment", "POST", {
               order_id: orderId
             });
 
             if (!res?.paymentUrl) {
-                throw new Error("Payment URL tidak tersedia");
-              }
+              throw new Error("Payment URL tidak tersedia");
+            }
 
-              window.location.href = res.paymentUrl;
-          } catch (err) {
-            console.error(err);
+            window.location.href = res.paymentUrl;
+          } catch (err: any) {
+            setRepayError(err?.message || "Gagal memproses pembayaran, coba lagi.");
+          } finally {
+            setRepayingId(null);
           }
         };
 
@@ -198,9 +204,35 @@ export default function SubscriptionsPage() {
           </div>
 
 
+          {/* ── PENDING PAYMENT BANNER ── */}
+          {subscription?.pending_payment && (
+            <div className="rounded-2xl border border-yellow-300 bg-yellow-50 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p className="font-semibold text-yellow-800">Pembayaran menunggu konfirmasi</p>
+                <p className="text-sm text-yellow-700 mt-0.5">
+                  {subscription.pending_payment.product_name} &middot; Rp{subscription.pending_payment.amount.toLocaleString("id-ID")}
+                </p>
+                <p className="text-xs text-yellow-600 mt-1">
+                  Link pembayaran berlaku 60 menit sejak order dibuat.
+                </p>
+              </div>
+              <button
+                onClick={() => handlePendingPayment(subscription.pending_payment!.order_id)}
+                disabled={repayingId === subscription.pending_payment.order_id}
+                className={`shrink-0 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition
+                  ${repayingId === subscription.pending_payment.order_id
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-yellow-500 hover:bg-yellow-600"
+                  }`}
+              >
+                {repayingId === subscription.pending_payment.order_id ? "Mengalihkan..." : "Lanjut Bayar"}
+              </button>
+            </div>
+          )}
+
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
-              Riwayat Langganan 
+              Riwayat Langganan
             </h2>
           </div>
 
@@ -227,6 +259,12 @@ export default function SubscriptionsPage() {
             </div>
           )}
 
+
+          {repayError && (
+            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              {repayError}
+            </div>
+          )}
 
           {Array.isArray(invoices?.orders) && invoices.orders.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200">
@@ -259,7 +297,11 @@ export default function SubscriptionsPage() {
                             {formatDateID(invoices.subscription?.ends_at)}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="inline-flex px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                            <span className={`inline-flex px-3 py-1 text-xs rounded-full font-medium
+                              ${order.status === "PAID"    ? "bg-green-100 text-green-800"  : ""}
+                              ${order.status === "PENDING" ? "bg-yellow-100 text-yellow-800" : ""}
+                              ${order.status === "EXPIRED" || order.status === "FAILED" ? "bg-red-100 text-red-700" : ""}
+                            `}>
                               {order.status}
                             </span>
                           </td>
@@ -278,9 +320,14 @@ export default function SubscriptionsPage() {
                             {order.status === "PENDING" && (
                                 <button
                                   onClick={() => handlePendingPayment(order.id)}
-                                  className="text-blue-600 hover:underline"
+                                  disabled={repayingId === order.id}
+                                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold text-white transition
+                                    ${repayingId === order.id
+                                      ? "bg-gray-400 cursor-not-allowed"
+                                      : "bg-blue-600 hover:bg-blue-700"
+                                    }`}
                                 >
-                                  Bayar
+                                  {repayingId === order.id ? "Mengalihkan..." : "Bayar Sekarang"}
                                 </button>
                               )}
 

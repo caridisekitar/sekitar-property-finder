@@ -49,8 +49,13 @@ export default function HeroSearch() {
 
         setResults(items.slice(0, 5))
         setOpen(true)
-      } catch {
+      } catch (err: any) {
         if (currentQuery !== query) return
+        // Don't show dropdown on auth errors — backend may gate /search for guests
+        if (err?.status === 401 || err?.status === 403) {
+          setOpen(false)
+          return
+        }
         setResults([])
         setOpen(true)
       }

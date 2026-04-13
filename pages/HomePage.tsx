@@ -16,7 +16,40 @@ import { secureGet } from '@/lib/secureGet';
 import BusinessSection from '@/components/BusinessSection';
 import HeroSearch from '@/components/HeroSearch';
 import Pagination from '@/components/Pagination';
+import LocationSearch from "@/components/LocationSearch";
 
+type LocationOption = {
+  label: string
+  value: string
+}
+
+const locations = [
+    {
+      name: "Jakarta",
+      properties: 5,
+      image: "/images/bsd.jpg",
+    },
+    {
+      name: "Bandung",
+      properties: 6,
+      image: "/images/bintaro.jpg",
+    },
+    {
+      name: "Bali",
+      properties: 1,
+      image: "/images/ciputat.jpg",
+    },
+    {
+      name: "Jogja",
+      properties: 1,
+      image: "/images/gading.jpg",
+    },
+    {
+      name: "Malang",
+      properties: 1,
+      image: "/images/gading.jpg",
+    },
+  ];
 
 const mockKostData: Kost[] = Array.from({ length: 10 }, (_, i) => ({
     id: i + 1,
@@ -70,8 +103,9 @@ const HomePage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [kosts, setKosts] = useState<Kost[]>([]);
     const [kostBasic, setKostBasic] = useState<Kost[]>([]);
-    const { subscription } = useAuth();
-    const [isSubscribed, setIsSubscribed] = useState(false);
+    const { subscription, user, loading: authLoading } = useAuth();
+    const [canBrowseFull, setCanBrowseFull] = useState(false);
+    const [canAccessDetails, setCanAccessDetails] = useState(false);
     const [visibleCount, setVisibleCount] = useState(VISIBLE_COUNT);
     const [kostsRecommendation, setKostsRecommendation] = useState<Kost[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
@@ -100,6 +134,7 @@ const HomePage: React.FC = () => {
         page: "1",
       });
     };
+    const [lokasiOptions, setLokasiOptions] = useState<LocationOption[]>([])
     // const [activeFilters, setActiveFilters] = useState<{
     //   q?: string;
     //   lokasi?: string;
@@ -108,63 +143,98 @@ const HomePage: React.FC = () => {
     //   max_price?: number;
     // }>({});
 
-    // useEffect(() => {
-    //   if (location.state?.openSubscription) {
-    //     setOpen(true)
-    //   }
-    // }, [location.state])
+    useEffect(() => {
+      if (location.state?.openSubscription) {
+        setOpen(true)
+      }
+    }, [location.state])
 
     // 🔹 Fetch data from API
       useEffect(() => {
+        // Wait for auth check to resolve before fetching
+        if (authLoading) return;
+
+        const fetchLocations = async () => {
+              try {
+                const res = await secureGet("/locations")
+                const mapped = res.data.map((item: any) => ({
+                  name: item.name,
+                  slug: item.slug,
+                }))
+                setLokasiOptions(mapped)
+              } catch (err) {
+                console.error("Failed to fetch locations", err)
+              }
+            }
+
+            fetchLocations();
+
         const fetchKosts = async () => {
           try {
             setLoading(true);
             setError(null);
 
-            const res = await secureGet('/search', {
-              page: filters.page,
-              per_page: ITEMS_PER_PAGE,
-              q: filters.q || '',
-              lokasi: filters.lokasi || '',
-              tipe: filters.tipe || '',
-              min_price: filters.min_price || '',
-              max_price: filters.max_price || '',
-            });
+            // Always fetch public endpoints (accessible for all, including guests)
+            const [recommendationRes, basicRes] = await Promise.all([
+              secureGet('/kost/recommendations'),
+              secureGet('/kost/basic'),
+            ]);
+            setKostsRecommendation(recommendationRes.data);
+            setKostBasic(basicRes.data);
+            // Capture total count from basic response (used for guest display)
+            if (!user && basicRes.total) setTotal(basicRes.total);
 
-            setKosts(res.data);
-            setLastPage(res.last_page);
-            setTotal(res.total);
+            // Only call /search for authenticated users
+            if (user) {
+              // For Premium/Premium+ with no explicit lokasi filter, default to their subscription locations
+              const subscriptionLokasi =
+                !filters.lokasi &&
+                subscription &&
+                subscription.plan !== "BASIC" &&
+                subscription.locations?.length > 0
+                  ? subscription.locations.join(",")
+                  : filters.lokasi || "";
 
-            const dataRecommendation = await secureGet('/kost/recommendations');
-            setKostsRecommendation(dataRecommendation.data);
-
-            const basic = await secureGet('/kost/basic');
-            setKostBasic(basic.data);
+              const res = await secureGet('/search', {
+                page: filters.page,
+                per_page: ITEMS_PER_PAGE,
+                q: filters.q || '',
+                lokasi: subscriptionLokasi,
+                tipe: filters.tipe || '',
+                min_price: filters.min_price || '',
+                max_price: filters.max_price || '',
+              });
+              setKosts(res.data);
+              setLastPage(res.meta?.last_page ?? 1);
+              setTotal(res.meta?.total ?? 0);
+            }
 
             setCurrentPage(filters.page);
 
-          } catch (err) {
-            setError((err as Error).message || 'Failed to fetch data');
+          } catch (err: any) {
+            if (err?.code === "SUBSCRIPTION_REQUIRED" || err?.code === "LOCATION_ACCESS_DENIED") {
+              setOpen(true);
+            } else {
+              setError(err?.message || 'Failed to fetch data');
+            }
           } finally {
             setLoading(false);
           }
         };
 
         fetchKosts();
-      }, [searchParams]);
+      }, [searchParams, authLoading, user]);
 
 
 
     useEffect(() => {
-        if (
-          subscription?.plan === 'PREMIUM'
-          ) {
-            setIsSubscribed(true);
-            setVisibleCount(100); // Show all items for subscribed users
-          } else {
-            setIsSubscribed(false);
-          }
-        }, [subscription]);
+        const plan = subscription?.plan;
+        const browse = plan === 'BASIC' || plan === 'PREMIUM' || plan === 'PREMIUM_PLUS';
+        const details = plan === 'PREMIUM' || plan === 'PREMIUM_PLUS';
+        setCanBrowseFull(browse);
+        setCanAccessDetails(details);
+        setVisibleCount(details ? 100 : VISIBLE_COUNT);
+      }, [subscription]);
     
     const lockedData = mockKostData.slice(visibleCount, visibleCount * 2);
 
@@ -302,12 +372,9 @@ const HomePage: React.FC = () => {
     </div>
 
     {/* Search Component */}
-    {/* <SearchKost
-        setIsFilterMenuOpen={setIsFilterMenuOpen}
-        onSearch={fetchSearchWithFilters}
-      /> */}
+    <LocationSearch title="Pilih Lokasi" locations={lokasiOptions} onRequireSubscription={() => setOpen(true)} />
 
-      <SearchKost
+      {/* <SearchKost
       setIsFilterMenuOpen={setIsFilterMenuOpen}
       onSearch={updateFilters}
       // isFilterActive={isFilterActive}
@@ -318,7 +385,7 @@ const HomePage: React.FC = () => {
         min_price: searchParams.get("min_price") || "",
         max_price: searchParams.get("max_price") || "",
       }}
-    />
+    /> */}
 
 
 
@@ -326,7 +393,24 @@ const HomePage: React.FC = () => {
     <div className="mt-10">
       {/* COUNT */}
       <p className="text-gray-600 mb-6">
-        Menampilkan {Math.min(visibleCount, kosts.length)} dari {total} hasil pencarian
+        {!canBrowseFull
+          // Guest: show total kosts available as a teaser
+          ? `${total > 0 ? total : kostBasic.length}+ kost tersedia di seluruh Indonesia`
+          : loading
+            ? "Mencari kost..."
+          // Authenticated + has results
+          : total > 0
+            ? filters.lokasi
+              ? `${total} kost ditemukan di ${filters.lokasi}`
+              : subscription?.plan !== "BASIC" && subscription?.locations?.length
+                ? `${total} kost ditemukan di ${subscription.locations.join(", ")}`
+                : `Menampilkan ${kosts.length} dari ${total} kost`
+            // Authenticated + no results
+            : filters.lokasi
+              ? `Tidak ada kost ditemukan di "${filters.lokasi}"`
+              : subscription?.plan !== "BASIC" && subscription?.locations?.length
+                ? `Tidak ada kost ditemukan di ${subscription.locations.join(", ")}`
+                : "Tidak ada kost ditemukan"}
       </p>
 
       {/* VISIBLE DATA */}
@@ -335,11 +419,11 @@ const HomePage: React.FC = () => {
           md:grid-cols-3
           lg:grid-cols-5 gap-4">
         {
-        !isSubscribed
-          ? kostBasic.map((kost) => (
+        canBrowseFull
+          ? kosts.map((kost: Kost) => (
               <KostCard key={kost.id} kost={kost} />
             ))
-          : kosts.slice(0, visibleCount).map((kost) => (
+          : kostBasic.slice(0, VISIBLE_COUNT).map((kost) => (
               <KostCard key={kost.id} kost={kost} />
             ))
       }
@@ -347,7 +431,7 @@ const HomePage: React.FC = () => {
 
       {/* HERE */}
 
-      {isSubscribed && lastPage > 1 && (
+      {canAccessDetails && lastPage > 1 && (
           <div className="mt-10">
             {/* <Pagination
               currentPage={currentPage}
@@ -382,20 +466,18 @@ const HomePage: React.FC = () => {
 
 
 
-      {/* LOCKED DATA */}
-      {!isSubscribed && kosts.length > visibleCount && (
+      {/* LOCKED DATA — always shown for Guests, dummy row blurred with subscribe overlay */}
+      {!canBrowseFull && (
         <div className="relative mt-6">
           <div
             className="
-              flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory
-              sm:grid sm:grid-cols-2
+              grid grid-cols-2
               md:grid-cols-3
-              lg:grid-cols-5
-              sm:overflow-visible
+              lg:grid-cols-5 gap-4
               blur-lg pointer-events-none select-none
             "
           >
-            {kosts.slice(visibleCount, visibleCount + VISIBLE_COUNT).map((kost) => (
+            {mockKostData.slice(0, VISIBLE_COUNT).map((kost) => (
               <KostCard key={kost.id} kost={kost} />
             ))}
           </div>
@@ -428,8 +510,52 @@ const HomePage: React.FC = () => {
         </div>
       )}
 
-      {/* EMPTY STATE */}
-      {kosts.length === 0 && !loading && (
+      {/* BASIC — can browse listings but details are locked */}
+      {canBrowseFull && !canAccessDetails && (
+        <div className="relative mt-6">
+          <div
+            className="
+              grid grid-cols-2
+              md:grid-cols-3
+              lg:grid-cols-5 gap-4
+              blur-lg pointer-events-none select-none
+            "
+          >
+            {mockKostData.slice(0, VISIBLE_COUNT).map((kost) => (
+              <KostCard key={kost.id} kost={kost} />
+            ))}
+          </div>
+
+          {/* LOCK OVERLAY */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full mx-4">
+              <div className="flex justify-center mb-4">
+                <img
+                  src="/images/icons/icon-locked.png"
+                  alt="Lock Icon"
+                  className="w-16 h-16"
+                />
+              </div>
+
+              <h3 className="text-xl font-bold mb-2">Yah terkunci nih!</h3>
+
+              <p className="text-gray-600 mb-6">
+                Tenang, ratusan informasi kost sudah siap kamu akses. Langganan sekarang, biar cari kost jadi lebih gampang! Sssst, bikin akun nya gratis!🤫
+              </p>
+
+              <button
+                onClick={() => setOpen(true)}
+                className="px-6 py-3 rounded-xl bg-[#96C8E2] text-white font-semibold hover:bg-blue-600 transition"
+              >
+                Mulai langganan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EMPTY STATE — only for authenticated users with no search results */}
+      {canBrowseFull && kosts.length === 0 && !loading && (
         <div className="px-5 py-16 flex flex-col items-center justify-center bg-white">
             <img src="/images/not-found-kost.png" alt="Kost Not Found" className="w-[300px] h-[300px]" />
             <h5 className="mt-3 font-bold text-[24px]">Belum ada hasil yang cocok!</h5>
