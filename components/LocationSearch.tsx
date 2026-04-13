@@ -101,7 +101,7 @@ export default function LocationSearch({
       </div>
 
       {/* 🔥 Horizontal Scroll */}
-      <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
+      <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar w-full min-w-0">
         {locations.map((loc, index) => {
           const isActive = activeLokasi.includes(loc.name);
 
@@ -110,9 +110,9 @@ export default function LocationSearch({
               key={index}
               onClick={() => handleToggle(loc)}
               className={`
-                relative min-w-[220px] h-[120px]
+                relative w-[220px] h-[120px]
                 rounded-2xl overflow-hidden cursor-pointer
-                flex-shrink-0 group
+                flex-none group
                 border-2 transition
                 ${
                   isActive
