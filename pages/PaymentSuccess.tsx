@@ -5,11 +5,21 @@ import { secureGet } from '@/lib/secureGet';
 import { User } from '@/types';
 import SidebarMenu from '@/components/profile/SidebarMenu';
 
+type OrderPlan = { name: string };
+type Order = { plan?: OrderPlan; product_name?: string; [key: string]: any };
+
+function planLabel(order: Order | null): string {
+  const name = order?.plan?.name ?? "";
+  if (name === "PREMIUM_PLUS") return "Premium Plus";
+  if (name === "PREMIUM") return "Premium";
+  return "Premium";
+}
+
 export default function PaymentSuccess() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState("checking"); // checking | success | pending | failed
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState<Order | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -106,9 +116,8 @@ export default function PaymentSuccess() {
             {user && <SidebarMenu user={user} />}
                 <div className="px-5 h-screen flex flex-col items-center justify-center mx-auto">
                 <img src="/images/payment-success.png" alt="Payment Success" className="w-[300px] h-[300px]" />
-                <h5 className="mt-3 font-bold text-[24px]">Selamat! Akun Premium-mu aktif</h5>
-                <p className="text-gray-500 mt-1 text-[14px]">Akunmu sekarang sudah jadi Premium. Lebih bebas, lebih lengkap, lebih seru.
-Nikmati semua akses tanpa hambatan mulai sekarang!</p>
+                <h5 className="mt-3 font-bold text-[24px]">Selamat! Akun {planLabel(order)}-mu aktif</h5>
+                <p className="text-gray-500 mt-1 text-[14px]">Akunmu sekarang sudah jadi {planLabel(order)}. Lebih bebas, lebih lengkap, lebih seru. Nikmati semua akses tanpa hambatan mulai sekarang!</p>
                 <Link
                     to="/cari-kost"
                     className="mt-8 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
