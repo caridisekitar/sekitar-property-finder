@@ -105,8 +105,10 @@ const SearchKost: React.FC<SearchKostProps> = ({
     return { min_price: min, max_price: max };
   };
 
+  const canSearch = subscription?.plan === "PREMIUM" || subscription?.plan === "PREMIUM_PLUS";
+
   const doSearch = () => {
-    if (!subscription || subscription?.plan !== "PREMIUM") {
+    if (!canSearch) {
       setShowLocked(true);
       return;
     }
@@ -143,7 +145,7 @@ const SearchKost: React.FC<SearchKostProps> = ({
         // 🔥 map response to select format
         const mapped = res.data.map((item: any) => ({
           label: item.name,
-          value: item.name,
+          value: item.slug,
         }))
 
         setLokasiOptions(mapped)
