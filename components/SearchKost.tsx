@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SearchIcon from "@/components/icons/SearchIcon";
 import FilterIcon from "@/components/icons/FilterIcon";
 import MultiSelectDropdown from "./MultiSelectDropdown";
+import TreeSelectDropdown from "./TreeSelectDropdown";
 import SingleSelectDropdown from "./SingleSelectDropdown";
 import { useAuth } from "@/hooks/useAuth";
 import LockedOverlay from "./LockedOverlay";
@@ -11,6 +12,7 @@ import { secureGet } from '@/lib/secureGet';
 type LocationOption = {
   label: string
   value: string
+  children: { label: string; value: string }[]
 }
 
 interface SearchKostProps {
@@ -53,42 +55,20 @@ const SearchKost: React.FC<SearchKostProps> = ({
      SYNC STATE FROM URL
   ============================== */
 
+  // Sync filters from URL
   useEffect(() => {
-  if (!initialFilters) return;
-
-  setLokasi(
-    initialFilters.lokasi
-      ? initialFilters.lokasi.split(",")
-      : []
-  );
-
-  setTipe(
-    initialFilters.tipe
-      ? initialFilters.tipe.split(",")
-      : []
-  );
-
-  setKeyword(initialFilters.q || "");
-
-  if (initialFilters.min_price && !initialFilters.max_price) {
-    setPriceRange(`${initialFilters.min_price}+`);
-  } else if (
-    initialFilters.min_price &&
-    initialFilters.max_price
-  ) {
-    setPriceRange(
-      `${initialFilters.min_price}-${initialFilters.max_price}`
-    );
-  } else {
-    setPriceRange(null);
-  }
-}, [
-  initialFilters?.q,
-  initialFilters?.lokasi,
-  initialFilters?.tipe,
-  initialFilters?.min_price,
-  initialFilters?.max_price,
-]);
+    if (!initialFilters) return;
+    setLokasi(initialFilters.lokasi ? initialFilters.lokasi.split(",").filter(Boolean) : []);
+    setTipe(initialFilters.tipe ? initialFilters.tipe.split(",") : []);
+    setKeyword(initialFilters.q || "");
+    if (initialFilters.min_price && !initialFilters.max_price) {
+      setPriceRange(`${initialFilters.min_price}+`);
+    } else if (initialFilters.min_price && initialFilters.max_price) {
+      setPriceRange(`${initialFilters.min_price}-${initialFilters.max_price}`);
+    } else {
+      setPriceRange(null);
+    }
+  }, [initialFilters?.q, initialFilters?.lokasi, initialFilters?.tipe, initialFilters?.min_price, initialFilters?.max_price]);
 
   /* ==============================
      HELPERS
@@ -142,10 +122,10 @@ const SearchKost: React.FC<SearchKostProps> = ({
 
         const res = await secureGet("/locations")
 
-        // 🔥 map response to select format
         const mapped = res.data.map((item: any) => ({
           label: item.name,
           value: item.slug,
+          children: (item.children ?? []).map((c: any) => ({ label: c.name, value: c.slug })),
         }))
 
         setLokasiOptions(mapped)
@@ -195,8 +175,9 @@ const SearchKost: React.FC<SearchKostProps> = ({
 
       {/* ================= DESKTOP ================= */}
       <div className="hidden md:block bg-brand-light-blue p-6 rounded-2xl shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-end">
+          {/* Cari — 3/12 */}
+          <div className="lg:col-span-3">
             <label className="font-semibold text-sm mb-2 block">Cari</label>
             <div className="relative">
               <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -205,53 +186,63 @@ const SearchKost: React.FC<SearchKostProps> = ({
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
                 placeholder="Cari kos .."
-                className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
+                className={`w-full pl-10 pr-4 py-3 rounded-lg border text-sm ${
                   keyword ? "border-brand-dark ring-1 ring-brand-dark" : "border-gray-300"
                 }`}
               />
             </div>
           </div>
 
-          <MultiSelectDropdown
-            label="Lokasi"
-            options={lokasiOptions}
-            value={lokasi}
-            onChange={setLokasi}
-            isActive={lokasi.length > 0}
-          />
+          {/* Lokasi — 3/12 (same as Cari) */}
+          <div className="lg:col-span-3">
+            <TreeSelectDropdown
+              label="Lokasi"
+              options={lokasiOptions}
+              value={lokasi}
+              onChange={setLokasi}
+              isActive={lokasi.length > 0}
+            />
+          </div>
 
-          <MultiSelectDropdown
-            label="Tipe"
-            options={tipeOptions}
-            value={tipe}
-            onChange={setTipe}
-            isActive={tipe.length > 0}
-          />
+          {/* Tipe — 2/12 */}
+          <div className="lg:col-span-2">
+            <MultiSelectDropdown
+              label="Tipe"
+              options={tipeOptions}
+              value={tipe}
+              onChange={setTipe}
+              isActive={tipe.length > 0}
+            />
+          </div>
 
-          <SingleSelectDropdown
-            label="Harga"
-            value={priceRange}
-            onChange={setPriceRange}
-            options={[
-              { label: "1 - 2 jt", value: "1000000-2000000" },
-              { label: "2 - 3 jt", value: "2000000-3000000" },
-              { label: "3 - 5 jt", value: "3000000-5000000" },
-              { label: "> 5 jt", value: "5000000+" },
-            ]}
-            isActive={priceRange !== null}
-          />
+          {/* Harga — 2/12 */}
+          <div className="lg:col-span-2">
+            <SingleSelectDropdown
+              label="Harga"
+              value={priceRange}
+              onChange={setPriceRange}
+              options={[
+                { label: "1 - 2 jt", value: "1000000-2000000" },
+                { label: "2 - 3 jt", value: "2000000-3000000" },
+                { label: "3 - 5 jt", value: "3000000-5000000" },
+                { label: "> 5 jt", value: "5000000+" },
+              ]}
+              isActive={priceRange !== null}
+            />
+          </div>
 
-          <button
-            onClick={doSearch}
-            className={`w-full font-bold py-3 rounded-lg transition ${
-              isInputActive
-                ? "bg-brand-dark text-white shadow-md"
-                : "bg-brand-dark text-white"
-            }`}
-          >
-            Cari
-          </button>
+          {/* Cari button — 2/12 */}
+          <div className="lg:col-span-2">
+            <label className="font-semibold text-sm mb-2 block opacity-0 select-none">.</label>
+            <button
+              onClick={doSearch}
+              className="w-full font-bold py-3 rounded-lg bg-brand-dark text-white hover:bg-gray-800 transition"
+            >
+              Cari
+            </button>
+          </div>
         </div>
+
       </div>
 
       {/* ================= MOBILE ================= */}
