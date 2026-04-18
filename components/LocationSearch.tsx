@@ -39,7 +39,6 @@ export default function LocationSearch({
   };
 
   const handleToggle = (loc: LocationItem) => {
-    // Guest (no user) cannot browse other listings
     if (!user) {
       onRequireSubscription?.();
       return;
@@ -47,17 +46,17 @@ export default function LocationSearch({
 
     let updated = [...activeLokasi];
 
-    if (updated.includes(loc.name)) {
-      updated = updated.filter((l) => l !== loc.name);
+    if (updated.includes(loc.slug)) {
+      updated = updated.filter((l) => l !== loc.slug);
     } else {
-      updated.push(loc.name);
+      updated.push(loc.slug);
     }
 
     updateParams(updated);
   };
 
-  const handleRemove = (name: string) => {
-    const updated = activeLokasi.filter((l) => l !== name);
+  const handleRemove = (slug: string) => {
+    const updated = activeLokasi.filter((l) => l !== slug);
     updateParams(updated);
   };
 
@@ -80,15 +79,18 @@ export default function LocationSearch({
 
       {/* 🔥 Active Chips */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {activeLokasi.map((loc) => (
-          <div
-            key={loc}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#96C8E2] text-white text-sm"
-          >
-            {loc}
-            <button onClick={() => handleRemove(loc)}>✕</button>
-          </div>
-        ))}
+        {activeLokasi.map((slug) => {
+          const found = locations.find((l) => l.slug === slug);
+          return (
+            <div
+              key={slug}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#96C8E2] text-white text-sm"
+            >
+              {found?.name ?? slug}
+              <button onClick={() => handleRemove(slug)}>✕</button>
+            </div>
+          );
+        })}
 
         {activeLokasi.length > 0 && (
           <button
@@ -103,7 +105,7 @@ export default function LocationSearch({
       {/* 🔥 Horizontal Scroll */}
       <div className="flex gap-4 overflow-x-auto pb-2 no-scrollbar w-full min-w-0">
         {locations.map((loc, index) => {
-          const isActive = activeLokasi.includes(loc.name);
+          const isActive = activeLokasi.includes(loc.slug);
 
           return (
             <div

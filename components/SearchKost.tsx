@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SearchIcon from "@/components/icons/SearchIcon";
 import FilterIcon from "@/components/icons/FilterIcon";
 import MultiSelectDropdown from "./MultiSelectDropdown";
@@ -86,6 +86,20 @@ const SearchKost: React.FC<SearchKostProps> = ({
   };
 
   const canSearch = subscription?.plan === "PREMIUM" || subscription?.plan === "PREMIUM_PLUS";
+
+  // Slugs the user may select; null = no restriction (BASIC / guest handled by canSearch gate)
+  const allowedSlugs = useMemo<Set<string> | null>(() => {
+    if (!canSearch || !subscription?.locations?.length) return null;
+    const subSlugs = new Set(subscription.locations);
+    const allowed = new Set<string>();
+    lokasiOptions.forEach((opt: LocationOption) => {
+      if (subSlugs.has(opt.value)) {
+        allowed.add(opt.value);
+        opt.children.forEach((c: { value: string }) => allowed.add(c.value));
+      }
+    });
+    return allowed;
+  }, [canSearch, subscription?.locations, lokasiOptions]);
 
   const doSearch = () => {
     if (!canSearch) {
@@ -201,6 +215,7 @@ const SearchKost: React.FC<SearchKostProps> = ({
               value={lokasi}
               onChange={setLokasi}
               isActive={lokasi.length > 0}
+              allowedValues={allowedSlugs}
             />
           </div>
 

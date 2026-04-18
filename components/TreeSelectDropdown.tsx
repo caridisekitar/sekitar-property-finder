@@ -13,6 +13,7 @@ type Props = {
   value: string[];
   onChange: (value: string[]) => void;
   isActive?: boolean;
+  allowedValues?: Set<string> | null;
 };
 
 function IndeterminateCheckbox({
@@ -45,6 +46,7 @@ export default function TreeSelectDropdown({
   value,
   onChange,
   isActive = false,
+  allowedValues = null,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -199,11 +201,12 @@ export default function TreeSelectDropdown({
           {options.map((opt) => {
             const hasChildren = (opt.children?.length ?? 0) > 0;
             const isExpanded = expanded.has(opt.value);
+            const isDisabled = allowedValues !== null && !allowedValues.has(opt.value);
 
             return (
               <div key={opt.value}>
                 {/* Parent row */}
-                <label className="flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 cursor-pointer select-none">
+                <label className={`flex items-center gap-2 px-4 py-2.5 select-none ${isDisabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer"}`}>
                   {hasChildren ? (
                     <button
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleExpand(opt.value); }}
@@ -221,14 +224,15 @@ export default function TreeSelectDropdown({
                     <IndeterminateCheckbox
                       checked={isParentChecked(opt.value)}
                       indeterminate={isParentIndeterminate(opt.value)}
-                      onChange={() => toggleParent(opt.value)}
+                      onChange={() => !isDisabled && toggleParent(opt.value)}
                     />
                   ) : (
                     <input
                       type="checkbox"
                       checked={value.includes(opt.value)}
-                      onChange={() => toggleLeaf(opt.value)}
-                      className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue cursor-pointer"
+                      onChange={() => !isDisabled && toggleLeaf(opt.value)}
+                      disabled={isDisabled}
+                      className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue cursor-pointer disabled:cursor-not-allowed"
                     />
                   )}
 
@@ -236,21 +240,25 @@ export default function TreeSelectDropdown({
                 </label>
 
                 {/* Children rows */}
-                {hasChildren && isExpanded && opt.children!.map((child) => (
-                  <label
-                    key={child.value}
-                    className="flex items-center gap-2 px-4 py-2 pl-10 hover:bg-gray-50 cursor-pointer select-none border-l-2 border-gray-100 ml-4"
-                  >
-                    <span className="w-3.5 flex-shrink-0" />
-                    <input
-                      type="checkbox"
-                      checked={value.includes(child.value) || value.includes(opt.value)}
-                      onChange={() => toggleChild(opt.value, child.value)}
-                      className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue cursor-pointer"
-                    />
-                    <span className="text-gray-600">{child.label}</span>
-                  </label>
-                ))}
+                {hasChildren && isExpanded && opt.children!.map((child) => {
+                  const childDisabled = allowedValues !== null && !allowedValues.has(child.value);
+                  return (
+                    <label
+                      key={child.value}
+                      className={`flex items-center gap-2 px-4 py-2 pl-10 select-none border-l-2 border-gray-100 ml-4 ${childDisabled ? "opacity-40 cursor-not-allowed" : "hover:bg-gray-50 cursor-pointer"}`}
+                    >
+                      <span className="w-3.5 flex-shrink-0" />
+                      <input
+                        type="checkbox"
+                        checked={value.includes(child.value) || value.includes(opt.value)}
+                        onChange={() => !childDisabled && toggleChild(opt.value, child.value)}
+                        disabled={childDisabled}
+                        className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <span className="text-gray-600">{child.label}</span>
+                    </label>
+                  );
+                })}
               </div>
             );
           })}

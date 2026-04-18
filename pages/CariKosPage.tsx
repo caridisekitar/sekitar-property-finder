@@ -280,6 +280,12 @@ const CariKosPage: React.FC = () => {
         isOpen={isFilterMenuOpen}
         setIsOpen={setIsFilterMenuOpen}
         onApply={updateFilters}
+        initialFilters={{
+          lokasi: filters.lokasi,
+          tipe: filters.tipe,
+          min_price: filters.min_price,
+          max_price: filters.max_price,
+        }}
       />
     </div>
   );
