@@ -45,11 +45,11 @@ export const PAYMENT_METHODS = [
 
 
 export default function SubscriptionsPage() {
-  // const [user, setUser] = useState<User | null>(null);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
     const [loading, setLoading] = useState(true);
     const { subscription, user } = useAuth();
+    const [locationNames, setLocationNames] = useState<Record<string, string>>({});
     const [invoices, setInvoices] = useState<{
       orders: any[];
       subscription?: any;
@@ -85,7 +85,15 @@ export default function SubscriptionsPage() {
 
       const fetchProfile = async () => {
         try {
-          const res = await secureGet("/auth/me");
+          await secureGet("/auth/me");
+
+          const locRes = await secureGet("/locations");
+          const nameMap: Record<string, string> = {};
+          (locRes.data ?? []).forEach((loc: any) => {
+            nameMap[loc.slug] = loc.name;
+            (loc.children ?? []).forEach((c: any) => { nameMap[c.slug] = c.name; });
+          });
+          setLocationNames(nameMap);
         } catch {
           localStorage.clear();
           navigate("/login", { replace: true });
@@ -194,13 +202,29 @@ export default function SubscriptionsPage() {
               </div>
             </div>
 
-            {subscription?.plan === "PREMIUM" ? (
-              <p className="text-sm text-gray-800">
-                Masa berlaku sampai: <span className="font-medium">{formatDateID(subscription?.ends_at)}</span>
-            </p>
-            ) : (
-              "Basic"
-            )}
+            <div className="flex flex-col gap-2 items-start sm:items-end">
+              {subscription?.plan === "PREMIUM" || subscription?.plan === "PREMIUM_PLUS" ? (
+                <p className="text-sm text-gray-800">
+                  Masa berlaku sampai: <span className="font-medium">{formatDateID(subscription?.ends_at)}</span>
+                </p>
+              ) : (
+                <span className="text-sm text-gray-500">Basic</span>
+              )}
+
+              {(subscription?.plan === "PREMIUM" || subscription?.plan === "PREMIUM_PLUS") &&
+                subscription.locations.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 justify-start sm:justify-end">
+                    {subscription.locations.map((slug: string) => (
+                      <span
+                        key={slug}
+                        className="text-xs px-3 py-1 bg-white border border-gray-200 rounded-full text-gray-700 font-medium shadow-sm"
+                      >
+                        {locationNames[slug] ?? slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                      </span>
+                    ))}
+                  </div>
+                )}
+            </div>
           </div>
 
 

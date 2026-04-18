@@ -54,10 +54,7 @@ const ProfilePage: React.FC = () => {
 
     const fetchProfile = async () => {
         try {
-            
             const data = await secureGet("/auth/me");
-
-            // Adjust based on your API response shape
             setUser(data.data.user);
 
         } catch (err) {
