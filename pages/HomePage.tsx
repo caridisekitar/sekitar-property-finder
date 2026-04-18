@@ -317,7 +317,9 @@ const HomePage: React.FC = () => {
                     <div className="flex items-end justify-end mb-4">
                     <SparklesIcon className="h-8 w-8 lg:w-12 lg:h-12 items-end lg:hidden" />
                 </div>
-                <h4 className="text-[#B3B3B3] text-md md:text-md lg:text-xl text-right font-semibold">Dengan data yang akurat dan filter yang personal, <span className="text-[#96C8E2]">Sekitar</span> hadir untuk bantu kamu menemukan kost terbaik yang sesuai dengan kebutuhan mu, di mana pun kamu berada.</h4>
+                <h4 className="text-[#B3B3B3] text-md md:text-md lg:text-xl text-right font-semibold">
+                  Dengan data yang akurat dan filter yang personal, <span className="text-[#96C8E2]">Sekitar</span> hadir untuk bantu kamu menemukan kost terbaik sesuai kebutuhan mu, Di <span className="text-[#96C8E2]">Jakarta</span>, <span className="text-[#96C8E2]">Tangerang</span>, <span className="text-[#96C8E2]">Bali</span>, <span className="text-[#96C8E2]">Jogja</span>, <span className="text-[#96C8E2]">Bandung</span>, <span className="text-[#96C8E2]">Depok</span>.
+                  Dengan data yang akurat dan filter yang personal, <span className="text-[#96C8E2]">Sekitar</span> hadir untuk bantu kamu menemukan kost terbaik yang sesuai dengan kebutuhan mu, di mana pun kamu berada.</h4>
                 </div>
             </div>
         </div>
