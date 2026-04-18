@@ -176,29 +176,35 @@ export default function SubscriptionsPage() {
 
   
           <div className={`rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4
-            ${subscription?.plan === "PREMIUM" ? "bg-[#FEF3C7]" : "bg-[#DCF4FF]"}
+            ${subscription?.plan === "PREMIUM_PLUS"
+              ? "bg-[#EDE9FE]"
+              : subscription?.plan === "PREMIUM"
+                ? "bg-[#FEF3C7]"
+                : "bg-[#DCF4FF]"}
             `}>
-            
+
             <div className="flex items-center gap-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white">
-                
-                {subscription?.plan === "PREMIUM" ? (
-                    <img src="/images/premium-tier.png" alt="" />
-                )
-                : (
-                    <img src="/images/basic-tier.png" alt="" />
+                {subscription?.plan === "PREMIUM" || subscription?.plan === "PREMIUM_PLUS" ? (
+                  <img src="/images/premium-tier.png" alt="" />
+                ) : (
+                  <img src="/images/basic-tier.png" alt="" />
                 )}
               </div>
 
               <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {subscription?.plan === "PREMIUM" ? "Premium" : "Basic"}
-                  </h3>
-                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {subscription?.plan === "PREMIUM_PLUS"
+                    ? "Premium Plus"
+                    : subscription?.plan === "PREMIUM"
+                      ? "Premium"
+                      : "Basic"}
+                </h3>
                 <p className="text-sm text-gray-600 py-1">
-                  {subscription?.plan === "PREMIUM" ? "Unlimited Access" : "Limited Access"}
-                  </p>
+                  {subscription?.plan === "PREMIUM" || subscription?.plan === "PREMIUM_PLUS"
+                    ? "Unlimited Access"
+                    : "Limited Access"}
+                </p>
               </div>
             </div>
 
