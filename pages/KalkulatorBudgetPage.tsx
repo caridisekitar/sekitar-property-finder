@@ -128,9 +128,7 @@ const KalkulatorBudgetPage: React.FC = () => {
         setMaxRangeBudget(0);
     };
 
-    /* ── UI sub-components ─────────────────── */
-
-    const SalaryForm = ({ isMobile }: { isMobile?: boolean }) => (
+    const salaryFormJSX = (isMobile?: boolean) => (
         <form onSubmit={handleSubmit}>
             <label htmlFor="gaji" className="block text-sm font-medium text-gray-700 mb-1">
                 Gaji kamu perbulan
@@ -143,7 +141,7 @@ const KalkulatorBudgetPage: React.FC = () => {
                     <input
                         name="gaji" id="gaji" type="text" inputMode="numeric"
                         value={gaji}
-                        onChange={(e) => setGaji(formatIDRNumber(e.target.value))}
+                        onChange={(e) => setGaji(e.target.value.replace(/\D/g, ''))}
                         className="block w-full rounded-md border border-gray-300 pl-10 py-3 text-gray-900 focus:border-brand-blue focus:ring-brand-blue sm:text-sm"
                         placeholder="Masukkan gaji kamu"
                     />
@@ -161,7 +159,7 @@ const KalkulatorBudgetPage: React.FC = () => {
         </form>
     );
 
-    const BudgetSummary = () => (
+    const budgetSummaryJSX = (
         <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#9ED4EE] flex items-center justify-center shrink-0">
@@ -212,14 +210,14 @@ const KalkulatorBudgetPage: React.FC = () => {
                     {/* Desktop form — hidden once budget is ready */}
                     {!budgetReady && (
                         <div className="hidden md:block mt-8 w-full max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-8 text-left">
-                            <SalaryForm />
+                            {salaryFormJSX()}
                         </div>
                     )}
 
                     {/* Desktop budget summary — shown after submit */}
                     {budgetReady && (
                         <div className="hidden md:block w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl px-8 py-5 text-left">
-                            <BudgetSummary />
+                            {budgetSummaryJSX}
                         </div>
                     )}
                 </div>
@@ -228,14 +226,14 @@ const KalkulatorBudgetPage: React.FC = () => {
             {/* Mobile form */}
             {!budgetReady && (
                 <div className="md:hidden mt-4">
-                    <SalaryForm isMobile />
+                    {salaryFormJSX(true)}
                 </div>
             )}
 
             {/* Mobile budget summary */}
             {budgetReady && (
                 <div className="md:hidden mt-4 bg-white rounded-2xl border border-gray-200 shadow-sm p-5">
-                    <BudgetSummary />
+                    {budgetSummaryJSX}
                 </div>
             )}
 
