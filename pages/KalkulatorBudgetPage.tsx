@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from 'react-router-dom';
 import WalletIcon from '../components/icons/WalletIcon';
 import { useAuth } from '@/hooks/useAuth';
@@ -30,6 +30,32 @@ const KalkulatorBudgetPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<React.ReactNode | null>(null);
     const [open, setOpen] = useState(false);
+
+    const salaryInputRef = useRef<HTMLInputElement>(null);
+
+    const handleGajiChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target;
+        const cursorPos = input.selectionStart ?? 0;
+        const digitsBeforeCursor = input.value.slice(0, cursorPos).replace(/\D/g, '').length;
+
+        const raw = input.value.replace(/\D/g, '');
+        setGaji(raw);
+
+        requestAnimationFrame(() => {
+            if (!salaryInputRef.current) return;
+            const formatted = salaryInputRef.current.value;
+            let digitsSeen = 0;
+            let newPos = formatted.length;
+            for (let i = 0; i < formatted.length; i++) {
+                if (/\d/.test(formatted[i])) {
+                    digitsSeen++;
+                    if (digitsSeen === digitsBeforeCursor) { newPos = i + 1; break; }
+                }
+            }
+            if (digitsBeforeCursor === 0) newPos = 0;
+            salaryInputRef.current.setSelectionRange(newPos, newPos);
+        });
+    };
 
     const premiumError = (
         <>
@@ -139,11 +165,12 @@ const KalkulatorBudgetPage: React.FC = () => {
                         <WalletIcon className="h-5 w-5 text-gray-400" />
                     </div>
                     <input
+                        ref={salaryInputRef}
                         name="gaji" id="gaji" type="text" inputMode="numeric"
-                        value={gaji}
-                        onChange={(e) => setGaji(e.target.value.replace(/\D/g, ''))}
+                        value={gaji ? new Intl.NumberFormat('id-ID').format(Number(gaji)) : ''}
+                        onChange={handleGajiChange}
                         className="block w-full rounded-md border border-gray-300 pl-10 py-3 text-gray-900 focus:border-brand-blue focus:ring-brand-blue sm:text-sm"
-                        placeholder="Masukkan gaji kamu"
+                        placeholder="Contoh: 5.000.000"
                     />
                 </div>
                 <button
@@ -153,7 +180,7 @@ const KalkulatorBudgetPage: React.FC = () => {
                     Hitung
                 </button>
             </div>
-            <p className="mt-2 text-xs text-gray-500">Masukkan nominal gaji tanpa koma atau titik.</p>
+            <p className="mt-2 text-xs text-gray-500">Masukkan nominal gaji kamu per bulan.</p>
             {loading && <p className="text-sm text-gray-500 mt-2">Memuat hasil...</p>}
             {error && <p className="mt-3 text-sm text-red-600 font-medium">{error}</p>}
         </form>
