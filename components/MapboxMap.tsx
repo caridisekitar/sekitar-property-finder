@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import PropertyCard from './PropertyCard';
 import { formatHargaRange } from '@/lib/helper';
-import LockedOverlay from './LockedOverlay';
-import SubscriptionModal from "@/components/SubscriptionModal";
 
 mapboxgl.accessToken = process.env.MAPBOX_TOKEN as string;
 
@@ -12,6 +10,8 @@ type Property = {
   name: string;
   slug?: string;
   city?: string;
+  district?: string;
+  address?: string;
   price_monthly?: number | null;
   longitude: number;
   latitude: number;
@@ -22,18 +22,17 @@ type Property = {
 type MapboxMapProps = {
   properties: Property[];
   plan: string;
+  allowedLocationNames?: string[];
   onUpgrade: () => void;
+  onBlock: () => void;
 };
 
-const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, onUpgrade }) => {
+const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, allowedLocationNames = [], onUpgrade, onBlock }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [blockedProperty, setBlockedProperty] = useState<Property | null>(null);
-  const [showLocked, setShowLocked] = useState(false);
-  const [open, setOpen] = useState(false);
 
 
   /* =========================
@@ -95,8 +94,22 @@ const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, onUpgrade }) =>
         const isPremium = plan === 'PREMIUM' || plan === 'PREMIUM_PLUS';
 
         if (!isPremium) {
-          setBlockedProperty(property);
+          onBlock();
           return;
+        }
+
+        // If subscription has specific locations, verify kost is within one of them
+        if (allowedLocationNames.length > 0) {
+          const fields = [property.city, property.district, property.address]
+            .filter(Boolean)
+            .map(s => s!.toLowerCase());
+          const isAllowed = allowedLocationNames.some(name =>
+            fields.some(f => f.includes(name.toLowerCase()))
+          );
+          if (!isAllowed) {
+            onBlock();
+            return;
+          }
         }
 
         setSelectedProperty(property);
@@ -113,7 +126,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, onUpgrade }) =>
 
       markersRef.current.push(marker);
     });
-  }, [properties, plan]);
+  }, [properties, plan, allowedLocationNames]);
 
   return (
     <div className="relative w-full">
@@ -131,15 +144,6 @@ const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, onUpgrade }) =>
         />
       )}
 
-      {/* BASIC BLOCKED MODAL */}
-      {blockedProperty && (
-        <LockedOverlay
-            message="Please subscribe to unlock search"
-            onClose={() => setBlockedProperty(null)}
-            onSubscribe={() => setOpen(true)}
-          />
-      )}
-      <SubscriptionModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 };

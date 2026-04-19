@@ -8,6 +8,7 @@ import Pagination from '../components/Pagination';
 import MapboxMap from '@/components/MapboxMap';
 import { useAuth } from "@/hooks/useAuth";
 import SubscriptionModal from "@/components/SubscriptionModal";
+import LockedOverlay from "@/components/LockedOverlay";
 import { secureGet } from "@/lib/secureGet";
 
 /* =====================================================
@@ -28,6 +29,7 @@ const ITEMS_PER_PAGE = 8;
 const MapsPage: React.FC = () => {
   const { subscription } = useAuth();
   const plan = subscription?.plan ?? 'FREE';
+  const subscriptionSlugs: string[] = subscription?.locations ?? [];
 
   const isFree = plan === 'FREE';
   const isBasic = plan === 'BASIC';
@@ -39,7 +41,25 @@ const MapsPage: React.FC = () => {
   const [lastPage, setLastPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showBlockedOverlay, setShowBlockedOverlay] = useState(false);
   const [mapKosts, setMapKosts] = useState<Kost[]>([]);
+  const [locationNames, setLocationNames] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!subscriptionSlugs.length) return;
+    secureGet('/locations').then((res) => {
+      const map: Record<string, string> = {};
+      (res.data ?? []).forEach((loc: any) => {
+        map[loc.slug] = loc.name;
+        (loc.children ?? []).forEach((c: any) => { map[c.slug] = c.name; });
+      });
+      setLocationNames(map);
+    }).catch(() => {});
+  }, [subscriptionSlugs.join(',')]);
+
+  const allowedLocationNames: string[] = subscriptionSlugs
+    .map(slug => locationNames[slug])
+    .filter(Boolean);
 
 
   /* =====================================================
@@ -220,7 +240,9 @@ const MapsPage: React.FC = () => {
               key={plan}
               properties={mapKosts}
               plan={plan}
+              allowedLocationNames={allowedLocationNames}
               onUpgrade={() => setOpen(true)}
+              onBlock={() => setShowBlockedOverlay(true)}
             />
 
           </div>
@@ -228,6 +250,12 @@ const MapsPage: React.FC = () => {
       </div>
       <SubscriptionModal open={open} onClose={() => setOpen(false)} />
 
+      {showBlockedOverlay && (
+        <LockedOverlay
+          onClose={() => setShowBlockedOverlay(false)}
+          onSubscribe={() => { setShowBlockedOverlay(false); setOpen(true); }}
+        />
+      )}
     </div>
   );
 };
