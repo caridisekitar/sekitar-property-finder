@@ -31,7 +31,7 @@ const MapsPage: React.FC = () => {
 
   const isFree = plan === 'FREE';
   const isBasic = plan === 'BASIC';
-  const isPremium = plan === 'PREMIUM';
+  const isPremium = plan === 'PREMIUM' || plan === 'PREMIUM_PLUS';
 
   const [kosts, setKosts] = useState<Kost[]>([]);
   const [kostBasic, setKostBasic] = useState<Kost[]>([]);
