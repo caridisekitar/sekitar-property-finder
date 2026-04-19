@@ -21,7 +21,7 @@ type Property = {
 
 type MapboxMapProps = {
   properties: Property[];
-  plan: 'FREE' | 'BASIC' | 'PREMIUM';
+  plan: string;
   onUpgrade: () => void;
 };
 
@@ -92,19 +92,19 @@ const MapboxMap: React.FC<MapboxMapProps> = ({ properties, plan, onUpgrade }) =>
 
       // 🔥 CLICK HANDLER (IMPORTANT)
       el.addEventListener('click', () => {
-        if (plan === 'BASIC') {
+        const isPremium = plan === 'PREMIUM' || plan === 'PREMIUM_PLUS';
+
+        if (!isPremium) {
           setBlockedProperty(property);
           return;
         }
 
-        if (plan === 'PREMIUM') {
-          setSelectedProperty(property);
-          mapRef.current?.flyTo({
-            center: [property.longitude, property.latitude],
-            zoom: 15,
-            offset: [0, 120],
-          });
-        }
+        setSelectedProperty(property);
+        mapRef.current?.flyTo({
+          center: [property.longitude, property.latitude],
+          zoom: 15,
+          offset: [0, 120],
+        });
       });
 
       const marker = new mapboxgl.Marker(el)
