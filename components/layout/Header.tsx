@@ -1,5 +1,5 @@
 
-import React, { useState, cache } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MobileMenu from './MobileMenu';
 import SekitarLogo from '../icons/SekitarLogo';
@@ -20,6 +20,12 @@ const Header: React.FC = () => {
   ];
 
   const { subscription, user } = useAuth();
+  const [showPendingPayment, setShowPendingPayment] = useState(false);
+
+  
+useEffect(() => {
+  setShowPendingPayment(!!subscription?.any_pending_payment);
+}, [subscription]);
 
   return (
     <>
@@ -58,6 +64,11 @@ const Header: React.FC = () => {
                       PREMIUM
                     </span>
                   )}
+                  {subscription?.plan === "PREMIUM_PLUS" && (
+                    <span className="-mt-2 text-xs font-bold text-white px-2 py-0.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500">
+                      PREMIUM+
+                    </span>
+                  )}
                 </Link>
               ) : (
                   <div>
@@ -89,6 +100,40 @@ const Header: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {showPendingPayment && (
+          <div className="w-full bg-gradient-to-r from-[#7FAFCB] to-[#B9D7E8] text-white">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center justify-between gap-3 py-2 text-sm sm:text-base">
+
+                {/* TEXT */}
+                <p className="flex-1 text-center md:text-left text-sm">
+                  Anda belum menyelesaikan pembayaran. Lakukan Pembayaran dan Nikmati Fitur Premium Sekarang!
+                  <Link
+                    to="/profile/subscriptions"
+                    className="bg-white text-indigo-600 ml-2 px-3 py-1 rounded-md font-semibold text-xs sm:text-sm hover:bg-gray-100 transition"
+                  >
+                    Bayar Sekarang
+                  </Link>
+                </p>
+
+                {/* CTA */}
+                <div className="flex items-center gap-2">
+                  
+
+                  {/* CLOSE BUTTON */}
+                  <button
+                    onClick={() => setShowPendingPayment(false)}
+                    className="text-white/80 hover:text-white text-lg leading-none"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        )}
       </header>
       <MobileMenu isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} navLinks={navLinks} isAuthenticated={!!token}/>
     </>

@@ -69,8 +69,9 @@ const KosDetailPage: React.FC = () => {
 
   // ✅ EFFECT 2 — subscription status
   useEffect(() => {
-    setIsSubscribed(subscription?.plan === "PREMIUM");
-    }, [subscription]);
+    const plan = subscription?.plan;
+    setIsSubscribed(plan === "PREMIUM" || plan === "PREMIUM_PLUS");
+  }, [subscription]);
 
     // ⛔ returns AFTER hooks
     if (loading) {
@@ -334,14 +335,16 @@ const KosDetailPage: React.FC = () => {
                     <h3 className="text-xl font-bold mb-2">Yah terkunci nih!</h3>
 
                     <p className="text-gray-600 mb-6">
-                      Tenang, ratusan informasi kost sudah siap kamu akses. Langganan sekarang, biar cari kost jadi lebih gampang! Sssst, bikin akun nya gratis!🤫
+                      {subscription?.plan === "BASIC"
+                        ? "Subscribe to access details — upgrade ke Premium untuk lihat informasi lengkap kost ini."
+                        : "Tenang, ratusan informasi kost sudah siap kamu akses. Langganan sekarang, biar cari kost jadi lebih gampang! Sssst, bikin akun nya gratis!🤫"}
                     </p>
 
                     <button
                       onClick={() => setOpen(true)}
                       className="px-6 py-3 rounded-xl bg-[#96C8E2] text-white font-semibold hover:bg-blue-600 transition"
                     >
-                      Mulai langganan
+                      {subscription?.plan === "BASIC" ? "Upgrade ke Premium" : "Mulai langganan"}
                     </button>
                   </div>
                 </div>

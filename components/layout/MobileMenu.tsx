@@ -41,7 +41,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, setIsOpen, navLinks, is
             localStorage.removeItem('user');
             sessionStorage.clear();
 
-            navigate('/', { replace: true });
+            // navigate('/', { replace: true });
+            window.location.href = "/";
         }
     };
 

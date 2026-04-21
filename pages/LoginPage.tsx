@@ -60,11 +60,35 @@ export default function Login() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
-      localStorage.removeItem("redirectAfterLogin");
-      navigate(redirectPath, { replace: true });
+      // NEW
+      const actionRaw = localStorage.getItem("postLoginAction");
 
-      // navigate("/", { replace: true });
+      if (actionRaw) {
+        const action = JSON.parse(actionRaw);
+
+        localStorage.removeItem("postLoginAction");
+
+        // 🔥 handle different flows
+        switch (action.type) {
+          case "SUBSCRIBE":
+            navigate("/", {
+              state: {
+                openSubscription: true,
+                targetPlan: action.payload.plan,
+              },
+              replace: true,
+            });
+            break;
+
+          default:
+            navigate("/", { replace: true });
+        }
+      } else {
+        const redirectPath = localStorage.getItem("redirectAfterLogin") || "/";
+        localStorage.removeItem("redirectAfterLogin");
+        navigate(redirectPath, { replace: true });
+      }
+
 
     } catch (err: any) {
       setError(err.message || "Email atau password salah");

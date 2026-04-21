@@ -33,7 +33,8 @@ const SidebarMenu: React.FC<SidebarMenuProps> = ({ user }) => {
       localStorage.removeItem('user');
       sessionStorage.clear();
 
-      navigate('/', { replace: true });
+      // navigate('/', { replace: true });
+      window.location.href = "/";
     }
   };
 
