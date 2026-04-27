@@ -592,9 +592,15 @@ const KosDetailPage: React.FC = () => {
 
         {/* RIGHT CARD */}
         <div className="bg-white border rounded-xl p-5 h-fit">
+          <div>
+            <p className="text-sm font-bold">mulai dari</p>
+          </div>
           <div className="text-2xl font-bold text-gray-900">
             Rp{formatHargaRangeID(kost.price_monthly)}
             <span className="text-sm font-medium text-gray-500"> /bulan</span>
+          </div>
+          <div>
+            <p className="text-xs font-bold mt-2">*harga dapat berubah sewaktu-waktu</p>
           </div>
 
           {kost.deposit && (
