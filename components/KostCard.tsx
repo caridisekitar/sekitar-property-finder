@@ -59,7 +59,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => {
         {/* LOCATION */}
         <div className="flex items-center text-gray-500 mt-1 mb-3 text-xs truncate">
           <MapPin size={16} className="mr-1" />
-          {kost.city}
+          {kost.city} - {kost.district}
         </div>
 
         {/* PRICE */}
