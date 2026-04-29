@@ -128,7 +128,7 @@ const KostCard: React.FC<{ kost: Kost }> = ({ kost }) => {
             <path d="M12 21s-6-5.686-6-10a6 6 0 1112 0c0 4.314-6 10-6 10z" />
             <circle cx="12" cy="11" r="2" />
           </svg>
-          {kost.city}
+          {kost.city} - {kost.district}
         </p>
 
         {/* Price */}
