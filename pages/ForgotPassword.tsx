@@ -40,7 +40,7 @@ export default function ForgotPassword() {
       const res = await securePost(
         "/auth/forgot-password",
         "POST",
-        { email }
+        { email: email.toLowerCase() }
       );
 
       if (!res.success) {

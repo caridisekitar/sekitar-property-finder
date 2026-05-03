@@ -43,7 +43,7 @@ export default function Login() {
         "/auth/login",
         "POST",
         {
-          email,
+          email: email.toLowerCase(),
           password,
         },
         {
