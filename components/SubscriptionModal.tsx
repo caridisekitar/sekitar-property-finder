@@ -258,7 +258,7 @@ export default function SubscriptionModal({
               <h2 className="text-4xl font-bold mt-2">
                 Rp{premium.amount.toLocaleString("id-ID")}{" "}
                 <span className="text-sm font-normal text-gray-500">
-                  per tahun
+                  akses setahun
                 </span>
               </h2>
 
@@ -338,7 +338,7 @@ export default function SubscriptionModal({
               <h2 className="text-4xl font-bold mt-2">
                 Rp{premiumPlus.amount.toLocaleString("id-ID")}{" "}
                 <span className="text-sm font-normal text-gray-500">
-                  per tahun
+                  akses setahun
                 </span>
               </h2>
 

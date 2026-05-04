@@ -66,7 +66,7 @@ export default function SubscriptionPlans() {
             <p className="text-red-500 line-through mb-1">Rp150.000</p>
             <div className="flex items-end gap-2 mb-2">
               <h2 className="text-4xl font-bold">Rp99.000</h2>
-              <span className="text-gray-500 mb-1">per tahun</span>
+              <span className="text-gray-500 mb-1">akses setahun</span>
               <span className="ml-2 text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">
                 Promo 🎉
               </span>

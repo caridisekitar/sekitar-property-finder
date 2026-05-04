@@ -162,7 +162,7 @@ export default function UpgradePlanPage() {
               <h2 className="text-4xl font-bold">
                 Rp{plans.PREMIUM.amount.toLocaleString("id-ID")}
               </h2>
-              <span className="text-gray-500 mb-1 text-xs">per tahun</span>
+              <span className="text-gray-500 mb-1 text-xs">akses setahun</span>
             </div>
             <p className="text-gray-500 mb-8 text-xs">
               Cuma Rp8.200 perbulan, lebih murah dari harga kopi kamu sehari ☕
@@ -222,7 +222,7 @@ export default function UpgradePlanPage() {
               <h2 className="text-4xl font-bold">
                 Rp{plans.PREMIUM_PLUS.amount.toLocaleString("id-ID")}
               </h2>
-              <span className="text-gray-500 mb-1 text-xs">per tahun</span>
+              <span className="text-gray-500 mb-1 text-xs">akses setahun</span>
             </div>
             <p className="text-gray-500 mb-8 text-xs">
               Bebas akses ratusan kost di 3 lokasi berbeda, bisa pilih semau mu
