@@ -54,6 +54,8 @@ const KosDetailPage: React.FC = () => {
           const data = await secureGet(`/kosts/${slug}`);
           setKost(data);
 
+          document.title = `${data.name} - Sekitar`;
+
           setLiked(data.is_liked_by_me);
           setLikesCount(data.likes_count);
           setBookmarked(data.is_bookmarked_by_me);
@@ -65,6 +67,8 @@ const KosDetailPage: React.FC = () => {
       };
 
       fetchKostDetail();
+
+      return () => { document.title = 'Sekitar'; };
     }, [slug]);
 
   // ✅ EFFECT 2 — subscription status
