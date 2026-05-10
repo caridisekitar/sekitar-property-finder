@@ -119,13 +119,9 @@ export default function UpgradePlanPage() {
               Mau coba yang gratis dulu? Ngga jadi masalah, we got you!
             </p>
 
-            <Feature text="Akses ratusan informasi kost" limited />
-            <Feature text="Akses fitur Kalkulator" limited />
-            <Feature text="Akses fitur Maps" limited />
-            <Feature text="Bebas request kost via fitur Wishlist" />
-            <Feature text="Akses fitur Daftarkan Kost Mu" disabled />
-            <Feature text="Akses fitur Daftarkan Bisnis Mu" disabled />
-            <Feature text="Jumlah list kost akan terus bertambah setiap bulan" disabled />
+            <Feature text="Akses informasi kost" limited />
+            <Feature text="Akses fitur di Sekitar" limited />
+            <Feature text="Bebas request survey kost di menu Wishlist" />
 
             {currentPlan === "BASIC" && (
               <div className="mt-auto pt-8">
@@ -168,14 +164,13 @@ export default function UpgradePlanPage() {
               Cuma Rp8.200 perbulan, lebih murah dari harga kopi kamu sehari ☕
             </p>
 
-            <Feature text="Pilih 1 lokasi kost saja" bold />
-            <Feature text="Akses ratusan informasi kost" />
-            <Feature text="Akses fitur Kalkulator" />
-            <Feature text="Akses fitur Maps" />
-            <Feature text="Bebas request kost via fitur Wishlist" />
-            <Feature text="Akses fitur Daftarkan Kost Mu" />
-            <Feature text="Akses fitur Daftarkan Bisnis Mu" />
-            <Feature text="Jumlah list kost akan terus bertambah ratusan setiap bulan nya" />
+            <Feature text="Pilih 1 lokasi kost saja (Jkt/Bali/Depok/Bdg/Jogja)" bold />
+            <Feature text="Cocok utk kamu yang buru-buru mencari kost" />
+            <Feature text="Semua nomor pemilik kost sudah di verifikasi, menghindari penipuan" />
+            <Feature text="Bebas akses ratusan informasi kost" />
+            <Feature text="Bebas ⁠akses semua fitur di Sekitar" />
+            <Feature text="Harga transparant, Sekitar tidak ambil komisi apapun dari setiap bookingan kost" />
+            <Feature text="Bebas request survey kost di menu Wishlist" />
 
             <div className="mt-auto pt-8">
               {currentPlan === "PREMIUM" || currentPlan === "PREMIUM_PLUS" ? (
@@ -228,14 +223,13 @@ export default function UpgradePlanPage() {
               Bebas akses ratusan kost di 3 lokasi berbeda, bisa pilih semau mu
             </p>
 
-            <Feature text="Pilih 3 lokasi kost" bold />
-            <Feature text="Akses ratusan informasi kost" />
-            <Feature text="Akses fitur Kalkulator" />
-            <Feature text="Akses fitur Maps" />
-            <Feature text="Bebas request kost via fitur Wishlist" />
-            <Feature text="Akses fitur Daftarkan Kost Mu" />
-            <Feature text="Akses fitur Daftarkan Bisnis Mu" />
-            <Feature text="Jumlah list kost akan terus bertambah ratusan setiap bulan nya" />
+            <Feature text="Pilih 3 lokasi kost (Jkt/Bali/Depok/Bdg/Jogja)" bold />
+            <Feature text="Cocok utk kamu yang buru-buru mencari kost" />
+            <Feature text="emua nomor pemilik kost sudah di verifikasi, menghindari penipuan kost" />
+            <Feature text="Bebas akses ratusan informasi kost" />
+            <Feature text="Bebas ⁠akses semua fitur di Sekitar" />
+            <Feature text="Harga transparant, Sekitar tidak mengambil komisi apapun dari setiap bookingan kost" />
+            <Feature text="Bebas request survey kost di menu Wishlist" />
 
             <div className="mt-auto pt-8">
               {currentPlan === "PREMIUM_PLUS" ? (

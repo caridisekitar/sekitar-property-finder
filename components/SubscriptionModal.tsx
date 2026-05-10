@@ -192,7 +192,7 @@ export default function SubscriptionModal({
         {/* Pricing Cards */}
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 w-full max-w-5xl">
           {/* ================= BASIC ================= */}
-          <div className="border rounded-2xl p-8 shadow-sm flex flex-col justify-between order-2 lg:order-1">
+          <div className="border rounded-2xl p-6 shadow-sm flex flex-col justify-between order-2 lg:order-1">
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -229,7 +229,7 @@ export default function SubscriptionModal({
           </div>
 
           {/* ================= PREMIUM ================= */}
-          <div className="relative border-2 border-blue-400 rounded-2xl p-8 shadow-lg flex flex-col justify-between order-1 lg:order-2">
+          <div className="relative border-2 border-blue-400 rounded-2xl p-6 shadow-lg flex flex-col justify-between order-1 lg:order-2">
             {/* Badge */}
             <span className="absolute -top-4 right-4 bg-black text-white text-xs px-3 py-1 rounded-full">
               Recommended for you
@@ -255,9 +255,9 @@ export default function SubscriptionModal({
                 </span>
               </div>
 
-              <h2 className="text-4xl font-bold mt-2">
+              <h2 className="text-3xl font-bold mt-2">
                 Rp{premium.amount.toLocaleString("id-ID")}{" "}
-                <span className="text-sm font-normal text-gray-500">
+                <span className="text-xs font-normal text-gray-500">
                   akses setahun
                 </span>
               </h2>
@@ -309,7 +309,7 @@ export default function SubscriptionModal({
 
 
           {/* ================= PREMIUM PLUS ================= */}
-          <div className="relative border rounded-2xl p-8 shadow-lg flex flex-col justify-between order-1 lg:order-2">
+          <div className="relative border rounded-2xl p-6 shadow-lg flex flex-col justify-between order-1 lg:order-2">
             {/* Badge */}
             {/* <span className="absolute -top-4 right-4 bg-black text-white text-xs px-3 py-1 rounded-full">
               Recommended for you
@@ -335,9 +335,9 @@ export default function SubscriptionModal({
                 </span>
               </div>
 
-              <h2 className="text-4xl font-bold mt-2">
+              <h2 className="text-3xl font-bold mt-2">
                 Rp{premiumPlus.amount.toLocaleString("id-ID")}{" "}
-                <span className="text-sm font-normal text-gray-500">
+                <span className="text-xs font-normal text-gray-500">
                   akses setahun
                 </span>
               </h2>
@@ -397,99 +397,46 @@ export default function SubscriptionModal({
 
 type Plan = "basic" | "premium" | "premium_plus";
 
+const featureMap: Record<Plan, { text: string; highlight?: boolean; limited?: boolean }[]> = {
+  basic: [
+    { text: "Akses informasi kost", limited: true },
+    { text: "Akses fitur di Sekitar", limited: true },
+    { text: "Bebas request survey kost di menu Wishlist" },
+  ],
+  premium: [
+    { text: "Pilih 1 lokasi kost saja (Jkt/Bali/Depok/Bdg/Jogja)", highlight: true },
+    { text: "Cocok utk kamu yang buru-buru mencari kost" },
+    { text: "Semua nomor pemilik kost sudah di verifikasi, menghindari penipuan" },
+    { text: "Bebas akses ratusan informasi kost" },
+    { text: "Bebas akses semua fitur di Sekitar" },
+    { text: "Harga transparant, Sekitar tidak ambil komisi apapun dari setiap bookingan kost" },
+    { text: "Bebas request survey kost di menu Wishlist" },
+  ],
+  premium_plus: [
+    { text: "Pilih 3 lokasi kost (Jkt/Bali/Depok/Bdg/Jogja)", highlight: true },
+    { text: "Cocok utk kamu yang buru-buru mencari kost" },
+    { text: "Semua nomor pemilik kost sudah di verifikasi, menghindari penipuan kost" },
+    { text: "Bebas akses ratusan informasi kost" },
+    { text: "Bebas akses semua fitur di Sekitar" },
+    { text: "Harga transparant, Sekitar tidak mengambil komisi apapun dari setiap bookingan kost" },
+    { text: "Bebas request survey kost di menu Wishlist" },
+  ],
+};
+
 function FeatureList({ plan }: { plan: Plan }) {
-  const features = [
-    {
-      text: "Pilih 1 lokasi kost saja",
-      plans: ["premium"],
-      highlight: true,
-    },
-    {
-      text: "Pilih 3 lokasi kost",
-      plans: ["premium_plus"],
-      highlight: true,
-    },
-    {
-      text: "Akses ratusan informasi kost",
-      plans: ["basic", "premium", "premium_plus"],
-      limited: ["basic"],
-    },
-    {
-      text: "Akses fitur Kalkulator",
-      plans: ["basic", "premium", "premium_plus"],
-      limited: ["basic"],
-    },
-    {
-      text: "Akses fitur Maps",
-      plans: ["basic", "premium", "premium_plus"],
-      limited: ["basic"],
-    },
-    {
-      text: "Bebas request kost via fitur Wishlist",
-      plans: ["basic", "premium", "premium_plus"],
-    },
-    {
-      text: "Akses fitur Daftarkan Kost Mu",
-      plans: ["premium", "premium_plus"],
-    },
-    {
-      text: "Akses fitur Daftarkan Bisnis Mu",
-      plans: ["premium", "premium_plus"],
-    },
-    {
-      text: "Jumlah list kost akan terus bertambah ratusan setiap bulan nya",
-      plans: ["premium", "premium_plus"],
-    },
-  ];
+  const features = featureMap[plan];
 
   return (
     <ul className="space-y-3 text-sm">
-      {features
-        .filter((f) => f.plans.includes(plan))
-        .map((f, i) => {
-          const limited = f.limited?.includes(plan);
-
-          return (
-            <li key={i} className="flex gap-3 items-start">
-              <span className="mt-0.5 text-green-500">✔</span>
-
-              <span
-                className={`text-gray-600 ${
-                  f.highlight ? "font-semibold text-gray-900" : ""
-                }`}
-              >
-                {f.text}{" "}
-                {limited && (
-                  <span className="text-gray-400">(terbatas)</span>
-                )}
-              </span>
-            </li>
-          );
-        })}
-
-      {/* Show disabled features for Basic */}
-      {plan === "basic" && (
-        <>
-          <li className="flex gap-3 items-start">
-            <span className="mt-0.5 text-red-400">✖</span>
-            <span className="text-gray-600">Akses fitur Daftarkan Kost Mu</span>
-          </li>
-
-          <li className="flex gap-3 items-start">
-            <span className="mt-0.5 text-red-400">✖</span>
-            <span className="text-gray-600">
-              Akses fitur Daftarkan Bisnis Mu
-            </span>
-          </li>
-
-          <li className="flex gap-3 items-start">
-            <span className="mt-0.5 text-red-400">✖</span>
-            <span className="text-gray-600">
-              Jumlah list kost akan terus bertambah ratusan setiap bulan nya
-            </span>
-          </li>
-        </>
-      )}
+      {features.map((f, i) => (
+        <li key={i} className="flex gap-3 items-start">
+          <span className="mt-0.5 text-green-500">✔</span>
+          <span className={`text-gray-600 ${f.highlight ? "font-semibold text-gray-900" : ""}`}>
+            {f.text}{" "}
+            {f.limited && <span className="text-gray-400">(terbatas)</span>}
+          </span>
+        </li>
+      ))}
     </ul>
   );
 }

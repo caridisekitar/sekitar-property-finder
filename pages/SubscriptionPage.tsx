@@ -34,13 +34,9 @@ export default function SubscriptionPlans() {
               Mau coba yang gratis dulu? Ngga jadi masalah, we got you!
             </p>
 
-            <Feature text="Akses ratusan informasi kost" limited />
-            <Feature text="Akses fitur Kalkulator" limited />
-            <Feature text="Akses fitur Maps" limited />
-            <Feature text="Bebas request kost via fitur Wishlist" />
-            <Feature text="Akses fitur Daftarkan Kost Mu" disabled />
-            <Feature text="Akses fitur Daftarkan Kost Bisnis Mu" disabled />
-            <Feature text="Jumlah list kost akan terus bertambah setiap bulan" disabled />
+            <Feature text="Akses informasi kost" limited />
+            <Feature text="Akses fitur di Sekitar" limited />
+            <Feature text="Bebas request survey kost di menu Wishlist" />
 
             <button className="mt-8 w-full bg-black text-white py-3 rounded-lg font-medium">
               Gratis
@@ -76,13 +72,54 @@ export default function SubscriptionPlans() {
               Cuma Rp8.200 perbulan, lebih murah dari harga kopi kamu sehari ☕
             </p>
 
-            <Feature text="Akses ratusan informasi kost tanpa batas" />
-            <Feature text="Akses fitur Kalkulator sepuasnya" />
-            <Feature text="Akses fitur Maps" />
-            <Feature text="Bebas request kost via fitur Wishlist" />
-            <Feature text="Akses fitur Daftarkan Kost Mu" />
-            <Feature text="Akses fitur Daftarkan Bisnis Mu" />
-            <Feature text="Jumlah list kost terus bertambah setiap bulan" />
+            <Feature text="Pilih 1 lokasi kost saja (Jkt/Bali/Depok/Bdg/Jogja)" bold />
+            <Feature text="Cocok utk kamu yang buru-buru mencari kost" />
+            <Feature text="Semua nomor pemilik kost sudah di verifikasi, menghindari penipuan" />
+            <Feature text="Bebas akses ratusan informasi kost" />
+            <Feature text="Bebas ⁠akses semua fitur di Sekitar" />
+            <Feature text="Harga transparant, Sekitar tidak ambil komisi apapun dari setiap bookingan kost" />
+            <Feature text="Bebas request survey kost di menu Wishlist" />
+
+            <button className="mt-8 w-full bg-blue-400 text-white py-3 rounded-lg font-medium hover:bg-blue-500 transition">
+              Mulai langganan
+            </button>
+          </div>
+
+          {/* ─── PREMIUM PLUS ─── */}
+          <div className="border rounded-2xl p-8 shadow-sm flex flex-col">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                <img src="/images/icons/premium.png" alt="premium plus" />
+              </div>
+              <div className="text-left">
+                <p className="font-semibold text-gray-900">Premium Plus</p>
+                <p className="text-sm text-gray-400">
+                  Unlimited for {plans.PREMIUM_PLUS.max_locations} Locations
+                </p>
+              </div>
+            </div>
+
+            <p className="text-red-500 line-through mb-1 text-left">Rp350.000</p>
+            <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full w-fit mb-2">
+              Promo 🎉
+            </span>
+            <div className="flex items-end gap-2 mb-2">
+              <h2 className="text-4xl font-bold">
+                Rp{plans.PREMIUM_PLUS.amount.toLocaleString("id-ID")}
+              </h2>
+              <span className="text-gray-500 mb-1 text-xs">akses setahun</span>
+            </div>
+            <p className="text-gray-500 mb-8 text-xs">
+              Bebas akses ratusan kost di 3 lokasi berbeda, bisa pilih semau mu
+            </p>
+
+            <Feature text="Pilih 3 lokasi kost (Jkt/Bali/Depok/Bdg/Jogja)" bold />
+            <Feature text="Cocok utk kamu yang buru-buru mencari kost" />
+            <Feature text="emua nomor pemilik kost sudah di verifikasi, menghindari penipuan kost" />
+            <Feature text="Bebas akses ratusan informasi kost" />
+            <Feature text="Bebas ⁠akses semua fitur di Sekitar" />
+            <Feature text="Harga transparant, Sekitar tidak mengambil komisi apapun dari setiap bookingan kost" />
+            <Feature text="Bebas request survey kost di menu Wishlist" />
 
             <button className="mt-8 w-full bg-blue-400 text-white py-3 rounded-lg font-medium hover:bg-blue-500 transition">
               Mulai langganan
@@ -99,17 +136,24 @@ function Feature({
   text,
   disabled = false,
   limited = false,
+  bold = false,
 }: {
   text: string;
   disabled?: boolean;
   limited?: boolean;
+  bold?: boolean;
 }) {
   return (
     <div className="flex items-start gap-3 mb-3">
       <span className={disabled ? "text-red-500" : "text-green-500"}>
         {disabled ? "✕" : "✓"}
       </span>
-      <p className={`text-sm ${disabled ? "text-gray-400" : "text-gray-700"}`}>
+      <p
+        className={`text-sm text-left
+          ${disabled ? "text-gray-400" : "text-gray-700"}
+          ${bold ? "font-semibold text-gray-900" : ""}
+        `}
+      >
         {text} {limited && <span className="font-medium">(terbatas)</span>}
       </p>
     </div>
