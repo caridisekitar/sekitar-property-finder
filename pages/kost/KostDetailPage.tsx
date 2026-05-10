@@ -494,7 +494,7 @@ const KosDetailPage: React.FC = () => {
                           </iframe>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                      {kost.neartransum && (
+                      {/* {kost.neartransum && ( */}
                           <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
                             <div className="flex items-center gap-3">
                               <div className="h-12 w-12 rounded-full bg-[#9ED4EE] flex items-center justify-center overflow-hidden">
@@ -511,7 +511,7 @@ const KosDetailPage: React.FC = () => {
                             </div>
                             {/* <span className="text-sm font-semibold text-gray-700">1 km</span> */}
                           </div>    
-                      )}
+                      {/* )} */}
                     
                     {kost.near_warteg && (
                         <div className="flex items-center justify-between gap-4 border rounded-xl p-4">
